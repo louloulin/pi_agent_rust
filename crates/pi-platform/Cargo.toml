@@ -1,0 +1,12 @@
+[package]
+name = "pi-platform"
+version = "0.4.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Pi platform identity and deterministic filesystem-access policy utilities"
+
+[lints]
+workspace = true
+
+[dependencies]
+rustix = { workspace = true }

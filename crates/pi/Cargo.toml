@@ -120,6 +120,7 @@ pi-markdown-rich = { workspace = true }
 pi-model = { workspace = true }
 pi-magic-keywords = { workspace = true }
 pi-overlay-system = { workspace = true }
+pi-platform = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-profiler = { workspace = true }
 pi-provider = { workspace = true }

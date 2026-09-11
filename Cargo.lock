@@ -5600,6 +5600,7 @@ dependencies = [
  "pi-markdown-rich",
  "pi-model",
  "pi-overlay-system",
+ "pi-platform",
  "pi-pmu-telemetry",
  "pi-profiler",
  "pi-provider",
@@ -5888,6 +5889,13 @@ name = "pi-overlay-system"
 version = "0.1.0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "pi-platform"
+version = "0.4.0"
+dependencies = [
+ "rustix",
 ]
 
 [[package]]

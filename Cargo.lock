@@ -5576,9 +5576,11 @@ dependencies = [
  "pbkdf2",
  "pdf-extract",
  "pi-cli",
+ "pi-dialects",
  "pi-jsonrpc",
  "pi-pmu-telemetry",
  "pi-sse",
+ "pi-stats",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5632,6 +5634,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-dialects"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pi-jsonrpc"
 version = "0.1.0"
 dependencies = [
@@ -5662,6 +5672,15 @@ dependencies = [
  "memchr",
  "proptest",
  "serde_json",
+]
+
+[[package]]
+name = "pi-stats"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tempfile",
 ]
 
 [[package]]

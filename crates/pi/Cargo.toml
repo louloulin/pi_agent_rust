@@ -90,9 +90,11 @@ harness = false
 clap = { workspace = true }
 clap_complete = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
+pi-dialects = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-sse = { workspace = true }
+pi-stats = { workspace = true }
 asupersync = { workspace = true }
 futures = { workspace = true }
 async-trait = { workspace = true }

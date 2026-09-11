@@ -7,9 +7,11 @@ members = [
     "crates/pi",
     "crates/pi-mono",
     "crates/pi-cli",
+    "crates/pi-dialects",
     "crates/pi-jsonrpc",
     "crates/pi-pmu-telemetry",
     "crates/pi-sse",
+    "crates/pi-stats",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -36,9 +38,11 @@ clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
+pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }
 pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
+pi-stats = { path = "crates/pi-stats", version = "0.1.0" }
 
 # Async runtime
 asupersync = { version = "0.4.4", default-features = false, features = ["tls-webpki-roots", "tls-native-roots", "test-internals"] }

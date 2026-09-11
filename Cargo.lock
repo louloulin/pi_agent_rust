@@ -5581,6 +5581,7 @@ dependencies = [
  "pi-dialects",
  "pi-flake-classifier",
  "pi-jsonrpc",
+ "pi-magic-keywords",
  "pi-markdown-rich",
  "pi-pmu-telemetry",
  "pi-sse",
@@ -5667,6 +5668,14 @@ dependencies = [
 
 [[package]]
 name = "pi-jsonrpc"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-magic-keywords"
 version = "0.1.0"
 dependencies = [
  "serde",

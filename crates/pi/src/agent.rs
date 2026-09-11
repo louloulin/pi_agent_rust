@@ -14813,7 +14813,7 @@ impl AgentSession {
                 session.append_model_message(message);
             }
             append_dialect_repair_telemetry(&mut session, &repairs);
-            crate::magic_keywords::append_session_telemetry(&mut session, &activations);
+            crate::magic_keywords::append_session_telemetry(&mut *session, &activations);
             if let Some(message) = incomplete_assistant
                 && !(run_failed && is_synthetic_empty_error_assistant(&message))
             {

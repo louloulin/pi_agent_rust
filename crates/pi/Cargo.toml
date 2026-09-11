@@ -96,6 +96,7 @@ pi-dialects = { workspace = true }
 pi-flake-classifier = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }
+pi-magic-keywords = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }

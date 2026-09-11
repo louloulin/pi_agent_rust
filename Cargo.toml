@@ -13,6 +13,7 @@ members = [
     "crates/pi-flake-classifier",
     "crates/pi-jsonrpc",
     "crates/pi-markdown-rich",
+    "crates/pi-magic-keywords",
     "crates/pi-sse",
     "crates/pi-stats",
     "crates/pi-token-count",
@@ -48,6 +49,7 @@ pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }
+pi-magic-keywords = { path = "crates/pi-magic-keywords", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }
 pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
 pi-stats = { path = "crates/pi-stats", version = "0.1.0" }

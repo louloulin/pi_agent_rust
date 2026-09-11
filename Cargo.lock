@@ -5579,6 +5579,7 @@ dependencies = [
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
+ "pi-context-files",
  "pi-conformance",
  "pi-crypto-shim",
  "pi-delight",
@@ -5683,6 +5684,16 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "proptest",
+]
+
+[[package]]
+name = "pi-context-files"
+version = "0.1.0"
+dependencies = [
+ "globset",
+ "serde",
+ "tempfile",
+ "tracing",
 ]
 
 [[package]]

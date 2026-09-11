@@ -93,6 +93,7 @@ pi-agent-cx = { workspace = true }
 pi-bpe = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
+pi-context-files = { workspace = true }
 pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }

@@ -10,6 +10,7 @@ members = [
     "crates/pi-mono",
     "crates/pi-buffer-shim",
     "crates/pi-cli",
+    "crates/pi-context-files",
     "crates/pi-crypto-shim",
     "crates/pi-delight",
     "crates/pi-dialects",
@@ -73,6 +74,7 @@ pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
 pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
+pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
 pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }

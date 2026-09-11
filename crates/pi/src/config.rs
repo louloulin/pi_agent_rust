@@ -441,16 +441,10 @@ pub struct TitlingSettings {
 /// Applies when the current working directory is inside `path` (or `path`
 /// itself); the most specific matching prefix wins over less specific
 /// prefixes and the global settings.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(default)]
-pub struct ModelScopeOverride {
-    /// Directory prefix this override applies to (absolute or `~`-rooted).
-    pub path: String,
-    #[serde(alias = "enabledModels")]
-    pub enabled_models: Option<Vec<String>>,
-    #[serde(alias = "disabledProviders")]
-    pub disabled_providers: Option<Vec<String>>,
-}
+///
+/// Defined in `pi-failover` (its only consumer) and re-exported here so
+/// settings parsing keeps the `config::ModelScopeOverride` path.
+pub use pi_failover::ModelScopeOverride;
 
 /// Tool load-mode configuration (bd-cv653.1.6).
 ///

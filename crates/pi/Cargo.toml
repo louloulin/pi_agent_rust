@@ -97,6 +97,7 @@ pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
 pi-error = { workspace = true }
+pi-failover = { workspace = true }
 pi-file-lock = { workspace = true }
 pi-http-shim = { workspace = true }
 pi-session-metrics = { workspace = true }

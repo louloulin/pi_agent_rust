@@ -5583,6 +5583,7 @@ dependencies = [
  "pi-delight",
  "pi-dialects",
  "pi-error",
+ "pi-failover",
  "pi-file-lock",
  "pi-flake-classifier",
  "pi-gallery",
@@ -5719,6 +5720,15 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pi-failover"
+version = "0.1.0"
+dependencies = [
+ "pi-error",
+ "pi-provider-metadata",
+ "serde",
 ]
 
 [[package]]

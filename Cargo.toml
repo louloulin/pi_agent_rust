@@ -14,6 +14,7 @@ members = [
     "crates/pi-delight",
     "crates/pi-dialects",
     "crates/pi-error",
+    "crates/pi-failover",
     "crates/pi-file-lock",
     "crates/pi-flake-classifier",
     "crates/pi-gallery",
@@ -64,6 +65,7 @@ pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
 pi-error = { path = "crates/pi-error", version = "0.1.0" }
+pi-failover = { path = "crates/pi-failover", version = "0.1.0" }
 pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }
 pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
 pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }

@@ -5575,6 +5575,7 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
+ "pi-buffer-shim",
  "pi-cli",
  "pi-delight",
  "pi-dialects",
@@ -5626,6 +5627,10 @@ dependencies = [
  "win32job",
  "xxhash-rust",
 ]
+
+[[package]]
+name = "pi-buffer-shim"
+version = "0.1.0"
 
 [[package]]
 name = "pi-cli"

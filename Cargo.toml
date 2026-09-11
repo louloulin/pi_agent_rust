@@ -6,6 +6,7 @@ resolver = "2"
 members = [
     "crates/pi",
     "crates/pi-mono",
+    "crates/pi-buffer-shim",
     "crates/pi-cli",
     "crates/pi-delight",
     "crates/pi-dialects",
@@ -39,6 +40,7 @@ clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
+pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }

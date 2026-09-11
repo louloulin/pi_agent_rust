@@ -89,6 +89,7 @@ harness = false
 [dependencies]
 clap = { workspace = true }
 clap_complete = { workspace = true }
+pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }

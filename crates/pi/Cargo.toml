@@ -96,6 +96,7 @@ pi-jsonrpc = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }
+pi-token-count = { workspace = true }
 asupersync = { workspace = true }
 futures = { workspace = true }
 async-trait = { workspace = true }
@@ -159,7 +160,6 @@ unicode-normalization = { workspace = true }
 xxhash-rust = { workspace = true }
 similar = { workspace = true }
 sysinfo = { workspace = true }
-tiktoken-rs = { workspace = true, optional = true }
 rquickjs = { workspace = true }
 pprof = { workspace = true, optional = true }
 swc_common = { workspace = true }
@@ -219,7 +219,7 @@ full = [
     "bpe-tokens",
     "rich_rust/full",
 ]
-bpe-tokens = ["dep:tiktoken-rs"]
+bpe-tokens = ["pi-token-count/bpe-tokens"]
 url-pdf = ["dep:pdf-extract"]
 profiler = ["dep:pprof"]
 tui = [

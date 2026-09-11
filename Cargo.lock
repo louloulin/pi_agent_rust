@@ -5582,6 +5582,7 @@ dependencies = [
  "pi-pmu-telemetry",
  "pi-sse",
  "pi-stats",
+ "pi-token-count",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5610,7 +5611,6 @@ dependencies = [
  "tempfile",
  "textwrap",
  "thiserror 2.0.20",
- "tiktoken-rs",
  "tikv-jemallocator",
  "toml 1.1.6+spec-1.1.0",
  "tracing",
@@ -5689,6 +5689,13 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+]
+
+[[package]]
+name = "pi-token-count"
+version = "0.1.0"
+dependencies = [
+ "tiktoken-rs",
 ]
 
 [[package]]

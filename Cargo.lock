@@ -5579,14 +5579,20 @@ dependencies = [
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
+ "pi-conformance",
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
  "pi-error",
+ "pi-extension-replay",
+ "pi-extension-scoring",
  "pi-failover",
  "pi-file-lock",
  "pi-flake-classifier",
  "pi-gallery",
+ "pi-hostcall-io-uring-lane",
+ "pi-hostcall-s3-fifo",
+ "pi-hostcall-superinstructions",
  "pi-http-shim",
  "pi-jsonrpc",
  "pi-magic-keywords",
@@ -5595,10 +5601,13 @@ dependencies = [
  "pi-pmu-telemetry",
  "pi-profiler",
  "pi-provider-metadata",
+ "pi-scheduler",
  "pi-session-metrics",
  "pi-sse",
  "pi-stats",
  "pi-status-line",
+ "pi-swarm-activity-ledger",
+ "pi-swarm-progress-slo",
  "pi-token-count",
  "pi-undo",
  "pi-web-remote",
@@ -5674,6 +5683,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-conformance"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "proptest",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "tempfile",
+]
+
+[[package]]
 name = "pi-crypto-shim"
 version = "0.1.0"
 dependencies = [
@@ -5723,6 +5745,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-extension-replay"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pi-extension-scoring"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "proptest",
+ "serde",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "pi-failover"
 version = "0.1.0"
 dependencies = [
@@ -5753,6 +5796,31 @@ dependencies = [
 name = "pi-gallery"
 version = "0.1.0"
 dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-hostcall-io-uring-lane"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-hostcall-s3-fifo"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+]
+
+[[package]]
+name = "pi-hostcall-superinstructions"
+version = "0.1.0"
+dependencies = [
+ "proptest",
  "serde",
  "serde_json",
 ]
@@ -5825,6 +5893,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-scheduler"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde_json",
+ "tracing",
+]
+
+[[package]]
 name = "pi-session-metrics"
 version = "0.1.0"
 dependencies = [
@@ -5855,6 +5932,22 @@ dependencies = [
 
 [[package]]
 name = "pi-status-line"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
+name = "pi-swarm-activity-ledger"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pi-swarm-progress-slo"
 version = "0.1.0"
 dependencies = [
  "serde",

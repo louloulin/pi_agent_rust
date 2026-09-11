@@ -17,6 +17,15 @@ members = [
     "crates/pi-failover",
     "crates/pi-file-lock",
     "crates/pi-flake-classifier",
+    "crates/pi-hostcall-superinstructions",
+    "crates/pi-hostcall-io-uring-lane",
+    "crates/pi-hostcall-s3-fifo",
+    "crates/pi-swarm-progress-slo",
+    "crates/pi-extension-replay",
+    "crates/pi-swarm-activity-ledger",
+    "crates/pi-extension-scoring",
+    "crates/pi-scheduler",
+    "crates/pi-conformance",
     "crates/pi-gallery",
     "crates/pi-http-shim",
     "crates/pi-jsonrpc",
@@ -72,6 +81,15 @@ pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
 pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
 pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
+pi-hostcall-superinstructions = { path = "crates/pi-hostcall-superinstructions", version = "0.1.0" }
+pi-hostcall-io-uring-lane = { path = "crates/pi-hostcall-io-uring-lane", version = "0.1.0" }
+pi-hostcall-s3-fifo = { path = "crates/pi-hostcall-s3-fifo", version = "0.1.0" }
+pi-swarm-progress-slo = { path = "crates/pi-swarm-progress-slo", version = "0.1.0" }
+pi-extension-replay = { path = "crates/pi-extension-replay", version = "0.1.0" }
+pi-swarm-activity-ledger = { path = "crates/pi-swarm-activity-ledger", version = "0.1.0" }
+pi-extension-scoring = { path = "crates/pi-extension-scoring", version = "0.1.0" }
+pi-scheduler = { path = "crates/pi-scheduler", version = "0.1.0" }
+pi-conformance = { path = "crates/pi-conformance", version = "0.1.0" }
 pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }

@@ -104,6 +104,15 @@ pi-session-metrics = { workspace = true }
 pi-undo = { workspace = true }
 pi-web-remote = { workspace = true }
 pi-flake-classifier = { workspace = true }
+pi-hostcall-superinstructions = { workspace = true }
+pi-hostcall-io-uring-lane = { workspace = true }
+pi-hostcall-s3-fifo = { workspace = true }
+pi-swarm-progress-slo = { workspace = true }
+pi-extension-replay = { workspace = true }
+pi-swarm-activity-ledger = { workspace = true }
+pi-extension-scoring = { workspace = true }
+pi-scheduler = { workspace = true }
+pi-conformance = { workspace = true }
 pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }

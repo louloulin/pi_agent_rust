@@ -1,0 +1,15 @@
+[package]
+name = "pi-pmu-telemetry"
+description = "PMU-guided stall-cycle and microarchitectural regression budgets (Stage 2 leaf crate)"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }

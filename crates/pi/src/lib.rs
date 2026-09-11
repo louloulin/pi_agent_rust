@@ -109,8 +109,17 @@ pub mod btw;
 #[doc(hidden)]
 pub mod buffer_shim;
 pub mod checkpoint;
+// Stage 2 extraction: pi-cli owns the CLI argument surface. The legacy
+// meta-crate keeps the original `crate::cli` module path so every existing
+// internal call site (`crate::cli::*`, `use pi::cli`, `pi::cli::Cli`) keeps
+// working unchanged.
 #[doc(hidden)]
-pub mod cli;
+pub mod cli {
+    //! Re-export of the extracted `pi-cli` leaf crate. The CLI surface used to
+    //! live at `crates/pi/src/cli.rs`; in Phase-1 it moved to
+    //! `crates/pi-cli/src/cli.rs`. This shim preserves the historical path.
+    pub use pi_cli::*;
+}
 pub mod commit_split;
 #[doc(hidden)]
 pub mod compaction;

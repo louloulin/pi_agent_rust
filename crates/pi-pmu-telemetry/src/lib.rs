@@ -1,10 +1,19 @@
-#![forbid(unsafe_code)]
-
 //! PMU-guided stall-cycle elimination and microarchitectural regression budgets.
 //!
 //! Provides hardware-level performance monitoring counter (PMU) sample models,
 //! derived microarchitectural ratios (IPC, LLC miss rate, branch miss rate, stall ratios),
 //! regression budget evaluation, and opportunity ranking for extension fast paths.
+//!
+//! ## Stage 2 extraction
+//!
+//! This crate is a pure leaf: it depends only on `serde` and never touches the
+//! legacy meta-crate's `error` / `tools` / `agent_cx` machinery. The original
+//! implementation lived at `crates/pi/src/pmu_telemetry.rs`; the legacy
+//! module now re-exports these items so existing call sites
+//! (`crate::pmu_telemetry::PmuSample`, `pi::pmu_telemetry::PMU_TELEMETRY_SCHEMA`,
+//! etc.) keep working unchanged.
+
+#![forbid(unsafe_code)]
 
 use serde::{Deserialize, Serialize};
 

@@ -1,0 +1,23 @@
+UTC 2026-09-11T02:00:02Z
+cargo 1.100.0-nightly (e8cb624d5 2026-08-22)
+rustc 1.100.0-nightly (908501772 2026-08-30)
+===START A1===
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/crates/pi/Cargo.toml
+workspace: /home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/Cargo.toml
+warning: crates/pi/Cargo.toml: file `/home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/crates/pi/examples/pijs_workload.rs` found to be present in multiple build targets:
+  * `example` target `pijs_workload`
+  * `bench` target `pijs_workload`
+warning: `pi` (manifest) generated 1 warning
+[bubbletea-macros] Deriving Model for: PiApp
+[bubbletea-macros] Deriving Model for: SessionPicker
+[bubbletea-macros] Deriving Model for: ConfigUiApp
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.66s
+warning: the following packages contain code that will be rejected by a future version of Rust: nix v0.28.0, proc-macro-error2 v2.0.1
+note: to see what the problems were, use the option `--future-incompat-report`, or run `cargo report future-incompatibilities --id 1`
+
+real	0m0.700s
+user	0m0.260s
+sys	0m0.114s
+===END A1 exit=0===
+UTC 2026-09-11T02:00:02Z

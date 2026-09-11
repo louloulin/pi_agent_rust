@@ -8,6 +8,14 @@
 //! - Queue mode switching behavior
 //! - Truncation UTF-8 boundary edge cases
 //! - Fuzzy match normalization (curly quotes, em dashes)
+//!
+//! On `nightly-2026-08-31` the future-incompatible `recursion_depth_exceeding_limit`
+//! lint fires on the deep async `Send` impl chain reached through
+//! `AgentSession::run_text_with_abort`. The library root already opts into the
+//! higher recursion limit via `#![recursion_limit = "256"]`; integration tests
+//! inherit the crate's settings via `extern crate` resolution but the lint
+//! still complains at the test crate root, so we mirror the limit here.
+#![recursion_limit = "512"]
 //! - Bash with nonexistent working directory
 //! - Edit empty old_text
 //! - Write deeply nested directory creation

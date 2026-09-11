@@ -1,0 +1,17 @@
+[package]
+name = "pi-sse"
+description = "Server-Sent Events parser for streaming LLM responses (Stage 2 leaf crate)"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+futures = { workspace = true }
+memchr = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+serde_json = { workspace = true }

@@ -1,0 +1,25 @@
+[package]
+name = "pi-mono"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Workspace aggregator crate for pi.rs (Phase-1 modularization)"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+
+[lib]
+name = "pi_mono"
+path = "src/lib.rs"
+
+[dependencies]
+# Aggregator: re-export the public surface from the workspace's primary crate
+# so SDK consumers and downstream monorepos can `use pi_mono::pi as pi;` from
+# a single workspace dependency. Phase-1 keeps this thin — later stages will
+# add cross-crate re-exports for chord/tui/telemetry/ai/agent/protocol/...
+# mirroring @earendil-works/* packages.
+pi = { path = "../pi" }
+
+[lints]
+workspace = true

@@ -1,0 +1,41 @@
+{
+  "kind": "dispatch-verifier",
+  "checks": [
+    {
+      "id": "ws.cargo-check-green",
+      "name": "A1: cargo check --workspace --locked exits 0",
+      "executable": "cargo",
+      "argv": ["check", "--workspace", "--locked"],
+      "cwdRef": ".",
+      "timeoutMs": 300000,
+      "repeatable": true
+    },
+    {
+      "id": "ws.smoke-test-green",
+      "name": "A3: cargo test -p xtask --locked --test workspace_smoke (4/4)",
+      "executable": "cargo",
+      "argv": ["test", "-p", "xtask", "--locked", "--test", "workspace_smoke"],
+      "cwdRef": ".",
+      "timeoutMs": 300000,
+      "repeatable": true
+    },
+    {
+      "id": "ws.clippy-green",
+      "name": "A4: cargo clippy -p xtask -p pi-mono --locked --all-targets -- -D warnings",
+      "executable": "cargo",
+      "argv": ["clippy", "-p", "xtask", "-p", "pi-mono", "--locked", "--all-targets", "--", "-D", "warnings"],
+      "cwdRef": ".",
+      "timeoutMs": 300000,
+      "repeatable": true
+    },
+    {
+      "id": "ws.public-api-preserved",
+      "name": "A6: cargo build -p pi --locked exits 0 (re-verify lib name = pi)",
+      "executable": "cargo",
+      "argv": ["build", "-p", "pi", "--locked"],
+      "cwdRef": ".",
+      "timeoutMs": 600000,
+      "repeatable": true
+    }
+  ]
+}

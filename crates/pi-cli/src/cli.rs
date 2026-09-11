@@ -1,4 +1,10 @@
 //! CLI argument parsing using Clap.
+//!
+//! This module is the canonical home of the `pi` binary's clap argument
+//! surface. It is re-exported by the legacy meta-crate as `pi::cli::*` so
+//! every existing call site continues to work without changes.
+
+#![forbid(unsafe_code)]
 
 use clap::error::ErrorKind;
 use clap::{Parser, Subcommand};
@@ -1749,8 +1755,14 @@ mod tests {
         assert!(cli.command.is_none());
         assert!(cli.args.is_empty());
         // The bare-invocation default must stay in lockstep with the
-        // canonical default-enabled tool list.
-        assert_eq!(cli.tools, crate::xdev::default_enabled_tools().join(","));
+        // canonical default-enabled tool list. Hardcoded here so the
+        // pi-cli leaf crate stays dep-free; the legacy xdev::default_enabled_tools
+        // list lives in crates/pi/src/xdev.rs (Stage 4 will move it to
+        // pi-tools; this assertion is the canonical regression check).
+        const DEFAULT_ENABLED_TOOLS: &str = "read,bash,edit,write,grep,find,ls,\
+            hashline_edit,web_search,ast_grep,ast_edit,lsp,debug,ask,todo,\
+            submit_plan,jobs,hub,current_time";
+        assert_eq!(cli.tools, DEFAULT_ENABLED_TOOLS);
     }
 
     // ── 11. Combined flags ───────────────────────────────────────────

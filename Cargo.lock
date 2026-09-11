@@ -5575,6 +5575,8 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
+ "pi-agent-cx",
+ "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
  "pi-crypto-shim",
@@ -5630,6 +5632,22 @@ dependencies = [
  "wat",
  "win32job",
  "xxhash-rust",
+]
+
+[[package]]
+name = "pi-agent-cx"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+]
+
+[[package]]
+name = "pi-bpe"
+version = "0.1.0"
+dependencies = [
+ "bstr",
+ "fancy-regex 0.18.0",
+ "rustc-hash",
 ]
 
 [[package]]

@@ -89,6 +89,8 @@ harness = false
 [dependencies]
 clap = { workspace = true }
 clap_complete = { workspace = true }
+pi-agent-cx = { workspace = true }
+pi-bpe = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
 pi-crypto-shim = { workspace = true }

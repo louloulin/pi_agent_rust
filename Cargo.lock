@@ -5579,6 +5579,7 @@ dependencies = [
  "pi-delight",
  "pi-dialects",
  "pi-jsonrpc",
+ "pi-markdown-rich",
  "pi-pmu-telemetry",
  "pi-sse",
  "pi-stats",
@@ -5655,6 +5656,13 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "pi-markdown-rich"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

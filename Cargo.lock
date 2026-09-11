@@ -5579,6 +5579,7 @@ dependencies = [
  "pi-cli",
  "pi-delight",
  "pi-dialects",
+ "pi-flake-classifier",
  "pi-jsonrpc",
  "pi-markdown-rich",
  "pi-pmu-telemetry",
@@ -5651,6 +5652,15 @@ dependencies = [
 name = "pi-dialects"
 version = "0.1.0"
 dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-flake-classifier"
+version = "0.1.0"
+dependencies = [
+ "proptest",
  "serde",
  "serde_json",
 ]

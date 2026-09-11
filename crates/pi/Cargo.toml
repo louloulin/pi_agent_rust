@@ -93,6 +93,7 @@ pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
+pi-flake-classifier = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }
 pi-pmu-telemetry = { workspace = true }

@@ -10,6 +10,7 @@ members = [
     "crates/pi-cli",
     "crates/pi-delight",
     "crates/pi-dialects",
+    "crates/pi-flake-classifier",
     "crates/pi-jsonrpc",
     "crates/pi-markdown-rich",
     "crates/pi-sse",
@@ -44,6 +45,7 @@ pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
+pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }

@@ -5576,6 +5576,7 @@ dependencies = [
  "pbkdf2",
  "pdf-extract",
  "pi-cli",
+ "pi-delight",
  "pi-dialects",
  "pi-jsonrpc",
  "pi-pmu-telemetry",
@@ -5631,6 +5632,13 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "proptest",
+]
+
+[[package]]
+name = "pi-delight"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

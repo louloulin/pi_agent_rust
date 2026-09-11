@@ -7,6 +7,7 @@ members = [
     "crates/pi",
     "crates/pi-mono",
     "crates/pi-cli",
+    "crates/pi-delight",
     "crates/pi-dialects",
     "crates/pi-jsonrpc",
     "crates/pi-pmu-telemetry",
@@ -38,6 +39,7 @@ clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
+pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }

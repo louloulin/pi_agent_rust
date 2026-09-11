@@ -31,6 +31,7 @@ members = [
     "crates/pi-jsonrpc",
     "crates/pi-markdown-rich",
     "crates/pi-magic-keywords",
+    "crates/pi-model",
     "crates/pi-overlay-system",
     "crates/pi-profiler",
     "crates/pi-provider-metadata",
@@ -93,6 +94,7 @@ pi-conformance = { path = "crates/pi-conformance", version = "0.1.0" }
 pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }
+pi-model = { path = "crates/pi-model", version = "0.1.0" }
 pi-magic-keywords = { path = "crates/pi-magic-keywords", version = "0.1.0" }
 pi-overlay-system = { path = "crates/pi-overlay-system", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }

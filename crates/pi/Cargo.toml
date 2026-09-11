@@ -116,6 +116,7 @@ pi-conformance = { workspace = true }
 pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }
+pi-model = { workspace = true }
 pi-magic-keywords = { workspace = true }
 pi-overlay-system = { workspace = true }
 pi-pmu-telemetry = { workspace = true }

@@ -5597,6 +5597,7 @@ dependencies = [
  "pi-jsonrpc",
  "pi-magic-keywords",
  "pi-markdown-rich",
+ "pi-model",
  "pi-overlay-system",
  "pi-pmu-telemetry",
  "pi-profiler",
@@ -5850,6 +5851,16 @@ name = "pi-markdown-rich"
 version = "0.1.0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "pi-model"
+version = "0.1.0"
+dependencies = [
+ "pi-provider-metadata",
+ "proptest",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

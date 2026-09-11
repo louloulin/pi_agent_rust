@@ -121,6 +121,7 @@ pi-magic-keywords = { workspace = true }
 pi-overlay-system = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-profiler = { workspace = true }
+pi-provider = { workspace = true }
 pi-provider-metadata = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }

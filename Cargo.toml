@@ -34,6 +34,7 @@ members = [
     "crates/pi-model",
     "crates/pi-overlay-system",
     "crates/pi-profiler",
+    "crates/pi-provider",
     "crates/pi-provider-metadata",
     "crates/pi-session-metrics",
     "crates/pi-sse",
@@ -99,6 +100,7 @@ pi-magic-keywords = { path = "crates/pi-magic-keywords", version = "0.1.0" }
 pi-overlay-system = { path = "crates/pi-overlay-system", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }
 pi-profiler = { path = "crates/pi-profiler", version = "0.1.0" }
+pi-provider = { path = "crates/pi-provider", version = "0.1.0" }
 pi-provider-metadata = { path = "crates/pi-provider-metadata", version = "0.1.0" }
 pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
 pi-stats = { path = "crates/pi-stats", version = "0.1.0" }

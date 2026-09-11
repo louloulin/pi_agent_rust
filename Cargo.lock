@@ -5601,6 +5601,7 @@ dependencies = [
  "pi-overlay-system",
  "pi-pmu-telemetry",
  "pi-profiler",
+ "pi-provider",
  "pi-provider-metadata",
  "pi-scheduler",
  "pi-session-metrics",
@@ -5892,6 +5893,20 @@ dependencies = [
  "pi-pmu-telemetry",
  "pprof",
  "tracing",
+]
+
+[[package]]
+name = "pi-provider"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "futures",
+ "pi-error",
+ "pi-model",
+ "pi-provider-metadata",
+ "proptest",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

@@ -5584,6 +5584,7 @@ dependencies = [
  "pi-jsonrpc",
  "pi-magic-keywords",
  "pi-markdown-rich",
+ "pi-overlay-system",
  "pi-pmu-telemetry",
  "pi-sse",
  "pi-stats",
@@ -5715,6 +5716,13 @@ name = "pi-mono"
 version = "0.4.0"
 dependencies = [
  "pi",
+]
+
+[[package]]
+name = "pi-overlay-system"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

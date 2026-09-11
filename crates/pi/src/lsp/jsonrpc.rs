@@ -600,14 +600,11 @@ mod tests {
 
     #[test]
     fn tail_buffer_truncates_to_cap() {
-        let mut tail = TailBuffer {
-            data: String::new(),
-            cap: 16,
-        };
+        let mut tail = TailBuffer::new(16);
         tail.push("0123456789");
         tail.push("abcdefghij");
-        assert!(tail.data.len() <= 16);
-        assert!(tail.data.ends_with("abcdefghij"));
+        assert!(tail.len() <= 16);
+        assert!(tail.tail_str().ends_with("abcdefghij"));
     }
 
     #[test]

@@ -127,6 +127,7 @@ pi-sse = { workspace = true }
 pi-stats = { workspace = true }
 pi-status-line = { workspace = true }
 pi-token-count = { workspace = true }
+pi-turn-recovery = { workspace = true }
 asupersync = { workspace = true }
 futures = { workspace = true }
 async-trait = { workspace = true }

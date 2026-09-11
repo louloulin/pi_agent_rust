@@ -5611,6 +5611,7 @@ dependencies = [
  "pi-swarm-activity-ledger",
  "pi-swarm-progress-slo",
  "pi-token-count",
+ "pi-turn-recovery",
  "pi-undo",
  "pi-web-remote",
  "portable-pty",
@@ -5984,6 +5985,15 @@ name = "pi-token-count"
 version = "0.1.0"
 dependencies = [
  "tiktoken-rs",
+]
+
+[[package]]
+name = "pi-turn-recovery"
+version = "0.1.0"
+dependencies = [
+ "pi-model",
+ "serde",
+ "tracing",
 ]
 
 [[package]]

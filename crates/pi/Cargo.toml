@@ -91,6 +91,7 @@ clap = { workspace = true }
 clap_complete = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
+pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
 pi-flake-classifier = { workspace = true }

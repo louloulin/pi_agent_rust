@@ -1,0 +1,27 @@
+[package]
+name = "pi-crypto-shim"
+description = "Node.js crypto shim JS source + QuickJS hostcall registration — Stage 2 leaf crate"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+rquickjs = { workspace = true }
+ring = { workspace = true }
+sha2 = { workspace = true }
+sha1 = { workspace = true }
+md-5 = { workspace = true }
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+scrypt = { workspace = true }
+uuid = { workspace = true }
+base64 = { workspace = true }
+getrandom = { workspace = true }
+tracing = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }

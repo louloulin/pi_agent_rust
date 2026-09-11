@@ -96,6 +96,12 @@ pi-cli = { workspace = true, features = ["ftui"] }
 pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
+pi-error = { workspace = true }
+pi-file-lock = { workspace = true }
+pi-http-shim = { workspace = true }
+pi-session-metrics = { workspace = true }
+pi-undo = { workspace = true }
+pi-web-remote = { workspace = true }
 pi-flake-classifier = { workspace = true }
 pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
@@ -104,6 +110,7 @@ pi-magic-keywords = { workspace = true }
 pi-overlay-system = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
 pi-profiler = { workspace = true }
+pi-provider-metadata = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }
 pi-status-line = { workspace = true }

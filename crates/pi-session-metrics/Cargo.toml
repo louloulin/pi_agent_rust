@@ -1,0 +1,17 @@
+[package]
+name = "pi-session-metrics"
+description = "Session-level counters and periodic summary emission (Stage 2 leaf crate)"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+serde = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+proptest = { workspace = true }

@@ -5582,18 +5582,25 @@ dependencies = [
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
+ "pi-error",
+ "pi-file-lock",
  "pi-flake-classifier",
  "pi-gallery",
+ "pi-http-shim",
  "pi-jsonrpc",
  "pi-magic-keywords",
  "pi-markdown-rich",
  "pi-overlay-system",
  "pi-pmu-telemetry",
  "pi-profiler",
+ "pi-provider-metadata",
+ "pi-session-metrics",
  "pi-sse",
  "pi-stats",
  "pi-status-line",
  "pi-token-count",
+ "pi-undo",
+ "pi-web-remote",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5701,6 +5708,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-error"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+ "fsqlite",
+ "pi-provider-metadata",
+ "proptest",
+ "regex",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pi-file-lock"
+version = "0.1.0"
+dependencies = [
+ "filetime",
+ "rustix",
+ "tempfile",
+]
+
+[[package]]
 name = "pi-flake-classifier"
 version = "0.1.0"
 dependencies = [
@@ -5716,6 +5746,10 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "pi-http-shim"
+version = "0.1.0"
 
 [[package]]
 name = "pi-jsonrpc"
@@ -5772,6 +5806,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-provider-metadata"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "url",
+]
+
+[[package]]
+name = "pi-session-metrics"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "tempfile",
+ "tracing",
+]
+
+[[package]]
 name = "pi-sse"
 version = "0.1.0"
 dependencies = [
@@ -5802,6 +5855,22 @@ name = "pi-token-count"
 version = "0.1.0"
 dependencies = [
  "tiktoken-rs",
+]
+
+[[package]]
+name = "pi-undo"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "sha2 0.11.0",
+ "tempfile",
+]
+
+[[package]]
+name = "pi-web-remote"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

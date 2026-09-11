@@ -13,16 +13,24 @@ members = [
     "crates/pi-crypto-shim",
     "crates/pi-delight",
     "crates/pi-dialects",
+    "crates/pi-error",
+    "crates/pi-file-lock",
     "crates/pi-flake-classifier",
     "crates/pi-gallery",
+    "crates/pi-http-shim",
     "crates/pi-jsonrpc",
     "crates/pi-markdown-rich",
     "crates/pi-magic-keywords",
     "crates/pi-overlay-system",
+    "crates/pi-profiler",
+    "crates/pi-provider-metadata",
+    "crates/pi-session-metrics",
     "crates/pi-sse",
     "crates/pi-stats",
     "crates/pi-status-line",
     "crates/pi-token-count",
+    "crates/pi-undo",
+    "crates/pi-web-remote",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -55,6 +63,12 @@ pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
 pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
+pi-error = { path = "crates/pi-error", version = "0.1.0" }
+pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }
+pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
+pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
+pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
+pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
@@ -63,6 +77,7 @@ pi-magic-keywords = { path = "crates/pi-magic-keywords", version = "0.1.0" }
 pi-overlay-system = { path = "crates/pi-overlay-system", version = "0.1.0" }
 pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }
 pi-profiler = { path = "crates/pi-profiler", version = "0.1.0" }
+pi-provider-metadata = { path = "crates/pi-provider-metadata", version = "0.1.0" }
 pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
 pi-stats = { path = "crates/pi-stats", version = "0.1.0" }
 pi-status-line = { path = "crates/pi-status-line", version = "0.1.0" }

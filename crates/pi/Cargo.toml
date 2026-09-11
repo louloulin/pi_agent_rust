@@ -97,13 +97,16 @@ pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
 pi-flake-classifier = { workspace = true }
+pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }
 pi-magic-keywords = { workspace = true }
 pi-overlay-system = { workspace = true }
 pi-pmu-telemetry = { workspace = true }
+pi-profiler = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }
+pi-status-line = { workspace = true }
 pi-token-count = { workspace = true }
 asupersync = { workspace = true }
 futures = { workspace = true }
@@ -229,7 +232,7 @@ full = [
 ]
 bpe-tokens = ["pi-token-count/bpe-tokens"]
 url-pdf = ["dep:pdf-extract"]
-profiler = ["dep:pprof"]
+profiler = ["dep:pprof", "pi-profiler/profiler"]
 tui = [
     "dep:crossterm",
     "dep:bubbletea",

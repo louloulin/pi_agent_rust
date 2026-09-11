@@ -5583,13 +5583,16 @@ dependencies = [
  "pi-delight",
  "pi-dialects",
  "pi-flake-classifier",
+ "pi-gallery",
  "pi-jsonrpc",
  "pi-magic-keywords",
  "pi-markdown-rich",
  "pi-overlay-system",
  "pi-pmu-telemetry",
+ "pi-profiler",
  "pi-sse",
  "pi-stats",
+ "pi-status-line",
  "pi-token-count",
  "portable-pty",
  "pprof",
@@ -5707,6 +5710,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-gallery"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pi-jsonrpc"
 version = "0.1.0"
 dependencies = [
@@ -5752,6 +5763,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-profiler"
+version = "0.1.0"
+dependencies = [
+ "pi-pmu-telemetry",
+ "pprof",
+ "tracing",
+]
+
+[[package]]
 name = "pi-sse"
 version = "0.1.0"
 dependencies = [
@@ -5768,6 +5788,13 @@ dependencies = [
  "serde",
  "serde_json",
  "tempfile",
+]
+
+[[package]]
+name = "pi-status-line"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

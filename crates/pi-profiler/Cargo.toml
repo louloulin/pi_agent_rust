@@ -1,0 +1,23 @@
+[package]
+name = "pi-profiler"
+description = "CPU profiler snapshot loader — Stage 2 leaf crate"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-pmu-telemetry = { workspace = true }
+tracing = { workspace = true }
+
+[features]
+# Forwarded from `pi`'s `profiler` feature so the same `#[cfg(feature = "profiler")]`
+# guards in the source keep their semantics inside the leaf. Only meaningful on
+# Linux where `pprof` resolves; on other platforms the leaf falls back to the
+# no-op stub regardless.
+profiler = ["dep:pprof"]
+
+[target.'cfg(target_os = "linux")'.dependencies]
+pprof = { workspace = true, features = ["flamegraph"], optional = true }

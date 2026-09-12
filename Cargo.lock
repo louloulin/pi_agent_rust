@@ -5606,6 +5606,7 @@ dependencies = [
  "pi-provider",
  "pi-provider-metadata",
  "pi-scheduler",
+ "pi-secrets",
  "pi-session-metrics",
  "pi-sse",
  "pi-stats",
@@ -5945,6 +5946,15 @@ dependencies = [
  "proptest",
  "serde_json",
  "tracing",
+]
+
+[[package]]
+name = "pi-secrets"
+version = "0.1.0"
+dependencies = [
+ "pi-error",
+ "regex",
+ "serde",
 ]
 
 [[package]]

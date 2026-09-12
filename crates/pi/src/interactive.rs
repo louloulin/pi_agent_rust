@@ -1780,7 +1780,10 @@ pub async fn run_interactive(
     if should_check_for_updates {
         runtime_handle.spawn(async move {
             let client = crate::http::client::Client::new();
-            let _ = crate::version_check::refresh_cache_if_stale(&client).await;
+            let _ = crate::version_check::refresh_cache_if_stale(
+                &crate::version_check::ClientHttpFetch(&client),
+            )
+            .await;
         });
     }
 

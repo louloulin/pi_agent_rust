@@ -5620,6 +5620,7 @@ dependencies = [
  "pi-token-count",
  "pi-turn-recovery",
  "pi-undo",
+ "pi-version",
  "pi-web-remote",
  "pi-workspace",
  "portable-pty",
@@ -6079,6 +6080,19 @@ dependencies = [
  "serde",
  "sha2 0.11.0",
  "tempfile",
+]
+
+[[package]]
+name = "pi-version"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+ "dirs",
+ "pi-error",
+ "semver",
+ "serde_json",
+ "tempfile",
+ "tracing",
 ]
 
 [[package]]

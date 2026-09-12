@@ -50,6 +50,7 @@ members = [
     "crates/pi-token-count",
     "crates/pi-turn-recovery",
     "crates/pi-undo",
+    "crates/pi-version",
     "crates/pi-web-remote",
     "crates/pi-workspace",
     "xtask",
@@ -92,6 +93,7 @@ pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }
 pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
 pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
 pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
+pi-version = { path = "crates/pi-version", version = "0.1.0" }
 pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
 pi-workspace = { path = "crates/pi-workspace", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }

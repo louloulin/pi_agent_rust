@@ -1,0 +1,12 @@
+[package]
+name = "pi-workspace"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Multi-root workspace state and the unified path-confinement helper"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-error = { workspace = true }

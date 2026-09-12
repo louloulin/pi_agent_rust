@@ -420,31 +420,31 @@ mod tests {
     fn compressed_resources_restore_exact_source_bytes() {
         assert_eq!(
             super::legacy_models_generated_ts().as_bytes(),
-            include_bytes!("../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts")
+            include_bytes!("../../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts")
         );
         assert_eq!(
             super::legacy_models_generated_ts_crc32c(),
             crc32c::crc32c(include_bytes!(
-                "../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts"
+                "../../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts"
             ))
         );
         assert_eq!(
             super::provider_upstream_model_ids_json().as_bytes(),
-            include_bytes!("../../docs/provider-upstream-model-ids-snapshot.json")
+            include_bytes!("../../../docs/provider-upstream-model-ids-snapshot.json")
         );
         assert_eq!(
             super::provider_upstream_model_ids_json_crc32c(),
             crc32c::crc32c(include_bytes!(
-                "../../docs/provider-upstream-model-ids-snapshot.json"
+                "../../../docs/provider-upstream-model-ids-snapshot.json"
             ))
         );
         assert_eq!(
             super::extension_artifact_provenance_json().as_bytes(),
-            include_bytes!("../../docs/extension-artifact-provenance.json")
+            include_bytes!("../../../docs/extension-artifact-provenance.json")
         );
         assert_eq!(
             super::changelog().as_bytes(),
-            include_bytes!("../../CHANGELOG.md")
+            include_bytes!("../../../CHANGELOG.md")
         );
     }
 }

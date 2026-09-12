@@ -48,6 +48,7 @@ members = [
     "crates/pi-turn-recovery",
     "crates/pi-undo",
     "crates/pi-web-remote",
+    "crates/pi-workspace",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -89,6 +90,7 @@ pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
 pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
 pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
 pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
+pi-workspace = { path = "crates/pi-workspace", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-hostcall-superinstructions = { path = "crates/pi-hostcall-superinstructions", version = "0.1.0" }
 pi-hostcall-io-uring-lane = { path = "crates/pi-hostcall-io-uring-lane", version = "0.1.0" }

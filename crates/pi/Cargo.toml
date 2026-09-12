@@ -105,6 +105,7 @@ pi-http-shim = { workspace = true }
 pi-session-metrics = { workspace = true }
 pi-undo = { workspace = true }
 pi-web-remote = { workspace = true }
+pi-workspace = { workspace = true }
 pi-flake-classifier = { workspace = true }
 pi-hostcall-superinstructions = { workspace = true }
 pi-hostcall-io-uring-lane = { workspace = true }

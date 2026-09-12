@@ -5579,8 +5579,8 @@ dependencies = [
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
- "pi-context-files",
  "pi-conformance",
+ "pi-context-files",
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
@@ -5618,6 +5618,7 @@ dependencies = [
  "pi-turn-recovery",
  "pi-undo",
  "pi-web-remote",
+ "pi-workspace",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5690,16 +5691,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-context-files"
-version = "0.1.0"
-dependencies = [
- "globset",
- "serde",
- "tempfile",
- "tracing",
-]
-
-[[package]]
 name = "pi-conformance"
 version = "0.1.0"
 dependencies = [
@@ -5710,6 +5701,16 @@ dependencies = [
  "serde_json",
  "sha2 0.11.0",
  "tempfile",
+]
+
+[[package]]
+name = "pi-context-files"
+version = "0.1.0"
+dependencies = [
+ "globset",
+ "serde",
+ "tempfile",
+ "tracing",
 ]
 
 [[package]]
@@ -6048,6 +6049,13 @@ name = "pi-web-remote"
 version = "0.1.0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "pi-workspace"
+version = "0.1.0"
+dependencies = [
+ "pi-error",
 ]
 
 [[package]]

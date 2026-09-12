@@ -1,0 +1,16 @@
+[package]
+name = "pi-agent-hub"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Agent hub registry (bd-cv653.5.3): session-scoped roster of spawned subagent children with transcript persistence, steering, kill, revive, and a minimal peer-messaging bus."
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-error = { workspace = true }
+pi-secrets = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+dirs = { workspace = true }

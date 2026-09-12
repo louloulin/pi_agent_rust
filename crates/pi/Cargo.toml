@@ -90,6 +90,7 @@ harness = false
 clap = { workspace = true }
 clap_complete = { workspace = true }
 pi-agent-cx = { workspace = true }
+pi-agent-hub = { workspace = true }
 pi-bpe = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }

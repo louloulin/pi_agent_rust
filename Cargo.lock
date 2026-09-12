@@ -5576,6 +5576,7 @@ dependencies = [
  "pbkdf2",
  "pdf-extract",
  "pi-agent-cx",
+ "pi-agent-hub",
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
@@ -5672,6 +5673,17 @@ name = "pi-agent-cx"
 version = "0.1.0"
 dependencies = [
  "asupersync",
+]
+
+[[package]]
+name = "pi-agent-hub"
+version = "0.1.0"
+dependencies = [
+ "dirs",
+ "pi-error",
+ "pi-secrets",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

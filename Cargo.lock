@@ -5607,6 +5607,7 @@ dependencies = [
  "pi-provider",
  "pi-provider-metadata",
  "pi-scheduler",
+ "pi-secret-screener",
  "pi-secrets",
  "pi-session-metrics",
  "pi-sse",
@@ -5960,6 +5961,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-secret-screener"
+version = "0.1.0"
+dependencies = [
+ "regex",
+]
+
+[[package]]
 name = "pi-secrets"
 version = "0.1.0"
 dependencies = [
@@ -6011,6 +6019,7 @@ dependencies = [
  "chrono",
  "dirs",
  "pi-error",
+ "pi-secret-screener",
  "regex",
  "serde",
  "serde_json",

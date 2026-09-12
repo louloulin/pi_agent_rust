@@ -10,6 +10,7 @@ workspace = true
 
 [dependencies]
 pi-error = { workspace = true }
+pi-secret-screener = { workspace = true }
 chrono = { workspace = true }
 regex = { workspace = true }
 serde = { workspace = true }

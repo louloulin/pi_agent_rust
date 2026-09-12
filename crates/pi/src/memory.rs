@@ -24,6 +24,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use pi_secret_screener::screen_secrets as screener_screen_secrets;
 use serde::Serialize;
 
 use crate::error::{Error, Result};
@@ -31,6 +32,14 @@ use crate::session_sqlite::{SqliteConnection, run_on_sqlite_thread};
 
 /// Tool-result schema tag for memory operations (stable audit contract).
 pub const MEMORY_SCHEMA: &str = "pi.memory.v1";
+
+/// Replace any detected credential in `content` with a placeholder.
+/// Memories never store detected secrets. Re-exports the shared
+/// `pi-secret-screener` detector so all callers see one implementation.
+#[must_use]
+pub fn screen_secrets(content: &str) -> String {
+    screener_screen_secrets(content)
+}
 
 /// Default recall result cap.
 const DEFAULT_RECALL_LIMIT: usize = 10;
@@ -508,53 +517,6 @@ impl MemoryStore {
             rows.iter().map(row_to_memory).collect()
         })
     }
-}
-
-// ---------------------------------------------------------------------------
-// Secret screening (interim floor until bd-cv653.7.9's vault lands)
-// ---------------------------------------------------------------------------
-
-/// Well-known credential shapes screened out of retained content. Each
-/// entry: (regex, placeholder). TODO(.7.9): replace with the shared vault.
-const SECRET_PATTERNS: &[(&str, &str)] = &[
-    (r"sk-ant-[A-Za-z0-9_\-]{16,}", "[REDACTED_ANTHROPIC_KEY]"),
-    (r"sk-[A-Za-z0-9_\-]{16,}", "[REDACTED_OPENAI_KEY]"),
-    (r"ghp_[A-Za-z0-9]{20,}", "[REDACTED_GITHUB_PAT]"),
-    (r"github_pat_[A-Za-z0-9_]{20,}", "[REDACTED_GITHUB_PAT]"),
-    (r"AKIA[0-9A-Z]{16}", "[REDACTED_AWS_ACCESS_KEY]"),
-    (
-        r"-----BEGIN [A-Z ]*PRIVATE KEY-----",
-        "[REDACTED_PRIVATE_KEY]",
-    ),
-    (r"AIza[0-9A-Za-z_\-]{20,}", "[REDACTED_GOOGLE_API_KEY]"),
-    (r"xox[baprs]-[A-Za-z0-9\-]{10,}", "[REDACTED_SLACK_TOKEN]"),
-];
-
-fn secret_patterns() -> &'static Vec<(regex::Regex, &'static str)> {
-    static PATTERNS: std::sync::LazyLock<Vec<(regex::Regex, &'static str)>> =
-        std::sync::LazyLock::new(|| {
-            SECRET_PATTERNS
-                .iter()
-                .map(|(pattern, placeholder)| {
-                    (
-                        regex::Regex::new(pattern).expect("secret pattern compiles"),
-                        *placeholder,
-                    )
-                })
-                .collect()
-        });
-    &PATTERNS
-}
-
-/// Replace any detected credential in `content` with a placeholder.
-/// Memories never store detected secrets.
-#[must_use]
-pub fn screen_secrets(content: &str) -> String {
-    let mut screened = content.to_string();
-    for (pattern, placeholder) in secret_patterns() {
-        screened = pattern.replace_all(&screened, *placeholder).into_owned();
-    }
-    screened
 }
 
 // ---------------------------------------------------------------------------

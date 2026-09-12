@@ -5581,6 +5581,7 @@ dependencies = [
  "pi-cli",
  "pi-conformance",
  "pi-context-files",
+ "pi-crash",
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
@@ -5712,6 +5713,18 @@ dependencies = [
  "globset",
  "serde",
  "tempfile",
+ "tracing",
+]
+
+[[package]]
+name = "pi-crash"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "pi-secrets",
+ "serde",
+ "serde_json",
+ "signal-hook 0.4.4",
  "tracing",
 ]
 

@@ -30,6 +30,7 @@ members = [
     "crates/pi-secrets",
     "crates/pi-secret-screener",
     "crates/pi-conformance",
+    "crates/pi-crash",
     "crates/pi-gallery",
     "crates/pi-http-shim",
     "crates/pi-jsonrpc",
@@ -105,6 +106,7 @@ pi-scheduler = { path = "crates/pi-scheduler", version = "0.1.0" }
 pi-secrets = { path = "crates/pi-secrets", version = "0.1.0" }
 pi-secret-screener = { path = "crates/pi-secret-screener", version = "0.1.0" }
 pi-conformance = { path = "crates/pi-conformance", version = "0.1.0" }
+pi-crash = { path = "crates/pi-crash", version = "0.1.0" }
 pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }

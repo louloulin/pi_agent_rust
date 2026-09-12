@@ -118,6 +118,7 @@ pi-scheduler = { workspace = true }
 pi-secrets = { workspace = true }
 pi-secret-screener = { workspace = true }
 pi-conformance = { workspace = true }
+pi-crash = { workspace = true }
 pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }

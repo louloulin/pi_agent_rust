@@ -1,0 +1,19 @@
+[package]
+name = "pi-embedded-assets"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Compile-time compressed text resources bundled into the Pi binary"
+
+[lints]
+workspace = true
+
+[dependencies]
+flate2 = { workspace = true }
+
+[dev-dependencies]
+crc32c = { workspace = true }
+
+[build-dependencies]
+crc32c = { workspace = true }
+flate2 = { workspace = true }

@@ -14,6 +14,7 @@ members = [
     "crates/pi-crypto-shim",
     "crates/pi-delight",
     "crates/pi-dialects",
+    "crates/pi-embedded-assets",
     "crates/pi-error",
     "crates/pi-failover",
     "crates/pi-file-lock",
@@ -80,6 +81,7 @@ pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
 pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
 pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
+pi-embedded-assets = { path = "crates/pi-embedded-assets", version = "0.1.0" }
 pi-error = { path = "crates/pi-error", version = "0.1.0" }
 pi-failover = { path = "crates/pi-failover", version = "0.1.0" }
 pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }

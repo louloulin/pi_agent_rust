@@ -97,6 +97,7 @@ pi-context-files = { workspace = true }
 pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
 pi-dialects = { workspace = true }
+pi-embedded-assets = { workspace = true }
 pi-error = { workspace = true }
 pi-failover = { workspace = true }
 pi-file-lock = { workspace = true }
@@ -210,8 +211,6 @@ tikv-jemallocator = { workspace = true, optional = true }
 win32job = { workspace = true, optional = true }
 
 [build-dependencies]
-crc32c = { workspace = true }
-flate2 = { workspace = true }
 vergen-gix = { workspace = true }
 
 [dev-dependencies]

@@ -5584,6 +5584,7 @@ dependencies = [
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
+ "pi-embedded-assets",
  "pi-error",
  "pi-extension-replay",
  "pi-extension-scoring",
@@ -5744,6 +5745,14 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "pi-embedded-assets"
+version = "0.1.0"
+dependencies = [
+ "crc32c",
+ "flate2",
 ]
 
 [[package]]

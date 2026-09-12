@@ -5612,6 +5612,7 @@ dependencies = [
  "pi-sse",
  "pi-stats",
  "pi-status-line",
+ "pi-stream-rules",
  "pi-swarm-activity-ledger",
  "pi-swarm-progress-slo",
  "pi-token-count",
@@ -6001,6 +6002,20 @@ name = "pi-status-line"
 version = "0.1.0"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "pi-stream-rules"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "dirs",
+ "pi-error",
+ "regex",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "uuid",
 ]
 
 [[package]]

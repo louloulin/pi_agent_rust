@@ -44,6 +44,7 @@ members = [
     "crates/pi-sse",
     "crates/pi-stats",
     "crates/pi-status-line",
+    "crates/pi-stream-rules",
     "crates/pi-token-count",
     "crates/pi-turn-recovery",
     "crates/pi-undo",
@@ -116,6 +117,7 @@ pi-provider-metadata = { path = "crates/pi-provider-metadata", version = "0.1.0"
 pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
 pi-stats = { path = "crates/pi-stats", version = "0.1.0" }
 pi-status-line = { path = "crates/pi-status-line", version = "0.1.0" }
+pi-stream-rules = { path = "crates/pi-stream-rules", version = "0.1.0" }
 pi-token-count = { path = "crates/pi-token-count", version = "0.1.0" }
 pi-turn-recovery = { path = "crates/pi-turn-recovery", version = "0.1.0" }
 

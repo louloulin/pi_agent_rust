@@ -131,6 +131,7 @@ pi-provider-metadata = { workspace = true }
 pi-sse = { workspace = true }
 pi-stats = { workspace = true }
 pi-status-line = { workspace = true }
+pi-stream-rules = { workspace = true }
 pi-token-count = { workspace = true }
 pi-turn-recovery = { workspace = true }
 asupersync = { workspace = true }

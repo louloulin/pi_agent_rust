@@ -109,6 +109,7 @@ pi-usage = { workspace = true }
 pi-version = { workspace = true }
 pi-web-remote = { workspace = true }
 pi-workspace = { workspace = true }
+pi-worktree-iso = { workspace = true }
 pi-flake-classifier = { workspace = true }
 pi-hostcall-superinstructions = { workspace = true }
 pi-hostcall-io-uring-lane = { workspace = true }

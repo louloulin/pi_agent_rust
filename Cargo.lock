@@ -5626,6 +5626,7 @@ dependencies = [
  "pi-version",
  "pi-web-remote",
  "pi-workspace",
+ "pi-worktree-iso",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -6145,6 +6146,16 @@ name = "pi-workspace"
 version = "0.1.0"
 dependencies = [
  "pi-error",
+]
+
+[[package]]
+name = "pi-worktree-iso"
+version = "0.1.0"
+dependencies = [
+ "filetime",
+ "ignore",
+ "pi-error",
+ "serde",
 ]
 
 [[package]]

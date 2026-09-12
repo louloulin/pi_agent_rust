@@ -56,6 +56,7 @@ members = [
     "crates/pi-version",
     "crates/pi-web-remote",
     "crates/pi-workspace",
+    "crates/pi-worktree-iso",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -101,6 +102,7 @@ pi-usage = { path = "crates/pi-usage", version = "0.1.0" }
 pi-version = { path = "crates/pi-version", version = "0.1.0" }
 pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
 pi-workspace = { path = "crates/pi-workspace", version = "0.1.0" }
+pi-worktree-iso = { path = "crates/pi-worktree-iso", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-hostcall-superinstructions = { path = "crates/pi-hostcall-superinstructions", version = "0.1.0" }
 pi-hostcall-io-uring-lane = { path = "crates/pi-hostcall-io-uring-lane", version = "0.1.0" }

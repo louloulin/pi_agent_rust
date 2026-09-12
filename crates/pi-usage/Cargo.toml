@@ -1,0 +1,21 @@
+[package]
+name = "pi-usage"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Provider usage/quota readers and the `/usage` surface"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-error = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+async-trait = { workspace = true }
+asupersync = { workspace = true }
+
+[dev-dependencies]
+# asupersync already in [dependencies] for runtime helpers in `gather_usage`
+

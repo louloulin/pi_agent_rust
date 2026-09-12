@@ -4363,7 +4363,9 @@ fn run_undo_command(
 async fn run_usage_command(refresh: bool, agent_tx: &Sender<PiMsg>) {
     let message = match crate::auth::AuthStorage::load(crate::config::Config::auth_path()) {
         Ok(auth) => {
-            let rows = crate::usage::gather_usage(&auth, refresh).await;
+            let client = crate::http::client::Client::new();
+            let http = crate::usage::ClientHttpFetch(&client);
+            let rows = crate::usage::gather_usage(&auth, &http, refresh).await;
             crate::usage::render_usage_text(&rows)
         }
         Err(err) => format!("failed to load credentials: {err}"),

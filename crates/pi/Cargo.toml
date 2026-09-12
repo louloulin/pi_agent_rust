@@ -105,6 +105,7 @@ pi-file-lock = { workspace = true }
 pi-http-shim = { workspace = true }
 pi-session-metrics = { workspace = true }
 pi-undo = { workspace = true }
+pi-usage = { workspace = true }
 pi-version = { workspace = true }
 pi-web-remote = { workspace = true }
 pi-workspace = { workspace = true }

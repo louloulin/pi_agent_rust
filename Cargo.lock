@@ -5622,6 +5622,7 @@ dependencies = [
  "pi-token-count",
  "pi-turn-recovery",
  "pi-undo",
+ "pi-usage",
  "pi-version",
  "pi-web-remote",
  "pi-workspace",
@@ -6105,6 +6106,18 @@ dependencies = [
  "serde",
  "sha2 0.11.0",
  "tempfile",
+]
+
+[[package]]
+name = "pi-usage"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+ "async-trait",
+ "pi-error",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

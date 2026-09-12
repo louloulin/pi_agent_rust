@@ -1126,7 +1126,9 @@ impl PiApp {
         self.runtime_handle.spawn(async move {
             let message = match crate::auth::AuthStorage::load(crate::config::Config::auth_path()) {
                 Ok(auth) => {
-                    let rows = crate::usage::gather_usage(&auth, refresh).await;
+                    let client = crate::http::client::Client::new();
+                    let http = crate::usage::ClientHttpFetch(&client);
+                    let rows = crate::usage::gather_usage(&auth, &http, refresh).await;
                     crate::usage::render_usage_text(&rows)
                 }
                 Err(err) => format!("Failed to load credentials: {err}"),

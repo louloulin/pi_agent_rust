@@ -2961,7 +2961,9 @@ async fn handle_subcommand(
         }
         cli::Commands::Usage { format, refresh } => {
             let auth = AuthStorage::load(Config::auth_path())?;
-            let rows = pi::usage::gather_usage(&auth, refresh).await;
+            let client = pi::http::client::Client::new();
+            let http = pi::usage::ClientHttpFetch(&client);
+            let rows = pi::usage::gather_usage(&auth, &http, refresh).await;
             if format == "json" {
                 println!("{}", pi::usage::render_usage_json(&rows));
             } else {

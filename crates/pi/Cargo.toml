@@ -89,6 +89,7 @@ harness = false
 [dependencies]
 clap = { workspace = true }
 clap_complete = { workspace = true }
+pi-advisor = { workspace = true }
 pi-agent-cx = { workspace = true }
 pi-agent-hub = { workspace = true }
 pi-bpe = { workspace = true }

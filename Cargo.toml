@@ -5,6 +5,7 @@ resolver = "2"
 # xtask hosts workspace plumbing (cargo xtask ci).
 members = [
     "crates/pi",
+    "crates/pi-advisor",
     "crates/pi-agent-cx",
     "crates/pi-agent-hub",
     "crates/pi-bpe",
@@ -83,6 +84,7 @@ clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
 pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
+pi-advisor = { path = "crates/pi-advisor", version = "0.1.0" }
 pi-agent-hub = { path = "crates/pi-agent-hub", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
 pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }

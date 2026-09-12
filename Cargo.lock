@@ -5575,6 +5575,7 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
+ "pi-advisor",
  "pi-agent-cx",
  "pi-agent-hub",
  "pi-bpe",
@@ -5668,6 +5669,19 @@ dependencies = [
  "wat",
  "win32job",
  "xxhash-rust",
+]
+
+[[package]]
+name = "pi-advisor"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+ "chrono",
+ "futures",
+ "pi-error",
+ "pi-model",
+ "pi-provider",
+ "serde_json",
 ]
 
 [[package]]

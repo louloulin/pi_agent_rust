@@ -1,0 +1,19 @@
+[package]
+name = "pi-self-update"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Verified in-place self-updater for Pi (bd-cv653.7.10)"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-error = { workspace = true }
+pi-version = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+asupersync = { workspace = true }

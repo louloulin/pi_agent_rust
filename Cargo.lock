@@ -5610,6 +5610,7 @@ dependencies = [
  "pi-scheduler",
  "pi-secret-screener",
  "pi-secrets",
+ "pi-self-update",
  "pi-session-metrics",
  "pi-sse",
  "pi-stats",
@@ -5988,6 +5989,18 @@ dependencies = [
  "pi-error",
  "regex",
  "serde",
+]
+
+[[package]]
+name = "pi-self-update"
+version = "0.1.0"
+dependencies = [
+ "asupersync",
+ "pi-error",
+ "pi-version",
+ "serde_json",
+ "sha2 0.11.0",
+ "tracing",
 ]
 
 [[package]]

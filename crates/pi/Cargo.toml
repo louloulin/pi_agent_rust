@@ -118,6 +118,7 @@ pi-extension-scoring = { workspace = true }
 pi-scheduler = { workspace = true }
 pi-secrets = { workspace = true }
 pi-secret-screener = { workspace = true }
+pi-self-update = { workspace = true }
 pi-conformance = { workspace = true }
 pi-crash = { workspace = true }
 pi-gallery = { workspace = true }

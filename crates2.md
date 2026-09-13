@@ -880,8 +880,28 @@ Round 30 后(收尾)       : ~64%
 
 **Round 27 累计迁出 8/15 chord 文件,累计 ~7,500 LOC**
 
+### Round 27.8 — `hostcall_egraph.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_egraph.rs crates/pi-chord/src/hostcall_egraph.rs`(2,450 LOC,std + 内依赖 hostcall_rewrite)
+2. `pi-chord/Cargo.toml` 新增 `serde_json` 依赖
+3. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_egraph;`
+4. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_egraph;`
+5. Bulk rename `crate::hostcall_egraph::*` → `pi_chord::hostcall_egraph::*` in `extensions/protocol.rs`
+6. 修复文件内 `use pi_chord::hostcall_rewrite::*` → `use crate::hostcall_rewrite::*`(自身已在 pi-chord)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 2,450 LOC
+
+**Round 27 累计迁出 9/15 chord 文件,累计 ~10,000 LOC**
+
+**剩余 hostcall_* 候选:** 仅 `hostcall_amac.rs`(cycle-blocked,Round 31+)
+
 ---
 
-> 本文档版本:v2.8(2026-09-13)
+> 本文档版本:v2.9(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

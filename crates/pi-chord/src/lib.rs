@@ -21,11 +21,14 @@
 //!   superinstruction plans (Round 27.6)
 //! - `hostcall_queue.rs` — Hostcall dispatch queue with overflow handling
 //!   and S3-FIFO eviction telemetry (Round 27.7)
+//! - `hostcall_egraph.rs` — Equality-saturation e-graph for discovering
+//!   hostcall rewrite plans (Round 27.8)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
 pub mod file_lock;
+pub mod hostcall_egraph;
 pub mod hostcall_io_uring_lane;
 pub mod hostcall_queue;
 pub mod hostcall_rewrite;

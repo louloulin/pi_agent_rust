@@ -94,7 +94,6 @@ pub mod worktree_iso;
 pub mod compaction;
 pub mod compaction_worker;
 pub mod hostcall_amac;
-pub mod hostcall_egraph;
 pub mod http_shim;
 pub mod migrations;
 pub mod session;

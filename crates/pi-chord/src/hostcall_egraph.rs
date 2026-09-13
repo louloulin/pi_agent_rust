@@ -48,7 +48,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use pi_chord::hostcall_rewrite::{HostcallRewritePlan, HostcallRewritePlanKind};
+use crate::hostcall_rewrite::{HostcallRewritePlan, HostcallRewritePlanKind};
 
 /// Schema tag for emitted decision telemetry.
 pub const HOSTCALL_EGRAPH_SCHEMA: &str = "pi.ext.hostcall_egraph_decision.v1";
@@ -2351,7 +2351,7 @@ mod tests {
     fn handoff_to_the_existing_selector_authorizes_the_fast_path() {
         // The search proposes; hostcall_rewrite disposes. A selected rewrite
         // must survive that engine's own guard.
-        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
+        use crate::hostcall_rewrite::HostcallRewriteEngine;
 
         let egraph = HostcallEGraphEngine::new(true);
         let decision = egraph.optimize(&typed_plan_with_roundtrip("tool.read"));
@@ -2381,7 +2381,7 @@ mod tests {
     fn a_fallback_is_rejected_by_the_selector_too() {
         // Defense in depth: even if a caller forwards a fallback decision, the
         // selector refuses it because its cost cannot beat the baseline.
-        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
+        use crate::hostcall_rewrite::HostcallRewriteEngine;
 
         let egraph = HostcallEGraphEngine::new(false);
         let decision = egraph.optimize(&canonical_plan("tool.read"));
@@ -2426,7 +2426,7 @@ mod tests {
     fn the_kill_switch_agrees_with_the_existing_planner() {
         // One variable governs both halves of the rewrite path, so the two
         // parsers must never disagree about what a value means.
-        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
+        use crate::hostcall_rewrite::HostcallRewriteEngine;
 
         for value in [
             Some("0"),

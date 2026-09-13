@@ -23,6 +23,8 @@ rustix = { workspace = true }
 serde = { workspace = true }
 # hostcall_queue.rs (Round 27.7) uses crossbeam_queue for the fast ring
 crossbeam-queue = { workspace = true }
+# hostcall_egraph.rs (Round 27.8) uses serde_json for plan encoding
+serde_json = { workspace = true }
 tracing = { workspace = true }
 
 [dev-dependencies]

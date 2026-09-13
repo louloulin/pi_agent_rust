@@ -11,7 +11,7 @@ use serde_json::json;
 // Equality-saturation rewrite search (bd-3ar8v.4.22). Named explicitly rather
 // than riding the glob above: it feeds the marshalling candidate list, so the
 // dependency should be visible at the top of the file.
-use crate::hostcall_egraph::{HostcallEGraphEngine, PlanExpr, Repr, StageOp};
+use pi_chord::hostcall_egraph::{HostcallEGraphEngine, PlanExpr, Repr, StageOp};
 
 // ============================================================================
 // Protocol (v1)

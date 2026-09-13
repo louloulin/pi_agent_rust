@@ -1,6 +1,6 @@
 //! Permission snapshot drift classification and evidence.
 
-use super::{
+use super::{ 
     Capability, ExtensionPermissionDriftClass, ExtensionPermissionDriftVerdict,
     ExtensionPermissionProvenanceStatus, ExtensionPermissionRiskLevel, ExtensionPermissionSnapshot,
     ExtensionPermissionTrust,

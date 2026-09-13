@@ -17,6 +17,7 @@
 //! configuration error cannot revive an older trusted execution target.
 
 use std::collections::HashMap;
+use serde_json::json;
 use std::fs::File;
 use std::io::Read as _;
 use std::path::{Path, PathBuf};

@@ -24,7 +24,14 @@
 
 #![forbid(unsafe_code)]
 
+// `framing.rs` and `tail.rs` live at the crate root (next to `lib.rs`)
+// because they are shared by LSP, DAP, and MCP transports that are
+// siblings of `jsonrpc` rather than children of it. The `#[path]`
+// attribute keeps them visible to this module without renaming the
+// files or moving them into a `jsonrpc/` subdirectory.
+#[path = "framing.rs"]
 mod framing;
+#[path = "tail.rs"]
 mod tail;
 
 pub use framing::{

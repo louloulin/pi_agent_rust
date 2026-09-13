@@ -24,7 +24,7 @@ use crate::auth::AuthStorage;
 use crate::cli::Cli;
 use crate::models::default_models_path;
 use pi_ai::provider::ThinkingBudgets;
-use pi_ai::providers;
+use crate::providers;
 use clap::Parser;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::{Map, Value};

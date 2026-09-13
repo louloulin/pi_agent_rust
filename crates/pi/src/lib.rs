@@ -128,7 +128,7 @@ pub use pi_tui::*;
 // Stable re-exports named by the public API policy.
 pub use pi_coding_agent::Error;
 pub use pi_coding_agent::PiResult;
-pub use pi_protocol::sdk;
+pub use crate::coding_agent::sdk;
 
 // Conditional re-exports for fuzz harnesses.
 #[cfg(feature = "fuzzing")]

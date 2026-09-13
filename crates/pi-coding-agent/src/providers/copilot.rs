@@ -10,6 +10,7 @@
 //! GitHub Enterprise Server is supported via a configurable base URL.
 
 use pi_error::{Error, Result};
+use serde_json::json;
 use crate::http::client::Client;
 use crate::models::CompatConfig;
 use pi_ai::provider::{Context, Provider, StreamEvent, StreamOptions};

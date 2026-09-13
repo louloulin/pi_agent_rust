@@ -12,6 +12,7 @@
 //! bd-3uqg.3.5
 
 use pi_error::{Error, Result};
+use serde_json::json;
 use crate::http::client::{Client, effective_default_request_timeout};
 use pi_ai::model::{
     AssistantMessage, ContentBlock, Message, StopReason, StreamEvent, TextContent, Usage,

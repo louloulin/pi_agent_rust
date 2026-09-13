@@ -17739,3 +17739,19 @@ mod tests {
         assert_eq!(plan.entries.len(), plan_entry_count);
     }
 }
+
+/// Round 19 (Option B): the legacy `pi` crate owns the
+/// `pi_ai::magic_keywords::MagicKeywordSink` implementation for `Session`
+/// so `append_session_telemetry` can be reused by both the agent loop
+/// and the interactive TUI without dragging the session module across
+/// the leaf boundary.
+impl pi_ai::magic_keywords::MagicKeywordSink for Session {
+    fn append_keyword_entry(&mut self, schema: &str, word: String, action: String) {
+        let payload = serde_json::json!({
+            "schema": schema,
+            "word": word,
+            "action": action,
+        });
+        self.append_custom_entry("magic_keyword".to_string(), Some(payload));
+    }
+}

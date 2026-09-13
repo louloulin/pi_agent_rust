@@ -1,4 +1,5 @@
 use super::*;
+use serde_json::json;
 
 use crate::models::{
     ExtensionProviderBinding, ModelEntry, ModelRole, extension_provider_bindings,
@@ -3582,7 +3583,7 @@ result in account suspension/ban. Prefer using an Anthropic API key (ANTHROPIC_A
         owner_session_id: String,
         completion: &crate::subagents::TanCompletion,
     ) -> PiMsg {
-        let card = pi::jobs::push_completion_notice(&owner_session_id, completion.follow_up_text())
+        let card = crate::jobs::push_completion_notice(&owner_session_id, completion.follow_up_text())
             .map_or_else(
                 |err| format!("(/tan failed to queue follow-up)\n{err}"),
                 |()| completion.card_text(),

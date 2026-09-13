@@ -1,6 +1,6 @@
 //! Capability-scoped filesystem connector.
 
-use super::{
+use super::{ 
     CapabilityManifest, Error, ExtensionPolicy, FsConnector, FsOp, FsScopes, HostCallError,
     HostCallErrorCode, HostCallPayload, HostResultPayload, PolicyDecision, Result,
     strip_unc_prefix,
@@ -17,7 +17,7 @@ use std::path::{Path, PathBuf};
 // ============================================================================
 
 impl FsOp {
-    pub(super) fn parse(value: &str) -> Option<Self> {
+    pub(crate) fn parse(value: &str) -> Option<Self> {
         let value = value.trim();
         if value.eq_ignore_ascii_case("read") {
             Some(Self::Read)

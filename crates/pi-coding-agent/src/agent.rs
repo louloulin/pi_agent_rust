@@ -34,7 +34,7 @@ use crate::extensions::{
     SessionActionOriginSource, resolve_extension_load_spec,
 };
 #[cfg(feature = "wasm-host")]
-use crate::extensions::{WasmExtensionHost, WasmExtensionLoadSpec};
+use crate::extensions_api::{WasmExtensionHost, WasmExtensionLoadSpec};
 use crate::extensions_js::{PiJsRuntimeConfig, RepairMode};
 use pi_ai::model::{
     AssistantMessage, AssistantMessageEvent, ContentBlock, CustomMessage, ImageContent, Message,

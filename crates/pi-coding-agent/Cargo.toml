@@ -13,6 +13,16 @@ path = "src/main.rs"
 [lints]
 workspace = true
 
+[features]
+# Round 19: gate the ftui/TUI-only helpers behind a feature so headless
+# builds keep working. Cargo will need to compile with `--features tui`
+# to expose `theme::tui_styles`, `glamour_style_config`, and the
+# associated bubbletea-side helpers.
+default = ["tui", "wasm-host", "ftui"]
+tui = []
+wasm-host = []
+ftui = []
+
 [dependencies]
 # Workspace deps required by the inlined Phase-1 leaves.
 anyhow = { workspace = true }
@@ -87,6 +97,14 @@ url = { workspace = true }
 uuid = { workspace = true }
 wasmtime = { workspace = true }
 xxhash-rust = { workspace = true }
+# Round 19 deps introduced when the inlined extension tools started
+# referencing crates that had previously been live in pi-tui / pi-coder
+# siblings only.
+crossbeam-queue = "0.3"
+filetime = "0.2"
+grep-searcher = "0.1"
+rich_rust = { version = "0.2", features = ["markdown"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [dev-dependencies]
 serde_json = { workspace = true }

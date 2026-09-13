@@ -5,6 +5,7 @@
 //! `Mcp-Session-Id` continuity, and custom headers.
 
 use std::collections::{HashMap, HashSet};
+use serde_json::json;
 use std::future::Future;
 use std::io::{BufRead, BufReader, Read, Write};
 use std::path::Path;

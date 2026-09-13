@@ -76,7 +76,6 @@ pub mod models;
 pub mod perf_build;
 pub mod permissions;
 pub mod pi_wasm;
-pub mod providers;
 pub mod resources;
 pub mod security_scan;
 pub mod semantic_workspace_graph;
@@ -146,8 +145,6 @@ pub mod validation_broker;
 // declared flat here so extensions_api.rs can `mod xxx;` them inline.
 pub mod extensions;
 pub mod connectors;
-pub mod mcp;
-
 // Round 18: server-side / client-side / eval / tui modules absorbed from
 // pi-server, pi-client, pi-evals, pi-tui.
 pub mod package_manager;
@@ -166,3 +163,26 @@ pub mod terminal_images;
 pub mod tui;
 
 pub use pi_error::{Error, Result as PiResult};
+
+// Round 19: re-export the protocol / provider / scheduler / error-hint
+// modules from the upstream `pi-ai` and `pi-agent-core` crates so legacy
+// `crate::X` call sites inside `extensions/*` continue to compile.
+pub use pi_ai::error_hints;
+pub use pi_ai::model as model_module;
+pub use pi_ai::provider;
+pub use pi_ai::provider as provider_module;
+pub use pi_agent_core::scheduler;
+
+// Convenience aliases used by inlined extension manager code that
+// originally addressed `crate::model::*` and `crate::error::*`.
+#[doc(hidden)]
+pub mod model {
+    pub use crate::model_module::*;
+}
+#[doc(hidden)]
+pub mod error {
+    pub use pi_error::{Error, Result};
+}
+
+// Re-export the web_search module so tool registry wiring finds it.
+pub mod web_search;

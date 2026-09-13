@@ -7,6 +7,7 @@
 //! machine. Waits reuse the shared `await_completion` tick loop.
 
 use std::collections::HashMap;
+use serde_json::json;
 use std::io::Write;
 use std::path::Path;
 use std::process::Stdio;

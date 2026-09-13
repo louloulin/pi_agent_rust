@@ -1,4 +1,5 @@
 use pi_ai::model::ContentBlock;
+use serde_json::json;
 use crate::theme::TuiStyles;
 use serde_json::Value;
 use std::borrow::Cow;

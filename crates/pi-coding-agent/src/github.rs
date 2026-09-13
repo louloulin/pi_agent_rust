@@ -10,7 +10,7 @@
 
 use crate::agent_cx::AgentCx;
 use pi_error::{Error, Result};
-use pi_agent_core::memory::screen_secrets;
+use crate::memory::screen_secrets;
 use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{
     ProcessCleanupMode, ProcessGuard, Tool, ToolEffects, ToolOutput, ToolUpdate,

@@ -6,6 +6,7 @@
 //! command/args and launch/attach argument templates.
 
 use std::path::Path;
+use serde_json::json;
 
 use serde_json::Value;
 

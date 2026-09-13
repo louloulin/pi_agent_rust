@@ -6,6 +6,7 @@
 // private, so this import does not widen the external API; narrower production
 // seams use explicit dependencies.
 use super::*;
+use serde_json::json;
 
 // Equality-saturation rewrite search (bd-3ar8v.4.22). Named explicitly rather
 // than riding the glob above: it feeds the marshalling candidate list, so the
@@ -2040,7 +2041,7 @@ impl ExtensionMessage {
     }
 }
 
-pub(super) fn validate_register(payload: &RegisterPayload) -> Result<()> {
+pub(crate) fn validate_register(payload: &RegisterPayload) -> Result<()> {
     if payload.name.trim().is_empty() {
         return Err(Error::validation("Extension name is empty"));
     }

@@ -43,6 +43,7 @@
 //! key + fallback paths unchanged; only the network call shape varies.
 
 use std::collections::{HashMap, HashSet};
+use serde_json::json;
 #[cfg(any(unix, windows))]
 use std::fs::File;
 #[cfg(any(unix, windows))]

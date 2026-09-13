@@ -10,6 +10,7 @@
 //! discipline as `ast_edit`).
 
 use std::collections::HashMap;
+use serde_json::json;
 use std::path::{Path, PathBuf};
 
 use serde_json::Value;

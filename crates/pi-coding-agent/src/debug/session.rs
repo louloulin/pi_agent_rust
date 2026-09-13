@@ -2,6 +2,7 @@
 //! transport, with typed requests for the debug surface (bd-cv653.1.2).
 
 use std::sync::Mutex;
+use serde_json::json;
 use std::time::Duration;
 
 use serde_json::Value;

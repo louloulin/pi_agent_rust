@@ -35,7 +35,7 @@ use pi_ai::model::{
 use crate::models::{ModelEntry, model_requires_configured_credential};
 use pi_ai::provider::InputType;
 use pi_ai::provider_metadata::provider_ids_match;
-use pi_ai::providers;
+use crate::providers;
 use crate::resources::ResourceLoader;
 use crate::session::{AutosaveFlushTrigger, Session, SessionEntry, SessionMessage};
 use crate::tools::{DEFAULT_MAX_BYTES, DEFAULT_MAX_LINES, truncate_tail};

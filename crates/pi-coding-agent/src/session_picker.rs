@@ -15,7 +15,7 @@ use pi_error::{Error, Result};
 use crate::session::{Session, encode_cwd};
 use crate::session_index::session_file_stats;
 use crate::session_index::{SessionIndex, SessionMeta, build_meta_from_file, is_session_file_path};
-use crate::interactive::theme{Theme, TuiStyles};
+use crate::theme::{Theme, TuiStyles};
 
 /// Format a timestamp for display.
 pub fn format_time(timestamp: &str) -> String {

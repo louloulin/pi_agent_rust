@@ -25,6 +25,7 @@
 //! `crate::agent_cx::AgentCx` that the leaf crate intentionally avoids.
 
 use std::collections::HashMap;
+use serde_json::json;
 use std::io::{BufReader, Read, Write};
 use std::path::Path;
 use std::process::{Child, ChildStdin, Command, Stdio};

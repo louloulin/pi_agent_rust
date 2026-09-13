@@ -1,6 +1,6 @@
 //! Coalescing dispatch implementation for [`super::EventCoalescer`].
 
-use super::{
+use super::{ 
     AgentEvent, CoalescedPayload, EventCoalescer, ExtensionEventName, ExtensionManager,
     extension_event_name_from_agent, is_coalescable_event, is_lifecycle_event,
 };

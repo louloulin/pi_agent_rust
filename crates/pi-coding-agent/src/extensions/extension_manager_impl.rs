@@ -5,6 +5,7 @@
 // implementation and therefore needs the manager's complete private state
 // graph; narrower leaf modules use explicit imports instead.
 use super::*;
+use serde_json::json;
 
 struct PendingExtensionUiLease {
     inner: Arc<Mutex<ExtensionManagerInner>>,

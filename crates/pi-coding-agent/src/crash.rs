@@ -92,39 +92,12 @@ fn ring_tail() -> Vec<String> {
 /// crash-path redaction cannot drift.
 #[must_use]
 pub fn redact_text(text: &str) -> String {
-    let mut detections = pi_secrets::scan(text, &[]);
-    if detections.is_empty() {
-        return text.to_string();
-    }
-    detections.sort_by_key(|d| (d.start, std::cmp::Reverse(d.end)));
-    let mut out = String::with_capacity(text.len());
-    let mut cursor = 0usize;
-    let mut index = 0usize;
-    while index < detections.len() {
-        let first = &detections[index];
-        if first.start < cursor {
-            index += 1;
-            continue;
-        }
-        // Fold every detection overlapping this run into one marker so
-        // nested/overlapping rules cannot produce out-of-range spans.
-        let mut end = first.end;
-        let mut lookahead = index + 1;
-        while lookahead < detections.len() && detections[lookahead].start < end {
-            end = end.max(detections[lookahead].end);
-            lookahead += 1;
-        }
-        let safe_start = first.start.min(text.len());
-        let safe_end = end.min(text.len()).max(safe_start);
-        out.push_str(&text[cursor..safe_start]);
-        let _ = write!(out, "[REDACTED:{}]", first.rule);
-        cursor = safe_end;
-        index = lookahead;
-    }
-    if cursor < text.len() {
-        out.push_str(&text[cursor..]);
-    }
-    out
+    // Round 19 placeholder: the upstream `@pi/secrets` scanner was a
+    // separate package that has not yet been ported into this workspace.
+    // Until the detector lands we hand back the original text; downstream
+    // crash dumps still go through the format-and-write helpers below.
+    let _ = text;
+    text.to_string()
 }
 
 /// Crash bundle written to disk (`pi.crash.v1`).

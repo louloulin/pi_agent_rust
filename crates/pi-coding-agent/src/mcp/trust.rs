@@ -13,6 +13,7 @@
 //! tool returns a typed `[MCP_TRUST_PENDING]` refusal naming the remedy.
 
 use std::collections::HashMap;
+use serde_json::json;
 #[cfg(unix)]
 use std::ffi::{OsStr, OsString};
 #[cfg(unix)]

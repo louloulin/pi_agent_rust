@@ -4,6 +4,7 @@
 //! supporting streaming responses and function calling (tool use).
 
 use pi_error::{Error, Result};
+use serde_json::json;
 use crate::http::client::Client;
 use pi_ai::model::{
     AssistantMessage, ContentBlock, Message, StopReason, StreamEvent, TextContent, ToolCall, Usage,

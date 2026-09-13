@@ -3,6 +3,7 @@
 //! with backoff; tool-list caching (bd-cv653.6.1).
 
 use std::collections::HashMap;
+use serde_json::json;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};

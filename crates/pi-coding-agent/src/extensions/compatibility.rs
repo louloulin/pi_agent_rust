@@ -3,7 +3,7 @@
 //! Public compatibility contracts remain defined in `extensions` so their
 //! Rust type identity stays stable while implementation details move here.
 
-use super::{
+use super::{ 
     COMPAT_LEDGER_SCHEMA_VERSION, CompatCapabilityEvidence, CompatEvidence, CompatIssueEvidence,
     CompatLedger, CompatRewriteEvidence, CompatibilityScanner,
 };
@@ -1085,7 +1085,7 @@ fn strip_js_comments(line: &str, state: &mut ScannerState) -> String {
 
 #[cfg(test)]
 mod compatibility_scanner_comment_tests {
-    use super::{CompatibilityScanner, ScannerState, strip_js_comments};
+    use super::{ CompatibilityScanner, ScannerState, strip_js_comments};
     use std::fs;
 
     #[test]

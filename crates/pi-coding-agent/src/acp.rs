@@ -40,7 +40,7 @@ use pi_ai::model::{AssistantMessageEvent, ContentBlock};
 use crate::models::{ModelEntry, ModelRegistry};
 use pi_ai::provider::StreamOptions;
 use pi_ai::provider_metadata::provider_ids_match;
-use pi_ai::providers;
+use crate::providers;
 use crate::session::{Session, SessionStoreKind};
 use crate::tools::ToolRegistry;
 use asupersync::channel::oneshot;

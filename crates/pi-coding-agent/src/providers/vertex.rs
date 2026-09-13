@@ -11,6 +11,7 @@
 //! `https://{region}-aiplatform.googleapis.com/v1/projects/{project}/locations/{region}/publishers/anthropic/models/{model}:streamRawPredict`
 
 use pi_error::{Error, Result};
+use serde_json::json;
 use crate::http::client::Client;
 use pi_ai::model::{
     AssistantMessage, ContentBlock, StopReason, StreamEvent, TextContent, ToolCall, Usage,

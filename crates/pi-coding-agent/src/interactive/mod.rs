@@ -57,7 +57,7 @@ use pi_ai::model::{
 use crate::models::{ModelEntry, ModelRegistry, default_models_path};
 use crate::package_manager::PackageManager;
 use crate::platform::VERSION;
-use pi_ai::providers;
+use crate::providers;
 use crate::resources::{DiagnosticKind, ResourceCliOptions, ResourceDiagnostic, ResourceLoader};
 use crate::session::{Session, SessionEntry, SessionMessage, bash_execution_to_text};
 use crate::theme::{Theme, TuiStyles};
@@ -67,23 +67,12 @@ use crate::workspace::WorkspaceHandle;
 #[cfg(all(feature = "clipboard", feature = "image-resize"))]
 use arboard::Clipboard as ArboardClipboard;
 
-mod agent;
+// Submodule declarations are at the bottom of this file (Round 13/19
+// migration). The compiler resolves them as long as the file is processed
+// once, so the `mod agent;` etc. duplicates that lived here before Round 19
+// have been removed.
 #[cfg(feature = "ftui")]
-pub(crate) use agent::tool_invocation_summary;
-mod commands;
-mod conversation;
-mod ext_session;
-mod file_refs;
-mod keybindings;
-mod model_selector_ui;
-mod perf;
-mod share;
-mod state;
-mod text_utils;
-mod tool_render;
-mod tree;
-mod tree_ui;
-mod view;
+pub(crate) use crate::interactive::agent::tool_invocation_summary;
 
 use self::agent::build_user_message;
 pub(crate) use self::agent::extension_commands_for_catalog;

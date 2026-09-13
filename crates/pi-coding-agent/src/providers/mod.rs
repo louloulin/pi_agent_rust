@@ -4,6 +4,7 @@
 //! for various LLM APIs.
 
 use pi_error::{Error, Result};
+use serde_json::json;
 use crate::extensions::{ExtensionManager, ExtensionRuntimeHandle};
 use crate::http::client::{Client, RequestBuilder};
 use pi_ai::model::{

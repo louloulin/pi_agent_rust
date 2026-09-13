@@ -10,6 +10,7 @@
 // This source snapshot is compiled out with `cfg(any())`. Preserve its broad
 // import until reactivation work can validate a real, explicit dependency set.
 use super::*;
+use serde_json::json;
 use crate::extensions::*;
 use crate::extensions_api::*;
 

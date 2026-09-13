@@ -1,6 +1,6 @@
 //! Dangerous-command mediation and secret-broker policy.
 
-use super::{DangerousCommandClass, ExecMediationPolicy, ExecRiskTier, SecretBrokerPolicy};
+use super::{ DangerousCommandClass, ExecMediationPolicy, ExecRiskTier, SecretBrokerPolicy};
 
 // ---------------------------------------------------------------------------
 // Exec mediation and secret broker (SEC-4.3 / bd-zh0hj)

@@ -1,6 +1,6 @@
 
 use crate::session::Session;
-use pi_ai::model::SessionMessage;
+use crate::session::SessionMessage;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::Mutex as StdMutex;

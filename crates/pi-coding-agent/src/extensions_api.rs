@@ -7,12 +7,23 @@ use crate::agent::AgentEvent;
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::connectors::http::HttpConnector;
-use pi_error::{Error, Result};
+// Round 19 (Option B): these types live in `pi_error`. The inline modules
+// below need them to be visible as `super::Error` / `super::Result` so we
+// promote the import to `pub use`.
+pub use pi_error::{Error, Result};
 use crate::extension_events::{ToolCallEventResult, ToolResultEventResult};
-use crate::extensions_js::{
+// Round 19 (Option B): these types/functions live in `extensions_js`. The
+// inline modules below need them to be visible as `super::Item` rather
+// than `crate::extensions_js::Item` (the original layout re-exported them
+// through `extensions::`), so we promote the imports to `pub use`.
+// `js_to_json` / `json_to_js` stay `pub(crate)` because they are
+// internal marshalling seams and the upstream `@earendil-works/pi` does
+// not expose them.
+pub use crate::extensions_js::{
     ExtensionRepairEvent, ExtensionToolDef, HostcallKind, HostcallRequest, PiJsRuntime,
-    PiJsRuntimeConfig, js_to_json, json_to_js,
+    PiJsRuntimeConfig,
 };
+pub(crate) use crate::extensions_js::{js_to_json, json_to_js};
 use crate::hostcall_amac::AmacBatchExecutor;
 #[cfg(test)]
 use crate::hostcall_amac::AmacBatchExecutorConfig;
@@ -25,7 +36,7 @@ use crate::hostcall_superinstructions::{
 use crate::hostcall_trace_jit::{GuardContext, TraceJitCompiler};
 use crate::permissions::{PermissionStore, PersistedDecision};
 use crate::resources::ExtensionResourcePaths;
-use pi_agent_core::scheduler::HostcallOutcome;
+pub(crate) use pi_agent_core::scheduler::HostcallOutcome;
 use crate::session::SessionMessage;
 use crate::tools::ToolRegistry;
 use ast_grep_core::{AstGrep, Pattern};
@@ -1153,13 +1164,42 @@ pub trait ExtensionHostActions: Send + Sync {
     }
 }
 
+// Round 19 (Option B): keep these as inline modules of extensions_api.rs
+// (so `use super::*` inside them resolves to extensions_api.rs items) but
+// point them at the `extensions/<name>.rs` files that moved in Round 18
+// via the `#[path = "..."]` attribute. This preserves the directory
+// structure for the per-file history while restoring the original
+// `super::*` resolution.
+#[path = "extensions/compatibility.rs"]
 mod compatibility;
+#[path = "extensions/event_coalescer_impl.rs"]
 mod event_coalescer_impl;
+#[path = "extensions/exec_mediation.rs"]
 mod exec_mediation;
+#[path = "extensions/extension_manager_impl.rs"]
 mod extension_manager_impl;
+#[path = "extensions/fs_connector.rs"]
 mod fs_connector;
+#[path = "extensions/permission_drift.rs"]
 mod permission_drift;
-mod protocol;
+#[path = "extensions/protocol.rs"]
+pub(crate) mod protocol;
+#[cfg(test)]
+#[path = "extensions/policy_snapshot_tests.rs"]
+mod policy_snapshot_tests;
+#[cfg(feature = "wasm-host")]
+#[allow(clippy::trait_duplication_in_bounds)]
+#[path = "extensions/wasm_host.rs"]
+mod wasm_host;
+#[cfg(any())]
+#[path = "extensions/native_runtime_experimental.rs"]
+mod native_runtime_experimental;
+#[path = "extensions/native_runtime.rs"]
+mod native_runtime;
+#[cfg(test)]
+#[path = "extensions/tests.rs"]
+mod tests;
+
 use exec_mediation::{
     classify_credential_file_modification, classify_device_write, classify_disk_wipe,
     classify_fork_bomb, classify_permission_escalation, classify_pipe_to_shell,
@@ -2004,7 +2044,7 @@ pub const SECURITY_ALERT_SCHEMA_VERSION: &str = "pi.ext.security_alert.v1";
 pub const INCIDENT_EVIDENCE_BUNDLE_SCHEMA_VERSION: &str = "pi.ext.incident_evidence_bundle.v1";
 const RUNTIME_HOSTCALL_SEQUENCE_WINDOW: usize = 64;
 const CAPABILITY_MANIFEST_SCHEMA_V1: &str = "pi.ext.cap.v1";
-const CAPABILITY_MANIFEST_SCHEMA_V2: &str = "pi.ext.cap.v2";
+pub(crate) const CAPABILITY_MANIFEST_SCHEMA_V2: &str = "pi.ext.cap.v2";
 
 fn runtime_risk_explanation_schema_default() -> String {
     RUNTIME_RISK_EXPLANATION_SCHEMA_VERSION.to_string()
@@ -2153,7 +2193,7 @@ pub const ALL_CAPABILITIES: &[Capability] = &[
 impl Capability {
     /// Parse a string token into a [`Capability`], case-insensitive.
     /// Returns `None` for unrecognised tokens.
-    pub fn parse(s: &str) -> Option<Self> {
+    pub(crate) fn parse(s: &str) -> Option<Self> {
         match s.trim().to_ascii_lowercase().as_str() {
             "read" => Some(Self::Read),
             "write" => Some(Self::Write),
@@ -9806,8 +9846,11 @@ impl PolicySnapshot {
     }
 }
 
+// Round 19 (Option B): policy_snapshot_tests lives at `extensions/policy_snapshot_tests.rs`.
+// See also the re-export block at the top of this file.
 #[cfg(test)]
-mod policy_snapshot_tests;
+#[allow(unused_imports)]
+use extensions::policy_snapshot_tests as _policy_snapshot_tests_re_export;
 
 fn required_capability_for_host_call_static_legacy(call: &HostCallPayload) -> Option<&'static str> {
     let method = call.method.trim();
@@ -9894,9 +9937,11 @@ pub struct WasmExtension {
     pub path: PathBuf,
 }
 
+// Round 19 (Option B): wasm_host lives at `extensions/wasm_host.rs`.
+// See also the re-export block at the top of this file.
 #[cfg(feature = "wasm-host")]
-#[allow(clippy::trait_duplication_in_bounds)]
-mod wasm_host;
+#[allow(clippy::trait_duplication_in_bounds, unused_imports)]
+use crate::extensions::wasm_host as _wasm_host_re_export;
 
 #[cfg(feature = "wasm-host")]
 pub struct WasmExtensionHost {
@@ -10856,34 +10901,38 @@ impl NativeRustExtensionLoadSpec {
     }
 }
 
+// Round 19 (Option B): native_runtime_experimental lives at
+// `extensions/native_runtime_experimental.rs`. See the re-export block at
+// the top of this file.
 #[cfg(any())]
-mod native_runtime_experimental;
+#[allow(dead_code, unused_imports)]
+use extensions::native_runtime_experimental as _native_runtime_experimental_marker;
 
 #[derive(Debug, Clone, Deserialize)]
-struct JsExtensionSnapshot {
-    id: String,
+pub struct JsExtensionSnapshot {
+    pub id: String,
     #[serde(default)]
-    name: String,
+    pub name: String,
     #[serde(default)]
-    version: String,
+    pub version: String,
     #[serde(default)]
-    api_version: String,
+    pub api_version: String,
     #[serde(default)]
-    tools: Vec<Value>,
+    pub tools: Vec<Value>,
     #[serde(default)]
-    slash_commands: Vec<Value>,
+    pub slash_commands: Vec<Value>,
     #[serde(default)]
-    shortcuts: Vec<Value>,
+    pub shortcuts: Vec<Value>,
     #[serde(default)]
-    providers: Vec<Value>,
+    pub providers: Vec<Value>,
     #[serde(default)]
-    mcp_servers: Vec<Value>,
+    pub mcp_servers: Vec<Value>,
     #[serde(default)]
-    flags: Vec<Value>,
+    pub flags: Vec<Value>,
     #[serde(default)]
-    event_hooks: Vec<String>,
+    pub event_hooks: Vec<String>,
     #[serde(default)]
-    active_tools: Option<Vec<String>>,
+    pub active_tools: Option<Vec<String>>,
 }
 
 #[cfg(feature = "wasm-host")]
@@ -10984,7 +11033,7 @@ impl WasmExtensionHandle {
     }
 }
 
-fn parse_extension_tool_defs(tools: &[Value]) -> Vec<ExtensionToolDef> {
+pub fn parse_extension_tool_defs(tools: &[Value]) -> Vec<ExtensionToolDef> {
     let mut defs = Vec::new();
     for value in tools {
         match serde_json::from_value::<ExtensionToolDef>(value.clone()) {
@@ -12639,7 +12688,7 @@ impl JsExtensionRuntimeHandle {
         }
     }
 
-    async fn load_extensions_snapshots(
+    pub(crate) async fn load_extensions_snapshots(
         &self,
         specs: Vec<JsExtensionLoadSpec>,
     ) -> Result<Vec<JsExtensionSnapshot>> {
@@ -13230,8 +13279,9 @@ impl JsExtensionRuntimeHandle {
     }
 }
 
-mod native_runtime;
-
+// Round 19 (Option B): native_runtime lives at `extensions/native_runtime.rs`
+// and is declared inline above via `#[path]`. The alias re-exports below
+// reach it as a sibling module of extensions_api.rs itself.
 pub type ExtensionRuntimeEngineSelection = native_runtime::ExtensionRuntimeEngineSelection;
 pub type ExtensionRuntimeHandle = native_runtime::ExtensionRuntimeHandle;
 pub type NativeRustExtensionRuntimeHandle = native_runtime::NativeRustExtensionRuntimeHandle;
@@ -15552,7 +15602,7 @@ fn js_hostcall_timeout_ms(request: &HostcallRequest) -> Option<u64> {
 pub(crate) const CAPABILITY_PROMPT_TIMEOUT_MS: u64 = 30_000;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum CapabilityPromptOutcome {
+pub(crate) enum CapabilityPromptOutcome {
     UserDecision {
         allow: bool,
         persist: bool,
@@ -15564,7 +15614,7 @@ enum CapabilityPromptOutcome {
     Unavailable,
 }
 
-fn remember_capability_prompt_decision(
+pub(crate) fn remember_capability_prompt_decision(
     manager: &ExtensionManager,
     extension_id: Option<&str>,
     capability: &str,
@@ -15599,7 +15649,7 @@ fn remember_capability_prompt_decision(
     }
 }
 
-const fn prompt_user_decision_reason(allow: bool, persistence_failed: bool) -> &'static str {
+pub(crate) const fn prompt_user_decision_reason(allow: bool, persistence_failed: bool) -> &'static str {
     match (allow, persistence_failed) {
         (true, false) => "prompt_user_allow",
         (false, false) => "prompt_user_deny",
@@ -15616,7 +15666,7 @@ const fn prompt_user_decision_reason(allow: bool, persistence_failed: bool) -> &
 /// decision. Trusted embedders that omit `remember` retain session-cache
 /// semantics. Cancellation, malformed responses, missing UI, and transport
 /// errors fail closed for the current call without forging a user denial.
-async fn prompt_capability_once(
+pub(crate) async fn prompt_capability_once(
     manager: &ExtensionManager,
     extension_id: &str,
     capability: &str,
@@ -16976,7 +17026,7 @@ async fn dispatch_shared_allowed(
 }
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
-async fn dispatch_hostcall_session_fast_ref(
+pub(crate) async fn dispatch_hostcall_session_fast_ref(
     manager: &ExtensionManager,
     op: &str,
     params: &Value,
@@ -17839,7 +17889,7 @@ async fn dispatch_shared_allowed_legacy(
 
 #[allow(clippy::future_not_send)]
 #[allow(clippy::unused_async)]
-async fn dispatch_hostcall_env(ctx: &HostCallContext<'_>, params: Value) -> HostcallOutcome {
+pub(crate) async fn dispatch_hostcall_env(ctx: &HostCallContext<'_>, params: Value) -> HostcallOutcome {
     let mut names = Vec::new();
 
     if let Some(name) = params.get("name").and_then(Value::as_str) {
@@ -17905,7 +17955,7 @@ async fn dispatch_hostcall_env(ctx: &HostCallContext<'_>, params: Value) -> Host
 
 #[allow(clippy::future_not_send)]
 #[allow(dead_code)]
-async fn dispatch_hostcall(host: &JsRuntimeHost, request: HostcallRequest) -> HostcallOutcome {
+pub(crate) async fn dispatch_hostcall(host: &JsRuntimeHost, request: HostcallRequest) -> HostcallOutcome {
     dispatch_hostcall_with_runtime(None, host, request).await
 }
 
@@ -17918,7 +17968,7 @@ async fn dispatch_hostcall(host: &JsRuntimeHost, request: HostcallRequest) -> Ho
 /// The test interceptor is checked *before* entering the shared path since
 /// it operates on the JS-specific [`HostcallRequest`] type.
 #[allow(clippy::future_not_send)]
-async fn dispatch_hostcall_with_runtime(
+pub(crate) async fn dispatch_hostcall_with_runtime(
     runtime: Option<&PiJsRuntime>,
     host: &JsRuntimeHost,
     request: HostcallRequest,
@@ -17956,7 +18006,7 @@ async fn dispatch_hostcall_with_runtime(
 }
 
 #[allow(clippy::future_not_send)]
-async fn dispatch_hostcall_tool(
+pub(crate) async fn dispatch_hostcall_tool(
     tools: &ToolRegistry,
     call_id: &str,
     name: &str,
@@ -17986,7 +18036,7 @@ async fn dispatch_hostcall_tool(
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
 #[allow(dead_code)]
-async fn dispatch_hostcall_exec(
+pub(crate) async fn dispatch_hostcall_exec(
     runtime: Option<&PiJsRuntime>,
     call_id: &str,
     cmd: &str,
@@ -17996,7 +18046,7 @@ async fn dispatch_hostcall_exec(
 }
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
-async fn dispatch_hostcall_exec_ref(
+pub(crate) async fn dispatch_hostcall_exec_ref(
     runtime: Option<&PiJsRuntime>,
     call_id: &str,
     cmd: &str,
@@ -18015,7 +18065,7 @@ async fn dispatch_hostcall_exec_ref(
 }
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
-async fn dispatch_hostcall_exec_ref_with_limit(
+pub(crate) async fn dispatch_hostcall_exec_ref_with_limit(
     runtime: Option<&PiJsRuntime>,
     call_id: &str,
     cmd: &str,
@@ -18562,7 +18612,7 @@ async fn dispatch_hostcall_exec_ref_with_limit(
 }
 
 #[allow(clippy::future_not_send)]
-async fn dispatch_hostcall_http(
+pub(crate) async fn dispatch_hostcall_http(
     call_id: &str,
     connector: &HttpConnector,
     payload: Value,
@@ -18654,7 +18704,7 @@ fn parse_session_hostcall_op(op: &str) -> Option<SessionHostcallOp> {
 #[allow(clippy::future_not_send)]
 #[allow(clippy::too_many_lines)]
 #[allow(dead_code)]
-async fn dispatch_hostcall_session(
+pub(crate) async fn dispatch_hostcall_session(
     call_id: &str,
     manager: &ExtensionManager,
     op: &str,
@@ -18666,7 +18716,7 @@ async fn dispatch_hostcall_session(
 #[allow(clippy::future_not_send)]
 #[allow(clippy::too_many_lines)]
 #[allow(clippy::option_if_let_else)]
-async fn dispatch_hostcall_session_ref(
+pub(crate) async fn dispatch_hostcall_session_ref(
     call_id: &str,
     manager: &ExtensionManager,
     op: &str,
@@ -18869,7 +18919,7 @@ async fn dispatch_hostcall_session_ref(
 
 #[allow(clippy::future_not_send)]
 #[allow(dead_code)]
-async fn dispatch_hostcall_ui(
+pub(crate) async fn dispatch_hostcall_ui(
     call_id: &str,
     manager: &ExtensionManager,
     op: &str,
@@ -18880,7 +18930,7 @@ async fn dispatch_hostcall_ui(
 }
 
 #[allow(clippy::future_not_send)]
-async fn dispatch_hostcall_ui_ref(
+pub(crate) async fn dispatch_hostcall_ui_ref(
     call_id: &str,
     manager: &ExtensionManager,
     op: &str,
@@ -18938,7 +18988,7 @@ pub(crate) fn classify_ui_hostcall_error(err: &Error) -> &'static str {
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
 #[allow(clippy::unused_async)]
-async fn dispatch_hostcall_log(
+pub(crate) async fn dispatch_hostcall_log(
     call_id: &str,
     extension_id: Option<&str>,
     payload: Value,
@@ -19097,7 +19147,7 @@ fn parse_events_hostcall_op(op: &str) -> Option<EventsHostcallOp> {
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
 #[allow(dead_code)]
-async fn dispatch_hostcall_events(
+pub(crate) async fn dispatch_hostcall_events(
     call_id: &str,
     manager: &ExtensionManager,
     tools: &ToolRegistry,
@@ -19136,7 +19186,7 @@ fn authoritative_events_extension_id(
 }
 
 #[allow(clippy::future_not_send, clippy::too_many_lines)]
-async fn dispatch_hostcall_events_ref(
+pub(crate) async fn dispatch_hostcall_events_ref(
     call_id: &str,
     manager: &ExtensionManager,
     tools: &ToolRegistry,
@@ -20048,7 +20098,7 @@ impl ExtensionManagerHandle {
         }
     }
 
-    fn upgrade(&self) -> Option<ExtensionManager> {
+    pub(crate) fn upgrade(&self) -> Option<ExtensionManager> {
         self.inner.upgrade().map(|inner| ExtensionManager {
             inner,
             snapshot: self
@@ -20734,7 +20784,7 @@ fn build_compat_registration_hints(
     out
 }
 
-fn extract_slash_command_name(value: &Value) -> Option<String> {
+pub fn extract_slash_command_name(value: &Value) -> Option<String> {
     value
         .get("name")
         .and_then(Value::as_str)
@@ -20763,5 +20813,8 @@ fn is_non_callable_compat_inferred(value: &Value) -> bool {
             .unwrap_or(true)
 }
 
+// Round 19 (Option B): tests lives at `extensions/tests.rs` (and the
+// sub-modules in `extensions/tests/`). See the re-export block at the top.
 #[cfg(test)]
-mod tests;
+#[allow(unused_imports)]
+use extensions::tests as _tests_re_export;

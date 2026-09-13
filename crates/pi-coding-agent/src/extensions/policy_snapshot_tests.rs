@@ -1,6 +1,6 @@
 //! Behavioral tests for compiled extension-policy snapshots.
 
-use super::{
+use super::{ 
     ALL_CAPABILITIES, ExtensionOverride, ExtensionPolicy, PolicyDecision, PolicyProfile,
     PolicySnapshot,
 };

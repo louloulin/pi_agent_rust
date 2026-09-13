@@ -19,7 +19,7 @@ use std::path::{Path, PathBuf};
 use std::sync::{Mutex, OnceLock};
 
 use pi_error::{Error, Result};
-use pi_secrets::{SecretVault, obfuscate};
+use crate::secrets::{SecretVault, obfuscate};
 use serde::{Deserialize, Serialize};
 
 /// Maximum transcript bytes paged back per `transcript` call.

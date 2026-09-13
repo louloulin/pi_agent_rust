@@ -1183,6 +1183,26 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.20(2026-09-13)
+> 本文档版本:v2.21(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 30.5 — `completions.rs` → `cli/completions.rs` ✅(cli 收编)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/completions.rs crates/pi-coding-agent/src/cli/completions.rs`(188 LOC)
+2. 文件内部 5 处 `crate::` 引用:
+   - `crate::cli::Cli::command()` —— 搬入 `cli/` 后自动变成 `super::Cli::command()`,语义零变化
+   - `crate::config::Config::global_dir()` / `crate::auth::AuthStorage::load(...)` / `crate::models::ModelRegistry::load(...)` —— `completions` 模型补全用,跨模块调用,保持 `crate::` 不变
+   - `crate::session_index::SessionIndex::new()` —— session 补全用,同上
+3. `cli/mod.rs` 末尾追加 `pub mod completions;`(原 2849 行单体,补一个 submodule 声明)。
+4. `lib.rs` 把 `pub mod completions;` 替换为 `pub use cli::completions;`(re-export,保留 `pi_coding_agent::completions::*` 路径 —— `main.rs:2779/2782` 两处调用不动)。
+
+**验证:**
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 25.32s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished(0 errors)
+- `cargo check --bins --tests`:baseline 错误未变(15 个既有 test module 文件缺失,与本轮无关)
+
+**LOC 迁移:** 188 LOC(`pi-coding-agent/src/` → `pi-coding-agent/src/cli/`)。
+
+**Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。

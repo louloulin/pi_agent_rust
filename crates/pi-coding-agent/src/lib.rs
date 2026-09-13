@@ -27,7 +27,10 @@ pub mod markdown_rich;
 // so binary + interactive/* callers can keep using
 // `crate::overlay_system::*`.
 pub use pi_tui::overlay_system;
-pub mod platform;
+// Round 31: `platform` re-housed in `pi-chord`. Re-export it here so
+// `models.rs` / `providers/model_fetch.rs` / tests keep resolving
+// `crate::platform::*` and `pi_coding_agent::platform::*` unchanged.
+pub use pi_chord::platform;
 pub mod secrets;
 pub mod self_update;
 pub mod stats;

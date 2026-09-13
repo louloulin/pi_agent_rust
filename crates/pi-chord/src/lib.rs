@@ -35,6 +35,8 @@
 //! - `skills_managed.rs` — User-managed skill CRUD (create / update /
 //!   delete / list) backed by a per-user ledger under the agent global dir
 //!   (Round 30.4)
+//! - `platform.rs` — OS / filesystem abstraction: effective-mode access
+//!   context, trusted symlink resolution, OS + arch naming (Round 31)
 
 #![forbid(unsafe_code)]
 
@@ -51,4 +53,5 @@ pub mod hostcall_rewrite;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
+pub mod platform;
 pub mod skills_managed;

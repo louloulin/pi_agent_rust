@@ -1183,9 +1183,28 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.23(2026-09-13)
+> 本文档版本:v2.24(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 33 — `version.rs` → `pi-chord` ✅(semver + HttpFetch trait)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/version.rs crates/pi-chord/src/version.rs`(525 LOC)
+2. 内容:`CURRENT_VERSION` 常量 + `HttpFetch` trait + `VersionCheckResult` enum + `is_newer / read_cached_version / write_cached_version / refresh_cache_if_stale / check_cached / parse_github_release_version`(semver + GitHub release 解析 + 缓存刷新 + HTTP trait seam)
+3. `pi-chord/Cargo.toml` 加 `semver = { workspace = true }`
+4. `pi-chord/src/lib.rs` 加 `pub mod version;` + 文档条目
+5. `pi-coding-agent/src/lib.rs` 替换 `pub mod version;` 为 `pub use pi_chord::version;`(re-export)
+6. `pi-coding-agent/src/version_check.rs` 改为 `pub use pi_chord::version::*;`(原 `crate::version::*`)+ `impl pi_chord::version::HttpFetch for ClientHttpFetch`,文档注释同步更新(`pi-version` 引用替换为 `pi-chord::version`)
+7. `pi-coding-agent/src/self_update.rs` 改 `use pi_chord::version::{is_newer, CURRENT_VERSION};`
+8. `interactive/mod.rs` 4 处 `crate::version_check::*` 不动 —— `version_check.rs` 仍在原位,通过 re-export 透传
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished(0 errors)
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 51.47s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 51.72s(0 errors)
+
+**LOC 迁移:** 525 LOC。pi-chord 现在持有 18 个模块。
 
 ### Round 32 — `crash.rs` → `pi-chord` ✅(panic hook + crash bundle)
 

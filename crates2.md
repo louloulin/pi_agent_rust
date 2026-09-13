@@ -1187,7 +1187,21 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 39 — `commit_split.rs` → `pi-chord` ✅(atomic commit planner)
+### Round 40 — `model_routing.rs` → `pi-chord` ✅(RoutingModel trait seam)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/model_routing.rs crates/pi-chord/src/model_routing.rs`（710 LOC）
+2. 新增最小 `RoutingModel` trait（provider、model id、cost），使路由证据模块不依赖 coding-agent 的 `ModelEntry`
+3. `pi-coding-agent` 为 `ModelEntry` 实现 adapter，并通过 re-export 保留现有 `crate::model_routing::*` 调用路径
+4. 测试改用独立 `FixtureModel`，证明目标 crate 可脱离 coding-agent 编译和运行
+
+**验证:**
+- `cargo check -p pi-chord` ✅
+- `cargo test -p pi-chord model_routing --lib` ✅ 9 passed
+- `git diff --check` ✅
+
+**LOC 迁移:** 710 LOC。pi-chord 现在持有 25 个模块。
+
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/commit_split.rs crates/pi-chord/src/commit_split.rs`（720 LOC）

@@ -103,11 +103,17 @@ pub mod hub;
 pub mod keybindings;
 pub mod mcp;
 pub mod media_tools;
-pub mod model_routing;
+// Round 40: model routing moved to pi-chord and is parameterized by a
+// minimal RoutingModel seam; the catalog adapter is implemented below.
+pub use pi_chord::model_routing;
 pub mod model_selector;
 pub mod models;
-pub mod perf_build;
 pub mod permissions;
+impl pi_chord::model_routing::RoutingModel for models::ModelEntry {
+    fn provider(&self) -> &str { &self.model.provider }
+    fn model_id(&self) -> &str { &self.model.id }
+    fn cost(&self) -> &pi_ai::provider::ModelCost { &self.model.cost }
+}
 pub mod pi_wasm;
 pub mod resources;
 pub mod security_scan;

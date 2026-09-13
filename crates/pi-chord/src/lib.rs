@@ -55,6 +55,8 @@
 //!   undo/redo and external-change protection (Round 38)
 //! - `commit_split.rs` — dependency-ordered atomic git commit planning and
 //!   execution with secret-safe messages (Round 39)
+//! - `model_routing.rs` — provider health and cost routing evidence over a
+//!   minimal `RoutingModel` trait seam (Round 40)
 
 #![forbid(unsafe_code)]
 
@@ -73,6 +75,7 @@ pub mod hostcall_rewrite;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
+pub mod model_routing;
 pub mod platform;
 pub mod secrets;
 pub mod skills_managed;

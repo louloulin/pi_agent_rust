@@ -4,10 +4,18 @@
 //! provider health metrics into redaction-safe evidence that UI and JSON
 //! surfaces can display without changing the live provider invocation path.
 
-use crate::models::ModelEntry;
 use pi_ai::provider::ModelCost;
 use pi_ai::provider_metadata::canonical_provider_id;
 use serde::{Deserialize, Serialize};
+
+/// Minimal model view required by routing. Coding-agent model catalogs can
+/// implement this without making the routing crate depend on catalog types.
+pub trait RoutingModel {
+    fn provider(&self) -> &str;
+    fn model_id(&self) -> &str;
+    fn cost(&self) -> &ModelCost;
+}
+
 
 pub const ROUTING_EVIDENCE_SCHEMA: &str = "pi.provider_routing.evidence.v1";
 
@@ -283,8 +291,8 @@ impl RoutingEvidenceSnapshot {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct RoutingEvaluation<'a> {
-    pub model: &'a ModelEntry,
+pub struct RoutingEvaluation<'a, M: RoutingModel + ?Sized> {
+    pub model: &'a M,
     pub metrics: Option<&'a ProviderRoutingMetrics>,
     pub now_ms: u64,
     pub configured_only_scope: bool,
@@ -292,9 +300,9 @@ pub struct RoutingEvaluation<'a> {
     pub thresholds: ProviderRoutingThresholds,
 }
 
-impl<'a> RoutingEvaluation<'a> {
+impl<'a, M: RoutingModel + ?Sized> RoutingEvaluation<'a, M> {
     #[must_use]
-    pub fn new(model: &'a ModelEntry, now_ms: u64) -> Self {
+    pub fn new(model: &'a M, now_ms: u64) -> Self {
         Self {
             model,
             metrics: None,
@@ -307,10 +315,10 @@ impl<'a> RoutingEvaluation<'a> {
 }
 
 #[must_use]
-pub fn evaluate_model_routing(input: RoutingEvaluation<'_>) -> ModelRoutingEvidence {
-    let provider = canonicalize_provider(input.model.model.provider.as_str());
-    let model = input.model.model.id.clone();
-    let cost_hint = RoutingCostHint::from_cost(&input.model.model.cost, input.thresholds);
+pub fn evaluate_model_routing<M: RoutingModel + ?Sized>(input: RoutingEvaluation<'_, M>) -> ModelRoutingEvidence {
+    let provider = canonicalize_provider(input.model.provider());
+    let model = input.model.model_id().to_string();
+    let cost_hint = RoutingCostHint::from_cost(input.model.cost(), input.thresholds);
     let mut evidence = ModelRoutingEvidence {
         provider: provider.clone(),
         model: model.clone(),
@@ -440,30 +448,27 @@ fn is_zero(value: f64) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use pi_ai::provider::{InputType, Model};
+    use pi_ai::provider::ModelCost;
     use serde_json::json;
-    use std::collections::HashMap;
 
-    fn model_entry(provider: &str, id: &str, cost: ModelCost) -> ModelEntry {
-        ModelEntry {
-            model: Model {
-                id: id.to_string(),
-                name: id.to_string(),
-                api: "openai-completions".to_string(),
-                provider: provider.to_string(),
-                base_url: "https://example.invalid".to_string(),
-                reasoning: true,
-                input: vec![InputType::Text],
-                cost,
-                context_window: 128_000,
-                max_tokens: 8_192,
-                headers: HashMap::new(),
-            },
-            api_key: Some("redacted-fixture-key".to_string()),
-            headers: HashMap::new(),
-            auth_header: true,
-            compat: None,
-            oauth_config: None,
+    #[derive(Debug)]
+    struct FixtureModel {
+        provider: String,
+        id: String,
+        cost: ModelCost,
+    }
+
+    impl RoutingModel for FixtureModel {
+        fn provider(&self) -> &str { &self.provider }
+        fn model_id(&self) -> &str { &self.id }
+        fn cost(&self) -> &ModelCost { &self.cost }
+    }
+
+    fn model_entry(provider: &str, id: &str, cost: ModelCost) -> FixtureModel {
+        FixtureModel {
+            provider: provider.to_string(),
+            id: id.to_string(),
+            cost,
         }
     }
 

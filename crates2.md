@@ -1183,9 +1183,25 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.25(2026-09-13)
+> 本文档版本:v2.26(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 35 — `status_line.rs` → `pi-chord` ✅(Powerline status line)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/status_line.rs crates/pi-chord/src/status_line.rs`(487 LOC,纯 std + serde,零 `crate::` 自依赖)
+2. 内容:`StatusLinePreset` enum + `SeparatorStyle` enum + `SegmentId` enum + `StatusContext<'a>` + `StatusSegment` + `PowerlineStatusLine`(响应式 dropping)+ `compute_session_accent_hue`(session 名字哈希出色调)
+3. `pi-chord/src/lib.rs` 加 `pub mod status_line;` + 文档条目
+4. `pi-coding-agent/src/lib.rs` 替换 `pub mod status_line;` 为 `pub use pi_chord::status_line;`
+5. caller `interactive/view.rs` + `interactive_ftui.rs` 走 `crate::status_line::*`,通过 re-export 自动解析
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished in 2.06s(0 errors,4 warnings)
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 34.82s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 34.11s(0 errors)
+
+**LOC 迁移:** 487 LOC。pi-chord 现在持有 20 个模块。
 
 ### Round 34 — `turn_recovery.rs` → `pi-chord` ✅(StopReason → RecoveryClass)
 

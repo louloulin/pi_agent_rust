@@ -1,0 +1,17 @@
+[package]
+name = "pi-compaction-snap"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Snapcompact compaction mode (bd-cv653.7.6) — rasterize compacted transcript into deterministic PNG frames for vision-capable model context"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-model = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+base64 = { workspace = true }
+flate2 = { workspace = true }
+tracing = { workspace = true }

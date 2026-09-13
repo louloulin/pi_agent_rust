@@ -12,6 +12,7 @@ members = [
     "crates/pi-mono",
     "crates/pi-buffer-shim",
     "crates/pi-cli",
+    "crates/pi-compaction-snap",
     "crates/pi-context-files",
     "crates/pi-crypto-shim",
     "crates/pi-delight",
@@ -89,6 +90,7 @@ pi-agent-hub = { path = "crates/pi-agent-hub", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
 pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
+pi-compaction-snap = { path = "crates/pi-compaction-snap", version = "0.1.0" }
 pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
 pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }

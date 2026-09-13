@@ -5581,6 +5581,7 @@ dependencies = [
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
+ "pi-compaction-snap",
  "pi-conformance",
  "pi-context-files",
  "pi-crash",
@@ -5721,6 +5722,18 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "proptest",
+]
+
+[[package]]
+name = "pi-compaction-snap"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "flate2",
+ "pi-model",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

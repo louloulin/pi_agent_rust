@@ -36,7 +36,9 @@ pub use pi_chord::platform;
 pub mod secrets;
 pub mod self_update;
 pub mod stats;
-pub mod status_line;
+// Round 35: `status_line` re-housed in `pi-chord` (powerline status,
+// responsive dropping, accent hue — pure std + serde).
+pub use pi_chord::status_line;
 pub mod swarm_activity_ledger;
 pub mod swarm_progress_slo;
 // Round 34: `turn_recovery` re-housed in `pi-chord` (only depends on

@@ -46,6 +46,9 @@
 //! - `turn_recovery.rs` — Classify model `StopReason` into
 //!   `RecoveryClass` (retry / continue / give-up) for the agent loop
 //!   (Round 34)
+//! - `status_line.rs` — Powerline status line builder: presets,
+//!   separators, segment IDs, responsive dropping, accent-hue hash
+//!   (Round 35)
 
 #![forbid(unsafe_code)]
 
@@ -65,5 +68,6 @@ pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
 pub mod platform;
 pub mod skills_managed;
+pub mod status_line;
 pub mod turn_recovery;
 pub mod version;

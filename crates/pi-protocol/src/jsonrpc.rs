@@ -24,21 +24,15 @@
 
 #![forbid(unsafe_code)]
 
-// `framing.rs` and `tail.rs` live at the crate root (next to `lib.rs`)
-// because they are shared by LSP, DAP, and MCP transports that are
-// siblings of `jsonrpc` rather than children of it. The `#[path]`
-// attribute keeps them visible to this module without renaming the
-// files or moving them into a `jsonrpc/` subdirectory.
-#[path = "framing.rs"]
-mod framing;
-#[path = "tail.rs"]
-mod tail;
-
-pub use framing::{
+// `framing` and `tail` are sibling modules of `jsonrpc` inside this crate.
+// In the legacy layout they were `#[path = ...]`-included from
+// `pi-coding-agent/src/jsonrpc.rs`; Round 30.1 hoisted them here, so they
+// are ordinary module declarations.
+pub use crate::framing::{
     EnvPolicy, MCP_ENV_ALLOWLIST, RpcErrorObject, ServerNotification, TransportError, encode_frame,
     find_subslice, parse_content_length, read_frame, read_frame_with_scratch,
 };
-pub use tail::{PublicTailBuffer, TailBuffer};
+pub use crate::tail::{PublicTailBuffer, TailBuffer};
 
 /// Why a completion wait ended without a value.
 ///

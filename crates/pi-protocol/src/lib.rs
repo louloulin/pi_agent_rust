@@ -1,13 +1,17 @@
-//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-protocol`:
-//! JSON-RPC / SSE / ACP / SDK transport layer. After Round 18 the files
-//! that previously lived here were absorbed into `pi-coding-agent` to
-//! break the `pi-coding-agent ↔ pi-protocol` cycle. This crate remains
-//! so the 11-package surface mirrors the upstream repository structure;
-//! downstream consumers should depend on `pi-coding-agent` instead.
+//! Phase-2 aggregator mirroring `@earendil-works/pi-protocol`:
+//! JSON-RPC / framing / tail-buffer primitives shared by LSP, DAP, and
+//! MCP transports.
+//!
+//! Round 30.1 began re-housing the framing + tail + jsonrpc modules
+//! here. The transport-specific surface (`JsonRpcClient`, `await_completion`,
+//! `apply_env_policy`, `reader_loop`, `PendingMap`, `SharedWriter`,
+//! `ServerRequestHandler`, `lock`) stays in `pi-coding-agent/src/lsp/jsonrpc.rs`
+//! because it threads through `crate::tools::ProcessGuard`,
+//! `pi_error::Error`, and `crate::agent_cx::AgentCx` that this leaf crate
+//! intentionally avoids.
 
 #![forbid(unsafe_code)]
 
-// Empty: all protocol / rpc / acp / sdk modules were moved to
-// `pi-coding-agent` in Round 18 to break the dependency cycle. This
-// crate is retained as a marker so `crates/pi`'s facade can still
-// re-export a `protocol` namespace.
+pub mod framing;
+pub mod jsonrpc;
+pub mod tail;

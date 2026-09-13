@@ -125,11 +125,17 @@ pub mod skills_managed;
 pub mod subagents;
 
 // Round 18: protocol / rpc / acp / sdk absorbed from pi-protocol.
+// Round 30.1: `jsonrpc` (plus its sibling `framing` + `tail` leaf modules)
+// re-housed in `pi-protocol`; re-export them here so existing call sites
+// (`crate::jsonrpc::*`, `crate::lsp::jsonrpc::PublicTailBuffer`, …) keep
+// resolving unchanged.
 pub mod acp;
 pub mod http;
-pub mod jsonrpc;
+pub use pi_protocol::framing;
+pub use pi_protocol::jsonrpc;
 pub mod rpc;
 pub mod sdk;
+pub use pi_protocol::tail;
 pub mod validation_broker;
 
 // The extensions/ directory predates Round 17; declared as a single

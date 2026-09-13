@@ -1075,6 +1075,36 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.16(2026-09-13)
+### Round 30.1 — `jsonrpc + framing + tail` → `pi-protocol` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/jsonrpc.rs crates/pi-protocol/src/jsonrpc.rs`(56 LOC)
+2. `git mv crates/pi-coding-agent/src/framing.rs crates/pi-protocol/src/framing.rs`(279 LOC)
+3. `git mv crates/pi-coding-agent/src/tail.rs crates/pi-protocol/src/tail.rs`(101 LOC)
+4. 三个文件仅依赖 `std + serde + serde_json`(framing),无 `crate::` 内部引用 —— Round 18 留的"空壳 pi-protocol + 抽到 pi-coding-agent"终于可以反向迁回。
+5. `pi-protocol/src/jsonrpc.rs` 移除 `#[path = "framing.rs"] mod framing; #[path = "tail.rs"] mod tail;` —— sibling 模块改用普通 `mod` 声明。
+6. `pi-protocol/src/lib.rs` 新增 `pub mod jsonrpc; pub mod framing; pub mod tail;`,文档注释更新为"jsonrpc 叶子模块归位,transport 层仍留在 pi-coding-agent"。
+7. `pi-protocol/Cargo.toml` 加 `serde = { workspace = true }` + 已有 `serde_json/anyhow`。
+8. `pi-coding-agent/Cargo.toml` 加 `pi-protocol = { workspace = true }`。
+9. `pi-coding-agent/src/lib.rs` 替换 `pub mod jsonrpc;` 为 `pub use pi_protocol::{jsonrpc, framing, tail};`(3 个 re-export,保留 `pi_coding_agent::jsonrpc::*` 路径)。
+10. `pi-coding-agent/src/lsp/jsonrpc.rs` 把 `pub use crate::jsonrpc::{...};` 改为 `pub use pi_protocol::jsonrpc::{...};`(该文件内 transport 特定代码 `JsonRpcClient`、`await_completion`、`apply_env_policy`、`reader_loop`、`PendingMap` 仍留在 pi-coding-agent,因为依赖 `crate::tools::ProcessGuard` + `crate::agent_cx::AgentCx`)。
+
+**验证:**
+- `cargo check -p pi-protocol`:✅ Finished(0 errors,无新增 warning)
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 48.97s(0 errors)
+
+**LOC 迁移:** 436 LOC(净代码 + lib.rs 重排 + 注释更新)
+
+**设计要点:**
+- `pi-protocol/src/jsonrpc.rs` 现在只装 framing 原语(`RpcErrorObject` / `TransportError` / `ServerNotification` / `EnvPolicy` / `encode_frame` / `read_frame` / `PublicTailBuffer` / `CompletionWaitError`),所有跨模块依赖(transport、子进程管理、cancel signal)继续留在 `pi-coding-agent/src/lsp/jsonrpc.rs`。
+- 叶子 crate 零内部依赖(std + serde + serde_json),任何想直接用 framing 的 crate 都能直接 `use pi_protocol::jsonrpc::*` 而不引入 pi-coding-agent 重量级依赖。
+- 路径兼容:`pi_coding_agent::jsonrpc::PublicTailBuffer`、`pi_coding_agent::lsp::jsonrpc::JsonRpcClient` 等等调用方路径全部保持,通过 `pub use` re-export 串联。
+
+**Round 30 累计(本轮 + Round 30 后续待办):** 436 / ~33K(provider 主体待评估)。
+
+---
+
+> 本文档版本:v2.17(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

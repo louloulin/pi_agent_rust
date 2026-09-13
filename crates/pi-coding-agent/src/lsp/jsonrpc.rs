@@ -35,9 +35,9 @@ use std::sync::{Mutex, MutexGuard};
 
 use serde_json::Value;
 
-// Re-exported framing primitives from `pi-jsonrpc`. See the module-level docs
+// Re-exported framing primitives from `pi-protocol`. See the module-level docs
 // above for the rationale.
-pub use crate::jsonrpc::{
+pub use pi_protocol::jsonrpc::{
     CompletionWaitError, EnvPolicy, MCP_ENV_ALLOWLIST, PublicTailBuffer, RpcErrorObject,
     ServerNotification, TailBuffer, TransportError, encode_frame, find_subslice,
     parse_content_length, read_frame, read_frame_with_scratch,

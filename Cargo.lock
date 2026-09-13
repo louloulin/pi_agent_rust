@@ -5751,6 +5751,7 @@ dependencies = [
  "pi-ai",
  "pi-chord",
  "pi-error",
+ "pi-protocol",
  "pi-session-backends",
  "pi-telemetry",
  "pi-tui",
@@ -5836,6 +5837,7 @@ name = "pi-protocol"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "serde",
  "serde_json",
 ]
 

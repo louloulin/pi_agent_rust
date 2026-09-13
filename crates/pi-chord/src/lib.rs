@@ -1,13 +1,16 @@
-//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-chord`: the
-//! hostcall / buffer / file-lock runtime. After Round 18 the files that
-//! previously lived here were moved into `pi-coding-agent` to break the
-//! `pi-coding-agent ↔ pi-chord` cyclic dependency. This crate remains so
-//! the 11-package surface mirrors the upstream repository structure;
-//! downstream consumers should depend on `pi-coding-agent` instead.
+//! Phase-2 module for `@earendil-works/pi-chord`:
+//! hostcall / buffer / file-lock runtime.
+//!
+//! Round 18 moved the chord leaves into `pi-coding-agent` to break the
+//! `pi-coding-agent ↔ pi-chord` cycle. Round 27 begins re-housing them
+//! here, one at a time, to restore the upstream surface.
+//!
+//! - `buffer_shim.rs` — Node `Buffer` polyfill source for the QuickJS extension
+//!   runtime (Round 27.1)
+//! - `file_lock.rs` — proper-lockfile-compatible directory lock for shared
+//!   settings/auth/session-index files (Round 27.1)
 
 #![forbid(unsafe_code)]
 
-// Empty: all hostcall / buffer / file-lock / swarm modules were moved to
-// `pi-coding-agent` in Round 18 to break the dependency cycle. This crate
-// is retained as a marker so `crates/pi`'s facade can still re-export a
-// `chord` namespace.
+pub mod buffer_shim;
+pub mod file_lock;

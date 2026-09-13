@@ -5682,7 +5682,10 @@ name = "pi-chord"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "filetime",
+ "rustix",
  "serde_json",
+ "tempfile",
 ]
 
 [[package]]
@@ -5739,6 +5742,7 @@ dependencies = [
  "pdf-extract",
  "pi-agent-core",
  "pi-ai",
+ "pi-chord",
  "pi-error",
  "pi-session-backends",
  "pi-telemetry",

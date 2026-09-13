@@ -721,8 +721,48 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 56 LOC(纯测试)
 
+### Round 26.3 — pivot to Round 27 (pi-chord) ✅
+
+**Round 26 后续被 cycle 阻断,本轮切换到 Round 27 (pi-chord)**
+
+**Round 26 剩余文件为什么暂时无法迁出:**
+- `session_picker.rs` / `session_sqlite.rs` / `session_index.rs` / `session_store_v2.rs` / `session.rs` / `session_import.rs` 全部 `use crate::session::*`
+- 如果迁入 `pi-session-backends/src/`,需要 `pi-session-backends → pi-coding-agent` 编译期依赖
+- 这会和 Round 26.1 加的 `pi-coding-agent → pi-session-backends` 重新形成 cycle
+- 真正的修复需要先把 `Session` 类型抽成 `SessionLike` trait,这是一个大重构,留待 Round 31+
+
+**本轮做的事(切到 Round 27):**
+1. `git mv crates/pi-coding-agent/src/buffer_shim.rs crates/pi-chord/src/buffer_shim.rs`
+2. `git mv crates/pi-coding-agent/src/file_lock.rs crates/pi-chord/src/file_lock.rs`
+3. `pi-coding-agent/Cargo.toml` 新增 `pi-chord = { workspace = true }` 依赖
+4. `pi-chord/Cargo.toml` 新增 `filetime` / `rustix` 生产依赖 + `tempfile` 开发依赖
+5. `pi-coding-agent/src/lib.rs` 移除 `pub mod buffer_shim;` 和 `pub mod file_lock;`
+6. 替换 5 个文件中的 `crate::file_lock::*` → `pi_chord::file_lock::*`(bulk sed):
+   - `pi-coding-agent/src/session_index.rs`(注释 + 2 处使用)
+   - `pi-coding-agent/src/auth.rs`(15 处使用)
+   - `pi-coding-agent/src/providers/model_fetch.rs`
+   - `pi-coding-agent/src/config.rs`
+   - `pi-coding-agent/src/mcp/trust.rs`
+7. 替换 `pi-coding-agent/src/extensions_js.rs:14334` 的 `crate::buffer_shim::NODE_BUFFER_JS` → `pi_chord::buffer_shim::NODE_BUFFER_JS`
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-chord --tests`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(189 warnings,与 R26.2 持平)
+- `cargo check -p pi-coding-agent --bin pi`:✅ Finished
+- `cargo check -p pi-session-backends --tests`:✅ Finished
+
+**LOC 迁移:** ~1100 LOC(buffer_shim ~440 LOC + file_lock ~660 LOC,文件级)
+
+**Round 26 → Round 27 战略决策:**
+- 原计划 Round 26 拆 `pi-session-backends`(8 文件,32K LOC)
+- 但 Round 18 cycle-break 让大部分 session 文件形成依赖耦合
+- 现实决策:Round 26 暂留 6 个 session 文件,Round 27 切到 `pi-chord`(本轮)
+- Round 27 价值:迁出 `buffer_shim + file_lock` 这两个零依赖 leaf 文件,验证 Round 18 的"反向修复"路径可行
+- Round 27.2+ 候选:`hostcall_*` 系列(8 文件,中等依赖),`extensions_api.rs`(25K,最大 chord 资产)
+
 ---
 
-> 本文档版本:v2.2(2026-09-13)
+> 本文档版本:v2.3(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

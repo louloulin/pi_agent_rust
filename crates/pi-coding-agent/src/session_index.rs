@@ -515,8 +515,8 @@ impl SessionIndex {
         }
         // `self.lock_path` is `<sessions>/session-index.lock` — the same path
         // upstream TS pi locks with `proper-lockfile`. Use the directory-based
-        // protocol (see `crate::file_lock`) so the two interoperate.
-        let _lock = crate::file_lock::DirLock::acquire(&self.lock_path, SESSION_INDEX_LOCK_TIMEOUT)
+        // protocol (see `pi_chord::file_lock`) so the two interoperate.
+        let _lock = pi_chord::file_lock::DirLock::acquire(&self.lock_path, SESSION_INDEX_LOCK_TIMEOUT)
             .map_err(|e| Error::session(format!("session index lock: {e}")))?;
 
         run_on_sqlite_thread(|| {
@@ -1881,7 +1881,7 @@ mod tests {
 
     #[test]
     fn dir_lock_prevents_concurrent_access() {
-        use crate::file_lock::DirLock;
+        use pi_chord::file_lock::DirLock;
         let harness = TestHarness::new("dir_lock_prevents_concurrent_access");
         let lock_path = harness.temp_path("session-index.lock");
 

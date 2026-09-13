@@ -1048,14 +1048,14 @@ fn auth_load_other_error(context: &str, error: &std::io::Error) -> AuthStorageLo
 struct GuardedAuthRead {
     content: Option<String>,
     parent_directory: File,
-    _lock: Option<crate::file_lock::DirLockAt>,
+    _lock: Option<pi_chord::file_lock::DirLockAt>,
 }
 
 #[cfg(windows)]
 struct GuardedAuthRead {
     content: Option<String>,
     operation_path: PathBuf,
-    _lock: Option<crate::file_lock::DirLock>,
+    _lock: Option<pi_chord::file_lock::DirLock>,
     _parent_guards: Vec<WindowsAuthDirectoryGuard>,
 }
 
@@ -1063,7 +1063,7 @@ struct GuardedAuthRead {
 struct GuardedAuthRead {
     content: Option<String>,
     operation_path: PathBuf,
-    _lock: Option<crate::file_lock::DirLock>,
+    _lock: Option<pi_chord::file_lock::DirLock>,
 }
 
 #[cfg(unix)]
@@ -1084,7 +1084,7 @@ where
     };
     let target_name = target_name.to_os_string();
     let lock = acquire_auth_read_lock(path, || {
-        crate::file_lock::DirLockAt::acquire_for(&parent_directory, &target_name, lock_timeout)
+        pi_chord::file_lock::DirLockAt::acquire_for(&parent_directory, &target_name, lock_timeout)
     })?;
     before_read().map_err(|error| auth_load_other_error("auth read preparation", &error))?;
     if !auth_parent_identity_matches(path, &parent_directory)
@@ -1119,7 +1119,7 @@ where
         Err(error) => return Err(auth_load_other_error("auth.json parent directory", &error)),
     };
     let lock = acquire_auth_read_lock(path, || {
-        crate::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
+        pi_chord::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
     })?;
     validate_windows_auth_parent(&parent_guards)
         .map_err(|error| auth_load_other_error("auth.json parent identity", &error))?;
@@ -1159,7 +1159,7 @@ where
         return Ok(None);
     }
     let lock = acquire_auth_read_lock(path, || {
-        crate::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
+        pi_chord::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
     })?;
     before_read().map_err(|error| auth_load_other_error("auth read preparation", &error))?;
     let content = read_auth_file_bounded(&operation_path)
@@ -1247,7 +1247,7 @@ where
 {
     let (parent_path, target_name) = auth_target_parts(path)?;
     let directory = open_auth_directory_nofollow(parent_path, true)?;
-    let _lock = crate::file_lock::DirLockAt::acquire_for(&directory, target_name, lock_timeout)
+    let _lock = pi_chord::file_lock::DirLockAt::acquire_for(&directory, target_name, lock_timeout)
         .map_err(|error| Error::auth(format!("auth lock: {error}")))?;
     if !auth_parent_identity_matches(path, &directory).map_err(|error| {
         Error::auth(format!(
@@ -1312,7 +1312,7 @@ where
     G: FnOnce(&Path) -> std::io::Result<()>,
 {
     let (operation_path, parent_guards) = open_or_create_windows_auth_parent(path, true)?;
-    let _lock = crate::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
+    let _lock = pi_chord::file_lock::DirLock::acquire_for(&operation_path, lock_timeout)
         .map_err(|error| Error::auth(format!("auth lock: {error}")))?;
     validate_windows_auth_parent(&parent_guards)?;
     let parent = operation_path.parent().unwrap_or_else(|| Path::new("."));
@@ -1347,7 +1347,7 @@ where
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent)?;
     }
-    let _lock = crate::file_lock::DirLock::acquire_for(path, lock_timeout)
+    let _lock = pi_chord::file_lock::DirLock::acquire_for(path, lock_timeout)
         .map_err(|error| Error::auth(format!("auth lock: {error}")))?;
     let parent = path.parent().unwrap_or_else(|| Path::new("."));
     let mut temp = NamedTempFile::new_in(parent)?;
@@ -1528,7 +1528,7 @@ impl AuthStorage {
         }
 
         let _locked =
-            crate::file_lock::DirLockAt::acquire_for(directory, target_name, lock_timeout)
+            pi_chord::file_lock::DirLockAt::acquire_for(directory, target_name, lock_timeout)
                 .map_err(|error| Error::auth(format!("auth lock: {error}")))?;
         let mut temp = create_auth_temp_file(directory)?;
         temp.file
@@ -6936,7 +6936,7 @@ mod tests {
         let auth_path = dir.path().join("auth.json");
         assert!(!auth_path.exists());
 
-        let held_lock = crate::file_lock::DirLock::acquire_for(&auth_path, Duration::from_secs(1))
+        let held_lock = pi_chord::file_lock::DirLock::acquire_for(&auth_path, Duration::from_secs(1))
             .expect("hold auth lock");
         let lock_failure = AuthStorage::load_with_lock_timeout_classified(
             auth_path.clone(),
@@ -8427,7 +8427,7 @@ mod tests {
         fs::write(&auth_path, "not valid json {{").expect("write corrupt auth");
         let backup_path = auth_path.with_extension("json.corrupt");
         let held_backup_lock =
-            crate::file_lock::DirLock::acquire_for(&backup_path, Duration::from_secs(1))
+            pi_chord::file_lock::DirLock::acquire_for(&backup_path, Duration::from_secs(1))
                 .expect("hold backup lock");
 
         let auth = AuthStorage::load_with_lock_timeout(auth_path, Duration::from_secs(1))
@@ -9165,7 +9165,7 @@ mod tests {
         // The proper-lockfile-compatible directory lock is created on acquire and
         // removed (`rmdir`) on release, so it must NOT persist after `save()`.
         // A leftover regular file here is exactly what poisons upstream TS pi.
-        let lock_path = crate::file_lock::lock_path_for(&auth_path);
+        let lock_path = pi_chord::file_lock::lock_path_for(&auth_path);
         assert!(
             !lock_path.exists(),
             "lock must not persist after save (no poisoning artifact)"
@@ -9240,7 +9240,7 @@ mod tests {
             "a rejected save must preserve the existing auth.json byte-for-byte"
         );
         assert!(
-            !crate::file_lock::lock_path_for(&auth_path).exists(),
+            !pi_chord::file_lock::lock_path_for(&auth_path).exists(),
             "a rejected save must not acquire or leave an auth lock"
         );
         let entries_after = fs::read_dir(dir.path())

@@ -2158,9 +2158,9 @@ fn patch_settings_file(path: &Path, patch: Value) -> Result<Value> {
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
     // Directory-based lock compatible with upstream TS pi's `proper-lockfile`
-    // (see `crate::file_lock`); the in-process `settings_persist_lock` above still
+    // (see `pi_chord::file_lock`); the in-process `settings_persist_lock` above still
     // serializes threads within this process.
-    let _file_guard = crate::file_lock::DirLock::acquire_for(path, Duration::from_secs(30))
+    let _file_guard = pi_chord::file_lock::DirLock::acquire_for(path, Duration::from_secs(30))
         .map_err(|e| Error::config(format!("settings lock: {e}")))?;
     let mut settings = load_settings_json_object(path)?;
     deep_merge_settings_value(&mut settings, patch)?;

@@ -101,19 +101,19 @@ pub(crate) struct TrustWriteGuard {
     directory: File,
     target_name: OsString,
     parent_path: PathBuf,
-    _global_lock: crate::file_lock::DirLockAt,
-    _lock: crate::file_lock::DirLockAt,
+    _global_lock: pi_chord::file_lock::DirLockAt,
+    _lock: pi_chord::file_lock::DirLockAt,
 }
 
 #[cfg(windows)]
 #[derive(Debug)]
 pub(crate) struct TrustWriteGuard {
     _directories: Vec<WindowsTrustDirectoryGuard>,
-    _lock: crate::file_lock::DirLock,
+    _lock: pi_chord::file_lock::DirLock,
 }
 
 #[cfg(all(not(unix), not(windows)))]
-pub(crate) type TrustWriteGuard = crate::file_lock::DirLock;
+pub(crate) type TrustWriteGuard = pi_chord::file_lock::DirLock;
 
 #[cfg(windows)]
 #[derive(Debug)]
@@ -358,7 +358,7 @@ fn create_trust_temp_file(directory: &File) -> std::io::Result<TrustTempFile> {
 }
 
 #[cfg(unix)]
-fn acquire_global_trust_lock(path: &Path) -> std::io::Result<crate::file_lock::DirLockAt> {
+fn acquire_global_trust_lock(path: &Path) -> std::io::Result<pi_chord::file_lock::DirLockAt> {
     acquire_global_trust_lock_for(path, TRUST_LOCK_TIMEOUT)
 }
 
@@ -409,7 +409,7 @@ fn stable_trust_lock_path(path: &Path) -> std::io::Result<PathBuf> {
 pub(crate) fn acquire_global_trust_lock_for(
     path: &Path,
     timeout: Duration,
-) -> std::io::Result<crate::file_lock::DirLockAt> {
+) -> std::io::Result<pi_chord::file_lock::DirLockAt> {
     use std::os::unix::fs::MetadataExt as _;
 
     let euid = rustix::process::geteuid().as_raw();
@@ -431,7 +431,7 @@ pub(crate) fn acquire_global_trust_lock_for(
         "trust-{}",
         crate::package_manager::hex_encode(&digest.finalize())
     ));
-    crate::file_lock::DirLockAt::acquire_for(&directory, &target_name, timeout)
+    pi_chord::file_lock::DirLockAt::acquire_for(&directory, &target_name, timeout)
 }
 
 #[cfg(windows)]
@@ -1138,7 +1138,7 @@ impl TrustStore {
             )
         })?;
         let lock =
-            crate::file_lock::DirLockAt::acquire_for(&directory, &target_name, TRUST_LOCK_TIMEOUT)
+            pi_chord::file_lock::DirLockAt::acquire_for(&directory, &target_name, TRUST_LOCK_TIMEOUT)
                 .map_err(|err| {
                     Error::tool(
                         "mcp",
@@ -1177,7 +1177,7 @@ impl TrustStore {
                 ),
             )
         })?;
-        let lock = crate::file_lock::DirLock::acquire_for(&operation_path, TRUST_LOCK_TIMEOUT)
+        let lock = pi_chord::file_lock::DirLock::acquire_for(&operation_path, TRUST_LOCK_TIMEOUT)
             .map_err(|err| {
                 Error::tool(
                     "mcp",

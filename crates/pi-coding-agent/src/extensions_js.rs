@@ -14331,7 +14331,7 @@ export default EventEmitter;
     // ── node:buffer ──────────────────────────────────────────────────
     modules.insert(
         "node:buffer".to_string(),
-        compressed_js_literal!(crate::buffer_shim::NODE_BUFFER_JS)
+        compressed_js_literal!(pi_chord::buffer_shim::NODE_BUFFER_JS)
             .trim()
             .to_string(),
     );

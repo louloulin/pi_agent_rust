@@ -12,7 +12,15 @@ workspace = true
 # Round 18: pi-chord is now an empty placeholder. All hostcall / buffer /
 # file-lock / swarm modules moved to pi-coding-agent to break the
 # pi-coding-agent ↔ pi-chord cycle.
+#
+# Round 27: re-housing leaves here, one at a time, to restore the upstream
+# surface.
 anyhow = { workspace = true }
+# file_lock.rs (Round 27.1)
+filetime = { workspace = true }
+rustix = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+# file_lock.rs in-crate tests need tempfile for scratch dirs.
+tempfile = { workspace = true }

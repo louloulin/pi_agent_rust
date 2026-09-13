@@ -1489,7 +1489,7 @@ where
     let _process_guard = fetched_catalog_persist_lock()
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
-    let _file_guard = crate::file_lock::DirLockAt::acquire_for(
+    let _file_guard = pi_chord::file_lock::DirLockAt::acquire_for(
         &context.directory,
         &context.target_name,
         Duration::from_secs(30),
@@ -1855,7 +1855,7 @@ where
         ))
     })?;
     let _file_guard =
-        crate::file_lock::DirLock::acquire_for(&operation_path, Duration::from_secs(30)).map_err(
+        pi_chord::file_lock::DirLock::acquire_for(&operation_path, Duration::from_secs(30)).map_err(
             |error| {
                 Error::config(format!(
                     "Failed to lock fetched model catalog {}: {error}",
@@ -1966,7 +1966,7 @@ where
     let _process_guard = fetched_catalog_persist_lock()
         .lock()
         .unwrap_or_else(std::sync::PoisonError::into_inner);
-    let _file_guard = crate::file_lock::DirLock::acquire_for(path, Duration::from_secs(30))
+    let _file_guard = pi_chord::file_lock::DirLock::acquire_for(path, Duration::from_secs(30))
         .map_err(|error| {
             Error::config(format!(
                 "Failed to lock fetched model catalog {}: {error}",
@@ -3380,7 +3380,7 @@ mod tests {
             original
         );
         assert!(
-            !crate::file_lock::lock_path_for(&fetched_path).exists(),
+            !pi_chord::file_lock::lock_path_for(&fetched_path).exists(),
             "permission preflight must run before DirLock acquisition"
         );
         drop(mode_guard);
@@ -3405,7 +3405,7 @@ mod tests {
             "preflight failure must not leave a partially-created directory tree"
         );
         assert!(!fetched_path.exists());
-        assert!(!crate::file_lock::lock_path_for(&fetched_path).exists());
+        assert!(!pi_chord::file_lock::lock_path_for(&fetched_path).exists());
         drop(mode_guard);
     }
 
@@ -3424,7 +3424,7 @@ mod tests {
             .expect_err("directory durability requires owner read permission");
         assert!(error.to_string().contains("Permission denied"), "{error}");
         assert!(!fetched_path.exists());
-        assert!(!crate::file_lock::lock_path_for(&fetched_path).exists());
+        assert!(!pi_chord::file_lock::lock_path_for(&fetched_path).exists());
         drop(mode_guard);
     }
 
@@ -3462,7 +3462,7 @@ mod tests {
                     b"preserve target\n"
                 );
             }
-            assert!(!crate::file_lock::lock_path_for(&fetched_path).exists());
+            assert!(!pi_chord::file_lock::lock_path_for(&fetched_path).exists());
         }
     }
 
@@ -3487,7 +3487,7 @@ mod tests {
         );
         assert!(!directory.path().join("missing-target").exists());
         assert!(!fetched_path.exists());
-        assert!(!crate::file_lock::lock_path_for(&fetched_path).exists());
+        assert!(!pi_chord::file_lock::lock_path_for(&fetched_path).exists());
     }
 
     #[cfg(unix)]

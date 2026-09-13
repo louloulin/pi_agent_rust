@@ -8,9 +8,26 @@
 
 ---
 
+## 0. `Round 41` 进展
+
+**做了什么:**
+1. 新增 `crates/pi-protocol/src/tool_effects.rs`，承载 read/write/append/network/process effects、labels、parallel-safety 与 barrier 规则
+2. `pi-coding-agent::tools` 改为 re-export 协议类型，保持所有既有 `ToolEffects` 调用路径与行为
+3. 新增协议单元测试覆盖 labels、barrier 与并发兼容性
+4. 为后续 `plan.rs` 迁移建立无 coding-agent 反向依赖的工具效果 seam
+
+**验证:**
+- `cargo check -p pi-protocol` ✅
+- `cargo test -p pi-protocol tool_effects --lib` ✅ 1 passed
+- `git diff --check` ✅
+- `cargo check -p pi-coding-agent --lib` 仍仅受仓库既有 Windows `win32job` / `windows_by_handle` 问题阻塞；本轮未引入新的协议错误
+
+**推送:** 本地提交 `a1df24af1`；首次推送因 GitHub `Recv failure: Connection was aborted` 失败，提交已保留，待网络恢复后重试。
+
+---
+
 ## 0. 摘要
 
-| 维度 | 当前 | 目标(Round 30) |
 |------|------|-----------------|
 | **结构镜像**(11 同名 crate) | 100% | 100% |
 | **代码归属镜像**(本文件逐文件分析) | **~30%** | **~64%** |

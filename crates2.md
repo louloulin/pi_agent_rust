@@ -1183,9 +1183,26 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.21(2026-09-13)
+> 本文档版本:v2.22(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 31 — `platform.rs` → `pi-chord` ✅(OS/文件系统抽象,纯 std)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/platform.rs crates/pi-chord/src/platform.rs`(360 LOC,纯 std,零 `crate::` 自依赖)
+2. 内容:`EffectiveModeAccessContext`(POSIX access bit)+ `UNIX_ACCESS_*` 常量 + `read_trusted_symlink_component` + `ensure_effective_mode_access` + `os_name / arch_name / VERSION`,20+ caller(`models.rs` + `providers/model_fetch.rs`)
+3. `pi-chord/src/lib.rs` 加 `pub mod platform;` + 文档条目
+4. `pi-coding-agent/src/lib.rs` 替换 `pub mod platform;` 为 `pub use pi_chord::platform;`(re-export,保留 `crate::platform::*` 与 `pi_coding_agent::platform::*` 路径)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished(0 errors)
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 40.81s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished(0 errors)
+
+**LOC 迁移:** 360 LOC。
+
+**Round 30+31 累计:** 1,699 LOC 归位。pi-chord 现在持有 16 个模块。
 
 ### Round 30.5 — `completions.rs` → `cli/completions.rs` ✅(cli 收编)
 

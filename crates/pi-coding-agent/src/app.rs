@@ -14,13 +14,13 @@ use thiserror::Error;
 use crate::auth::AuthStorage;
 use crate::cli;
 use crate::config::Config;
-use crate::model::{self, AssistantMessage, ContentBlock, ImageContent, TextContent};
+use pi_ai::model::{self, AssistantMessage, ContentBlock, ImageContent, TextContent};
 use crate::models::{
     ModelEntry, ModelRegistry, ModelRole, default_models_path, model_entry_is_ready,
     model_requires_configured_credential, normalize_api_key_opt,
 };
-use crate::provider::{CacheRetention, StreamOptions, ThinkingBudgets};
-use crate::provider_metadata::{
+use pi_ai::provider::{CacheRetention, StreamOptions, ThinkingBudgets};
+use pi_ai::provider_metadata::{
     canonical_provider_id, provider_ids_match, split_provider_model_spec,
 };
 use crate::session::Session;
@@ -1711,7 +1711,7 @@ mod tests {
 
     use super::*;
     use crate::auth::AuthStorage;
-    use crate::provider::{InputType, Model, ModelCost};
+    use pi_ai::provider::{InputType, Model, ModelCost};
 
     fn test_model_entry(id: &str, provider: &str, reasoning: bool) -> ModelEntry {
         ModelEntry {
@@ -2429,7 +2429,7 @@ mod tests {
         let config = Config::default();
         let mut session = Session::in_memory();
         let root_id = session.append_message(crate::session::SessionMessage::User {
-            content: crate::model::UserContent::Text("root".to_string()),
+            content: pi_ai::model::UserContent::Text("root".to_string()),
             timestamp: Some(0),
         });
         let openai_id =
@@ -2459,7 +2459,7 @@ mod tests {
         session.header.provider = Some("openai-codex".to_string());
         session.header.model_id = Some("gpt-5.4".to_string());
         let root_id = session.append_message(crate::session::SessionMessage::User {
-            content: crate::model::UserContent::Text("root".to_string()),
+            content: pi_ai::model::UserContent::Text("root".to_string()),
             timestamp: Some(0),
         });
         let high_id = session.append_thinking_level_change("high".to_string());

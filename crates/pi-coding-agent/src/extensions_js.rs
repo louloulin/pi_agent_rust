@@ -23,7 +23,7 @@
 //!   drain microtasks (Promises .then chains)
 //! ```
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::hostcall_io_uring_lane::{
     HostcallCapabilityClass, HostcallIoHint, IoUringLaneDecisionInput,
 };
@@ -31,7 +31,7 @@ use crate::hostcall_queue::{
     HOSTCALL_FAST_RING_CAPACITY, HOSTCALL_OVERFLOW_CAPACITY, HostcallQueueEnqueueResult,
     HostcallQueueTelemetry, HostcallRequestQueue, QueueTenant,
 };
-use crate::scheduler::{Clock as SchedulerClock, HostcallOutcome, Scheduler, WallClock};
+use pi_agent_core::scheduler::{Clock as SchedulerClock, HostcallOutcome, Scheduler, WallClock};
 use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use rquickjs::function::{Func, Opt};
@@ -64,10 +64,10 @@ macro_rules! compressed_js_literal {
     ($source:expr) => {{
         const RAW_LEN: usize = ($source).len();
         const COMPRESSED_LEN: usize =
-            crate::embedded_assets::lzss_compressed_len(($source).as_bytes());
+            pi_ai::embedded_assets::lzss_compressed_len(($source).as_bytes());
         static COMPRESSED: [u8; COMPRESSED_LEN] =
-            crate::embedded_assets::lzss_compress::<COMPRESSED_LEN>(($source).as_bytes());
-        crate::embedded_assets::lzss_decompress(&COMPRESSED, RAW_LEN)
+            pi_ai::embedded_assets::lzss_compress::<COMPRESSED_LEN>(($source).as_bytes());
+        pi_ai::embedded_assets::lzss_decompress(&COMPRESSED, RAW_LEN)
             .expect("compile-time compressed JavaScript literal must decode")
     }};
 }
@@ -8801,7 +8801,7 @@ export async function refreshOpenAICodexToken(_refreshToken) {
 }
 
 // Context-overflow classification. Mirrors the host classifier
-// (`crate::error::is_context_overflow`) so extensions that import
+// (`pi_error::is_context_overflow`) so extensions that import
 // `isContextOverflow` from pi-ai (e.g. custom compaction/recovery hooks)
 // reach the same verdict the agent loop itself uses. Keep the two in sync;
 // `pijs_pi_ai_is_context_overflow_matches_host_classifier` pins parity.
@@ -17949,9 +17949,9 @@ impl<C: SchedulerClock + 'static> PiJsRuntime<C> {
 
     fn take_session_action_origin_for_macrotask(
         &self,
-        task: &crate::scheduler::Macrotask,
+        task: &pi_agent_core::scheduler::Macrotask,
     ) -> Option<SessionActionOrigin> {
-        use crate::scheduler::MacrotaskKind as SMK;
+        use pi_agent_core::scheduler::MacrotaskKind as SMK;
 
         match &task.kind {
             SMK::HostcallComplete { call_id, .. } => {
@@ -18127,9 +18127,9 @@ impl<C: SchedulerClock + 'static> PiJsRuntime<C> {
     fn handle_macrotask(
         &self,
         ctx: &Ctx<'_>,
-        task: &crate::scheduler::Macrotask,
+        task: &pi_agent_core::scheduler::Macrotask,
     ) -> rquickjs::Result<()> {
-        use crate::scheduler::MacrotaskKind as SMK;
+        use pi_agent_core::scheduler::MacrotaskKind as SMK;
 
         match &task.kind {
             SMK::HostcallComplete { call_id, outcome } => {
@@ -25318,7 +25318,7 @@ for (const name of Object.getOwnPropertyNames(globalThis)) {
 mod tests {
     use super::*;
     use crate::extensions::SessionActionOriginSource;
-    use crate::scheduler::DeterministicClock;
+    use pi_agent_core::scheduler::DeterministicClock;
     use serde_json::json;
     use tracing_subscriber::layer::SubscriberExt as _;
 
@@ -34201,7 +34201,7 @@ export const bundled = globalThis.__doomWadFinderProbe.bundled;
         ];
         let expected: Vec<bool> = MESSAGES
             .iter()
-            .map(|m| crate::error::is_context_overflow(m, None, None))
+            .map(|m| pi_error::is_context_overflow(m, None, None))
             .collect();
         assert!(expected.iter().any(|v| *v) && expected.iter().any(|v| !*v));
 
@@ -34264,13 +34264,13 @@ export const bundled = globalThis.__doomWadFinderProbe.bundled;
             }
             assert_eq!(r["stopText"], serde_json::json!(false));
             assert_eq!(r["silent"], serde_json::json!(true));
-            assert!(crate::error::is_context_overflow(
+            assert!(pi_error::is_context_overflow(
                 "",
                 Some(210_000),
                 Some(200_000)
             ));
             assert_eq!(r["silentUnderWindow"], serde_json::json!(false));
-            assert!(!crate::error::is_context_overflow(
+            assert!(!pi_error::is_context_overflow(
                 "",
                 Some(190_000),
                 Some(200_000)

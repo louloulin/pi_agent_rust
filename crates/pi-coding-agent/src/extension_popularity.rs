@@ -5,7 +5,7 @@
 //! - Normalize missing/unavailable metrics to `null` (never `0`).
 //! - Persist evidence onto the canonical candidate pool JSON so scoring can be auditable.
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::http::client::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};

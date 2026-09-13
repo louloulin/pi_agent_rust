@@ -10,8 +10,8 @@
 //! The tool is essential-tier (tiny schema, no parameters) and declares read
 //! effects only: it touches nothing but the system clock.
 
-use crate::error::Result;
-use crate::model::{ContentBlock, TextContent};
+use pi_error::Result;
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 use chrono::{DateTime, FixedOffset, Local, SecondsFormat, Utc};
 

@@ -20,7 +20,7 @@ use serde_json::Value;
 use sha2::Digest as _;
 
 use crate::connectors::{Connector, http::HttpConnector};
-use crate::error::Result;
+use pi_error::Result;
 use crate::extensions::EXTENSION_EVENT_TIMEOUT_MS;
 use crate::extensions::{
     DangerousCommandClass, ExecMediationResult, ExtensionBody, ExtensionMessage, ExtensionPolicy,
@@ -40,7 +40,7 @@ use crate::hostcall_io_uring_lane::{
 use crate::resource_governor::{
     AdmissionAction, AdmissionDecision, ResourceGovernor, ResourceOperationKind, ResourceRequest,
 };
-use crate::scheduler::{Clock as SchedulerClock, HostcallOutcome, WallClock};
+use pi_agent_core::scheduler::{Clock as SchedulerClock, HostcallOutcome, WallClock};
 use crate::tools::SharedToolRegistry;
 #[cfg(test)]
 use crate::tools::ToolRegistry;
@@ -436,13 +436,13 @@ enum ExtensionEventTaskProgress {
 
 fn decode_extension_event_task_state(state_json: Value) -> Result<ExtensionEventTaskProgress> {
     if state_json.is_null() {
-        return Err(crate::error::Error::extension(
+        return Err(pi_error::Error::extension(
             "events.emit task state missing".to_string(),
         ));
     }
 
     let state: ExtensionEventJsTaskState = serde_json::from_value(state_json)
-        .map_err(|err| crate::error::Error::extension(err.to_string()))?;
+        .map_err(|err| pi_error::Error::extension(err.to_string()))?;
     match state.status.as_str() {
         "pending" => Ok(ExtensionEventTaskProgress::Pending),
         "resolved" => Ok(ExtensionEventTaskProgress::Resolved(
@@ -464,9 +464,9 @@ fn decode_extension_event_task_state(state_json: Value) -> Result<ExtensionEvent
                 message.push('\n');
                 message.push_str(&stack);
             }
-            Err(crate::error::Error::extension(message))
+            Err(pi_error::Error::extension(message))
         }
-        other => Err(crate::error::Error::extension(format!(
+        other => Err(pi_error::Error::extension(format!(
             "Unexpected JS task status: {other}"
         ))),
     }
@@ -2824,26 +2824,26 @@ impl<C: SchedulerClock + 'static> ExtensionDispatcher<C> {
     ) -> Result<ExtensionMessage> {
         let ExtensionMessage { id, version, body } = message;
         if id.trim().is_empty() {
-            return Err(crate::error::Error::validation(
+            return Err(pi_error::Error::validation(
                 "Extension message id is empty",
             ));
         }
         if version != PROTOCOL_VERSION {
-            return Err(crate::error::Error::validation(format!(
+            return Err(pi_error::Error::validation(format!(
                 "Unsupported extension protocol version: {version}"
             )));
         }
         let ExtensionBody::HostCall(payload) = body else {
-            return Err(crate::error::Error::validation(
+            return Err(pi_error::Error::validation(
                 "dispatch_protocol_message expects host_call message",
             ));
         };
 
         let outcome = match validate_host_call(&payload) {
             Ok(()) => self.dispatch_protocol_host_call(&payload).await,
-            Err(crate::error::Error::Validation(message)) => {
+            Err(pi_error::Error::Validation(message)) => {
                 if payload.call_id.trim().is_empty() {
-                    return Err(crate::error::Error::Validation(message));
+                    return Err(pi_error::Error::Validation(message));
                 }
                 HostcallOutcome::Error {
                     code: "invalid_request".to_string(),
@@ -3869,7 +3869,7 @@ impl<C: SchedulerClock + 'static> ExtensionDispatcher<C> {
             .await?;
 
         let snapshots: Vec<Snapshot> = serde_json::from_value(json)
-            .map_err(|err| crate::error::Error::extension(err.to_string()))?;
+            .map_err(|err| pi_error::Error::extension(err.to_string()))?;
 
         let mut events = BTreeSet::new();
         match extension_id {
@@ -3968,7 +3968,7 @@ impl<C: SchedulerClock + 'static> ExtensionDispatcher<C> {
         loop {
             let now = extension_wait_now();
             if std::time::Duration::from_nanos(now.duration_since(start)) > timeout {
-                return Err(crate::error::Error::extension(format!(
+                return Err(pi_error::Error::extension(format!(
                     "events.emit timed out after {}ms",
                     timeout.as_millis()
                 )));
@@ -4037,12 +4037,12 @@ mod tests {
     use super::*;
 
     use crate::connectors::http::HttpConnectorConfig;
-    use crate::error::Error;
+    use pi_error::Error;
     use crate::extensions::{
         ExtensionBody, ExtensionMessage, ExtensionOverride, ExtensionPolicyMode, HostCallPayload,
         PROTOCOL_VERSION, PolicyProfile, SessionActionOrigin,
     };
-    use crate::scheduler::DeterministicClock;
+    use pi_agent_core::scheduler::DeterministicClock;
     use crate::session::SessionMessage;
     use serde_json::Value;
     use std::collections::HashMap;
@@ -10548,7 +10548,7 @@ mod tests {
                     _name: String,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }
@@ -10557,7 +10557,7 @@ mod tests {
                     _message: SessionMessage,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }
@@ -10567,7 +10567,7 @@ mod tests {
                     _data: Option<Value>,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }
@@ -10577,7 +10577,7 @@ mod tests {
                     _model_id: String,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }
@@ -10589,7 +10589,7 @@ mod tests {
                     _level: String,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }
@@ -10602,7 +10602,7 @@ mod tests {
                     _label: Option<String>,
                     _origin: Option<SessionActionOrigin>,
                 ) -> Result<()> {
-                    Err(crate::error::Error::from(std::io::Error::other(
+                    Err(pi_error::Error::from(std::io::Error::other(
                         "disk full",
                     )))
                 }

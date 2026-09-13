@@ -6,7 +6,7 @@
 //! - **Host-agnostic**: the index is primarily a data structure; CLI commands live elsewhere.
 
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::extension_inclusion::{
     ExtensionCategory, InclusionEntry, VersionPin, classify_registrations,
 };
@@ -1288,7 +1288,7 @@ enum ArtifactProvenanceSource {
 
 pub fn seed_index() -> Result<ExtensionIndex> {
     let provenance: ArtifactProvenance =
-        serde_json::from_str(&crate::embedded_assets::extension_artifact_provenance_json())?;
+        serde_json::from_str(&pi_ai::embedded_assets::extension_artifact_provenance_json())?;
     let generated_at = provenance.generated;
 
     let mut entries = Vec::with_capacity(provenance.items.len());

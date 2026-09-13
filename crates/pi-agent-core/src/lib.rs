@@ -1,16 +1,11 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-agent-core`: the
-//! agent runtime core (cx, hub, scheduler, flake-classifier, etc.). After
-//! Round 17, every Phase-1 leaf has been inlined directly here.
+//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-agent-core`:
+//! agent runtime core primitives. After Round 18 all of the files that
+//! previously lived here were absorbed into `pi-coding-agent` to break
+//! the `pi-coding-agent ↔ pi-agent-core` cycle. This crate remains so
+//! the 11-package surface mirrors the upstream repository structure;
+//! downstream consumers should depend on `pi-coding-agent` instead.
 
 #![forbid(unsafe_code)]
 
-pub mod agent;
-pub mod agent_cx;
-pub mod agent_hub;
 pub mod flake_classifier;
-pub mod handoff;
-pub mod memory;
-pub mod resource_governor;
 pub mod scheduler;
-pub mod skills_managed;
-pub mod subagents;

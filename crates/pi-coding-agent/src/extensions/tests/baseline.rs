@@ -1,6 +1,8 @@
 //! Security baseline modeling, artifact, and scoring tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // SEC-3.2 Baseline Modeling Tests (bd-153pv)

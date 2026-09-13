@@ -13,7 +13,7 @@ use serde_json::Value;
 use super::config::{ConfiguredServer, McpDiscovery, Provenance};
 use super::transport::{DEFAULT_MCP_TIMEOUT, MCP_PROTOCOL_VERSION, McpTransport};
 use super::trust::{TrustDecision, TrustStore, TrustWriteGuard};
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 #[cfg(test)]
 type TestTransportFactory = dyn Fn() -> Box<dyn McpTransport> + Send + Sync;

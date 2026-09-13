@@ -9,14 +9,11 @@ description = "Phase-2 aggregator mirroring @earendil-works/pi-agent-core: agent
 workspace = true
 
 [dependencies]
-# Aggregator siblings re-exported through the pi facade.
-pi-ai = { workspace = true }
-pi-chord = { workspace = true }
-pi-coding-agent = { workspace = true }
-pi-protocol = { workspace = true }
 # Workspace deps required by the inlined Phase-1 leaves.
 anyhow = { workspace = true }
 chrono = { workspace = true }
+pi-ai = { workspace = true }
+pi-error = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }

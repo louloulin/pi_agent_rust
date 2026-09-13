@@ -6,7 +6,7 @@
 //! optionally scoped to a version range.
 
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use chrono::{DateTime, Utc};
 use fs4::FileExt;
 use serde::{Deserialize, Serialize};

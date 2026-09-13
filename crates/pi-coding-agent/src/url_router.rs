@@ -30,7 +30,7 @@ use std::process::Stdio;
 
 use serde::Serialize;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 /// Tool-result schema tag for scheme resolutions.
 pub const URL_ROUTER_SCHEMA: &str = "pi.url_router.v1";

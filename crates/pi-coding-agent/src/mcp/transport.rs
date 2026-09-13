@@ -18,7 +18,7 @@ use async_trait::async_trait;
 use futures::{FutureExt as _, StreamExt as _};
 use serde_json::Value;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::lsp::jsonrpc::{
     CompletionWaitError, MCP_ENV_ALLOWLIST, PublicTailBuffer, RpcErrorObject, await_completion,
 };
@@ -1378,7 +1378,7 @@ struct HttpSseCursor {
 }
 
 impl HttpSseCursor {
-    fn accept(&mut self, event: &crate::sse::SseEvent) -> Result<bool> {
+    fn accept(&mut self, event: &pi_ai::sse::SseEvent) -> Result<bool> {
         let Some(event_id) = event.id.as_deref().filter(|_| event.id_was_explicit) else {
             // Without an id there is no checkpoint beyond this event. If it
             // contains a server request, resuming from an earlier id could
@@ -1419,7 +1419,7 @@ impl HttpSseCursor {
 }
 
 struct BoundedHttpSseDecoder {
-    parser: crate::sse::SseParser,
+    parser: pi_ai::sse::SseParser,
     pending_utf8: Vec<u8>,
     received_bytes: usize,
 }
@@ -1427,13 +1427,13 @@ struct BoundedHttpSseDecoder {
 impl BoundedHttpSseDecoder {
     fn new() -> Self {
         Self {
-            parser: crate::sse::SseParser::new(),
+            parser: pi_ai::sse::SseParser::new(),
             pending_utf8: Vec::new(),
             received_bytes: 0,
         }
     }
 
-    fn feed(&mut self, chunk: &[u8]) -> Result<Vec<crate::sse::SseEvent>> {
+    fn feed(&mut self, chunk: &[u8]) -> Result<Vec<pi_ai::sse::SseEvent>> {
         self.received_bytes = self
             .received_bytes
             .checked_add(chunk.len())
@@ -1466,7 +1466,7 @@ impl BoundedHttpSseDecoder {
         Ok(events)
     }
 
-    fn finish(mut self) -> Result<Vec<crate::sse::SseEvent>> {
+    fn finish(mut self) -> Result<Vec<pi_ai::sse::SseEvent>> {
         let mut events = Vec::new();
         if !self.pending_utf8.is_empty() {
             let text = std::str::from_utf8(&self.pending_utf8).map_err(|err| {
@@ -2322,7 +2322,7 @@ impl HttpTransport {
 
     async fn handle_sse_event(
         &self,
-        event: crate::sse::SseEvent,
+        event: pi_ai::sse::SseEvent,
         expected_id: u64,
         wire_state: &HttpWireState,
     ) -> Result<Option<Value>> {
@@ -2342,7 +2342,7 @@ impl HttpTransport {
 
     async fn handle_server_stream_event(
         &self,
-        event: crate::sse::SseEvent,
+        event: pi_ai::sse::SseEvent,
         wire_state: &HttpWireState,
     ) -> Result<()> {
         let data = event.data.trim();
@@ -2785,7 +2785,7 @@ fn validate_jsonrpc_response(value: &Value, expected_id: u64) -> Result<Value> {
 /// and handles the response stream incrementally in `receive_sse_response`.
 #[cfg(test)]
 fn parse_sse_responses(body: &str, expected_id: u64) -> Result<Value> {
-    let mut parser = crate::sse::SseParser::new();
+    let mut parser = pi_ai::sse::SseParser::new();
     let events = parser.feed(body);
     for event in events {
         let Ok(value) = serde_json::from_str::<Value>(event.data.trim()) else {
@@ -4390,23 +4390,23 @@ mod tests {
     #[test]
     fn streamable_http_idless_event_blocks_unsafe_resume_until_checkpoint() {
         let mut cursor = HttpSseCursor::default();
-        let identified = crate::sse::SseEvent {
+        let identified = pi_ai::sse::SseEvent {
             id: Some("checkpoint-1".to_string()),
             id_was_explicit: true,
             data: "{}".to_string(),
-            ..crate::sse::SseEvent::default()
+            ..pi_ai::sse::SseEvent::default()
         };
         assert!(cursor.accept(&identified).expect("identified event"));
         assert_eq!(cursor.resume_id(), Some("checkpoint-1"));
 
-        let idless_request = crate::sse::SseEvent {
+        let idless_request = pi_ai::sse::SseEvent {
             // The parser carries the last id value forward, but marks that it
             // was not explicit on this event. Treating `id.is_some()` alone as
             // resumable would skip or replay this side effect incorrectly.
             id: Some("checkpoint-1".to_string()),
             id_was_explicit: false,
             data: r#"{"jsonrpc":"2.0","id":"ping-1","method":"ping"}"#.to_string(),
-            ..crate::sse::SseEvent::default()
+            ..pi_ai::sse::SseEvent::default()
         };
         assert!(cursor.accept(&idless_request).expect("idless event"));
         assert_eq!(
@@ -4415,11 +4415,11 @@ mod tests {
             "an earlier checkpoint cannot safely resume past an idless side effect"
         );
 
-        let next_checkpoint = crate::sse::SseEvent {
+        let next_checkpoint = pi_ai::sse::SseEvent {
             id: Some("checkpoint-2".to_string()),
             id_was_explicit: true,
             data: "{}".to_string(),
-            ..crate::sse::SseEvent::default()
+            ..pi_ai::sse::SseEvent::default()
         };
         assert!(cursor.accept(&next_checkpoint).expect("new checkpoint"));
         assert_eq!(cursor.resume_id(), Some("checkpoint-2"));

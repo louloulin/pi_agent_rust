@@ -24,7 +24,7 @@ use std::time::{Duration, Instant};
 
 use serde::Serialize;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 /// Tool-result schema tag for service descriptors (stable audit contract).
 pub const SERVICE_SCHEMA: &str = "pi.hub.service.v1";

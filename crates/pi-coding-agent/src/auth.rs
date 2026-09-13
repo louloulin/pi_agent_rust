@@ -3,8 +3,8 @@
 //! Auth file: ~/.pi/agent/auth.json
 
 use crate::config::Config;
-use crate::error::{Error, Result};
-use crate::provider_metadata::{
+use pi_error::{Error, Result};
+use pi_ai::provider_metadata::{
     canonical_provider_id, provider_auth_env_keys, provider_ids_match, provider_metadata,
 };
 use base64::Engine as _;
@@ -377,7 +377,7 @@ pub enum AuthStorageLoadFailure {
 // ACCOUNT-level switching for CLI subscriptions externally; this ring handles
 // KEY-level rotation inside pi. Never shell out to caam from the hot path.
 static CREDENTIAL_RINGS: std::sync::LazyLock<
-    std::sync::Mutex<std::collections::HashMap<String, crate::failover::CredentialRing>>,
+    std::sync::Mutex<std::collections::HashMap<String, pi_ai::failover::CredentialRing>>,
 > = std::sync::LazyLock::new(|| std::sync::Mutex::new(std::collections::HashMap::new()));
 
 /// Resolve the current usable key from a provider's rotation ring, if the
@@ -404,12 +404,12 @@ where
         return None;
     }
     let seed =
-        crate::failover::session_affinity_hash(&format!("{}:{provider}", auth_path.display()));
+        pi_ai::failover::session_affinity_hash(&format!("{}:{provider}", auth_path.display()));
     {
         let mut map = CREDENTIAL_RINGS.lock().ok()?;
         let value = {
             let ring = map.entry(provider.to_string()).or_insert_with(|| {
-                crate::failover::CredentialRing::new(keys, seed)
+                pi_ai::failover::CredentialRing::new(keys, seed)
                     .expect("non-empty key list checked above")
             });
             ring.current_key(std::time::Instant::now())
@@ -7963,7 +7963,7 @@ mod tests {
             serde_json::json!({ "provider": "anthropic" }),
         );
 
-        let err = crate::error::Error::auth("OAuth token refresh failed: invalid_grant");
+        let err = pi_error::Error::auth("OAuth token refresh failed: invalid_grant");
         let hints = err.hints();
         assert!(
             hints.hints.iter().any(|hint| hint.contains("login")),
@@ -7995,9 +7995,9 @@ mod tests {
             serde_json::json!({ "scenario": "compare provider-network vs auth-refresh hints" }),
         );
 
-        let auth_err = crate::error::Error::auth("OAuth token refresh failed: invalid_grant");
+        let auth_err = pi_error::Error::auth("OAuth token refresh failed: invalid_grant");
         let auth_hints = auth_err.hints();
-        let network_err = crate::error::Error::provider(
+        let network_err = pi_error::Error::provider(
             "anthropic",
             "Network connection error: connection reset by peer",
         );

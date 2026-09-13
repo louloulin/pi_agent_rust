@@ -10,6 +10,8 @@
 // This source snapshot is compiled out with `cfg(any())`. Preserve its broad
 // import until reactivation work can validate a real, explicit dependency set.
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 const NATIVE_RUST_EXTENSION_SCHEMA: &str = "pi.ext.native-rust.v1";
 

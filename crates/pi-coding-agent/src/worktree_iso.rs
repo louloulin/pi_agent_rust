@@ -24,7 +24,7 @@ use std::time::Duration;
 
 use serde::Serialize;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 /// Tool-result schema tag for isolation outcomes.
 pub const ISO_SCHEMA: &str = "pi.worktree_iso.v1";

@@ -1,6 +1,8 @@
 //! Budget, lifecycle, cancellation, and property-based dispatch tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // Budget / structured concurrency tests (bd-2vie)
@@ -108,6 +110,8 @@ fn extension_manager_shutdown_without_runtime_is_noop() {
 
 mod lab_runtime_tests {
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
     use asupersync::{LabConfig, LabRuntime};
     use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -285,6 +289,8 @@ mod lab_runtime_tests {
 
 mod lifecycle {
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
     #[test]
     fn region_shutdown_returns_true_when_no_runtime() {
@@ -535,6 +541,8 @@ mod lifecycle {
 
 mod budget_tests {
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
     use asupersync::channel::oneshot;
 
     #[test]
@@ -897,6 +905,8 @@ fn event_coalescer_characterization_handoff_does_not_strand_payload() {
 
 mod proptest_dispatch {
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
     use proptest::prelude::*;
 
     fn op_strategy() -> impl Strategy<Value = String> {
@@ -2391,6 +2401,8 @@ mod proptest_dispatch {
 
 mod hostcall_protocol_equivalence {
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
     fn tool_read_payload() -> HostCallPayload {
         HostCallPayload {

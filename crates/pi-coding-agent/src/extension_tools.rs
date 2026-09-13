@@ -10,7 +10,7 @@ use std::sync::Arc;
 #[cfg(feature = "wasm-host")]
 use std::time::Duration;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 #[cfg(test)]
 use crate::extensions::JsExtensionRuntimeHandle;
 #[cfg(feature = "wasm-host")]
@@ -277,11 +277,11 @@ mod tests {
     use crate::agent::{Agent, AgentConfig, AgentEvent, AgentSession};
     use crate::extensions::{ExtensionManager, JsExtensionLoadSpec};
     use crate::extensions_js::PiJsRuntimeConfig;
-    use crate::model::{
+    use pi_ai::model::{
         AssistantMessage, ContentBlock, Message, StopReason, StreamEvent, TextContent, ToolCall,
         Usage,
     };
-    use crate::provider::{Context, Provider, StreamOptions};
+    use pi_ai::provider::{Context, Provider, StreamOptions};
     use crate::session::Session;
     use crate::tools::ToolRegistry;
     use asupersync::runtime::RuntimeBuilder;
@@ -533,8 +533,8 @@ mod tests {
             &self,
             context: &Context<'_>,
             _options: &StreamOptions,
-        ) -> crate::error::Result<
-            Pin<Box<dyn Stream<Item = crate::error::Result<StreamEvent>> + Send>>,
+        ) -> pi_error::Result<
+            Pin<Box<dyn Stream<Item = pi_error::Result<StreamEvent>> + Send>>,
         > {
             fn assistant_message(content: Vec<ContentBlock>) -> AssistantMessage {
                 AssistantMessage {
@@ -708,14 +708,14 @@ mod tests {
             _tool_call_id: &str,
             input: serde_json::Value,
             _on_update: Option<Box<dyn Fn(crate::tools::ToolUpdate) + Send + Sync>>,
-        ) -> crate::error::Result<crate::tools::ToolOutput> {
+        ) -> pi_error::Result<crate::tools::ToolOutput> {
             let text = input
                 .get("text")
                 .and_then(serde_json::Value::as_str)
                 .unwrap_or_default();
             Ok(crate::tools::ToolOutput {
-                content: vec![crate::model::ContentBlock::Text(
-                    crate::model::TextContent::new(format!("echo:{text}")),
+                content: vec![pi_ai::model::ContentBlock::Text(
+                    pi_ai::model::TextContent::new(format!("echo:{text}")),
                 )],
                 details: None,
                 is_error: false,
@@ -822,7 +822,7 @@ mod tests {
                 .content
                 .iter()
                 .filter_map(|block| match block {
-                    crate::model::ContentBlock::Text(text) => Some(text.text.as_str()),
+                    pi_ai::model::ContentBlock::Text(text) => Some(text.text.as_str()),
                     _ => None,
                 })
                 .collect::<Vec<_>>()

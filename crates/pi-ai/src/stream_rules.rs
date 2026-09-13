@@ -32,10 +32,10 @@ pub const DEFAULT_ROLLING_LOOKBACK_BYTES: usize = 4096;
 pub const TTSR_CUSTOM_ENTRY_TYPE: &str = "stream_rule_injection";
 
 /// Re-export of the shared screener for callers that already import
-/// `pi_stream_rules::screen_secrets`.
+/// `crate::stream_rules::screen_secrets`.
 #[must_use]
 pub fn screen_secrets(content: &str) -> String {
-    pi_secret_screener::screen_secrets(content)
+    crate::secret_screener::screen_secrets(content)
 }
 
 /// A configured time-traveling stream rule.

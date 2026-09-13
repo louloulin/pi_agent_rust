@@ -15,8 +15,8 @@ use std::fmt;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::Result;
-use crate::model::{Message, UserContent, UserMessage};
+use pi_error::Result;
+use pi_ai::model::{Message, UserContent, UserMessage};
 use crate::session::{CustomEntry, Session, SessionEntry, SessionMessage};
 
 /// Tool-result schema tag for checkpoint/rewind operations.
@@ -59,12 +59,12 @@ pub fn estimate_tokens(messages: &[Message]) -> u64 {
                 UserContent::Blocks(blocks) => blocks
                     .iter()
                     .map(|block| match block {
-                        crate::model::ContentBlock::Text(text) => text.text.len(),
-                        crate::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
-                        crate::model::ContentBlock::RedactedThinking(_)
-                        | crate::model::ContentBlock::Image(_)
-                        | crate::model::ContentBlock::Media(_)
-                        | crate::model::ContentBlock::ToolCall(_) => 0,
+                        pi_ai::model::ContentBlock::Text(text) => text.text.len(),
+                        pi_ai::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
+                        pi_ai::model::ContentBlock::RedactedThinking(_)
+                        | pi_ai::model::ContentBlock::Image(_)
+                        | pi_ai::model::ContentBlock::Media(_)
+                        | pi_ai::model::ContentBlock::ToolCall(_) => 0,
                     })
                     .sum(),
             },
@@ -72,24 +72,24 @@ pub fn estimate_tokens(messages: &[Message]) -> u64 {
                 .content
                 .iter()
                 .map(|block| match block {
-                    crate::model::ContentBlock::Text(text) => text.text.len(),
-                    crate::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
-                    crate::model::ContentBlock::RedactedThinking(_)
-                    | crate::model::ContentBlock::Image(_)
-                    | crate::model::ContentBlock::Media(_)
-                    | crate::model::ContentBlock::ToolCall(_) => 0,
+                    pi_ai::model::ContentBlock::Text(text) => text.text.len(),
+                    pi_ai::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
+                    pi_ai::model::ContentBlock::RedactedThinking(_)
+                    | pi_ai::model::ContentBlock::Image(_)
+                    | pi_ai::model::ContentBlock::Media(_)
+                    | pi_ai::model::ContentBlock::ToolCall(_) => 0,
                 })
                 .sum(),
             Message::ToolResult(result) => result
                 .content
                 .iter()
                 .map(|block| match block {
-                    crate::model::ContentBlock::Text(text) => text.text.len(),
-                    crate::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
-                    crate::model::ContentBlock::RedactedThinking(_)
-                    | crate::model::ContentBlock::Image(_)
-                    | crate::model::ContentBlock::Media(_)
-                    | crate::model::ContentBlock::ToolCall(_) => 0,
+                    pi_ai::model::ContentBlock::Text(text) => text.text.len(),
+                    pi_ai::model::ContentBlock::Thinking(thinking) => thinking.thinking.len(),
+                    pi_ai::model::ContentBlock::RedactedThinking(_)
+                    | pi_ai::model::ContentBlock::Image(_)
+                    | pi_ai::model::ContentBlock::Media(_)
+                    | pi_ai::model::ContentBlock::ToolCall(_) => 0,
                 })
                 .sum(),
             Message::Custom(_) => 0,
@@ -179,7 +179,7 @@ pub struct RewindOutcome {
 /// Propagates compaction summarization errors.
 pub async fn summarize_span(
     span: &[Message],
-    provider: std::sync::Arc<dyn crate::provider::Provider>,
+    provider: std::sync::Arc<dyn pi_ai::provider::Provider>,
     api_key: &str,
     settings: &crate::compaction::ResolvedCompactionSettings,
 ) -> Result<String> {
@@ -614,9 +614,9 @@ mod tests {
 
     fn session_assistant(text: &str) -> SessionMessage {
         SessionMessage::from(Message::Assistant(std::sync::Arc::new(
-            crate::model::AssistantMessage {
-                content: vec![crate::model::ContentBlock::Text(
-                    crate::model::TextContent::new(text),
+            pi_ai::model::AssistantMessage {
+                content: vec![pi_ai::model::ContentBlock::Text(
+                    pi_ai::model::TextContent::new(text),
                 )],
                 ..Default::default()
             },
@@ -728,8 +728,8 @@ mod tests {
         let mut session = Session::in_memory();
         session.append_message(session_user("older prompt"));
         session.append_message(SessionMessage::User {
-            content: UserContent::Blocks(vec![crate::model::ContentBlock::Text(
-                crate::model::TextContent::new("image prompt"),
+            content: UserContent::Blocks(vec![pi_ai::model::ContentBlock::Text(
+                pi_ai::model::TextContent::new("image prompt"),
             )]),
             timestamp: Some(0),
         });

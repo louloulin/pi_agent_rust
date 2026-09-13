@@ -1,6 +1,8 @@
 //! Hostcall reactor mesh and result-taxonomy tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ------------------------------------------------------------------
 // Hostcall Reactor Mesh tests (bd-3ar8v.4.20)

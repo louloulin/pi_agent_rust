@@ -1,6 +1,8 @@
 //! JavaScript hostcall, cross-runtime parity, and streaming protocol tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // bd-1uy.1.3: JS-origin hostcalls produce taxonomy-only error codes

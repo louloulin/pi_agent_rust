@@ -8,7 +8,7 @@
 
 pub mod http;
 
-use crate::error::Result;
+use pi_error::Result;
 use async_trait::async_trait;
 use serde_json::{Value, json};
 

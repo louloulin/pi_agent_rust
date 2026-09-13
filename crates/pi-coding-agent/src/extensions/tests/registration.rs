@@ -1,6 +1,8 @@
 //! Registration, model control, session, and message API tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // Extension Registration API tests (bd-1yh7)

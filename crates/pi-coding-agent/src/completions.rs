@@ -9,7 +9,7 @@
 
 use clap::CommandFactory;
 
-use crate::error::Result;
+use pi_error::Result;
 
 /// Print the completion script for a shell.
 ///
@@ -21,7 +21,7 @@ pub fn print_script(shell: &str, out: &mut dyn std::io::Write) -> Result<()> {
         "zsh" => clap_complete::aot::Shell::Zsh,
         "fish" => clap_complete::aot::Shell::Fish,
         other => {
-            return Err(crate::error::Error::validation(format!(
+            return Err(pi_error::Error::validation(format!(
                 "Unknown shell '{other}'; expected bash, zsh, or fish"
             )));
         }
@@ -97,7 +97,7 @@ pub fn complete(flag: &str, prefix: &str, out: &mut dyn std::io::Write) -> Resul
         "--model" | "--provider" | "--smol" | "--slow" => model_candidates(prefix),
         "--session" | "--resume" => session_candidates(prefix),
         other => {
-            return Err(crate::error::Error::validation(format!(
+            return Err(pi_error::Error::validation(format!(
                 "Unknown __complete flag '{other}'; expected --model, --provider, --smol, \
                  --slow, --session, or --resume"
             )));

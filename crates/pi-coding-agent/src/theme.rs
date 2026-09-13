@@ -5,7 +5,7 @@
 //! - Project themes: `<cwd>/.pi/themes/*.json`
 
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 #[cfg(feature = "tui")]
 use glamour::{Style as GlamourStyle, StyleConfig as GlamourStyleConfig};
 #[cfg(feature = "tui")]

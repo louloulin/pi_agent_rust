@@ -8,9 +8,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::sync::Arc;
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::extensions::{EXTENSION_EVENT_TIMEOUT_MS, ExtensionRuntimeHandle};
-use crate::model::{
+use pi_ai::model::{
     AssistantMessage, ContentBlock, CustomMessage, ImageContent, Message, ToolResultMessage,
 };
 
@@ -535,7 +535,7 @@ mod tests {
     #[allow(clippy::too_many_lines)]
     fn event_name_matches_expected_strings() {
         fn sample_message() -> Message {
-            Message::Custom(crate::model::CustomMessage {
+            Message::Custom(pi_ai::model::CustomMessage {
                 content: "hi".to_string(),
                 custom_type: "test".to_string(),
                 display: true,
@@ -546,12 +546,12 @@ mod tests {
 
         fn sample_assistant_message() -> AssistantMessage {
             AssistantMessage {
-                content: vec![ContentBlock::Text(crate::model::TextContent::new("ok"))],
+                content: vec![ContentBlock::Text(pi_ai::model::TextContent::new("ok"))],
                 api: "test".to_string(),
                 provider: "test".to_string(),
                 model: "test".to_string(),
-                usage: crate::model::Usage::default(),
-                stop_reason: crate::model::StopReason::Stop,
+                usage: pi_ai::model::Usage::default(),
+                stop_reason: pi_ai::model::StopReason::Stop,
                 stop_details: None,
                 error_message: None,
                 timestamp: 0,
@@ -562,7 +562,7 @@ mod tests {
             ToolResultMessage {
                 tool_call_id: "call-1".to_string(),
                 tool_name: "read".to_string(),
-                content: vec![ContentBlock::Text(crate::model::TextContent::new("ok"))],
+                content: vec![ContentBlock::Text(pi_ai::model::TextContent::new("ok"))],
                 details: None,
                 is_error: false,
                 timestamp: 0,
@@ -627,7 +627,7 @@ mod tests {
                     tool_name: "read".to_string(),
                     tool_call_id: "call-1".to_string(),
                     input: json!({ "path": "a.txt" }),
-                    content: vec![ContentBlock::Text(crate::model::TextContent::new("ok"))],
+                    content: vec![ContentBlock::Text(pi_ai::model::TextContent::new("ok"))],
                     details: Some(json!({ "k": "v" })),
                     is_error: false,
                 },

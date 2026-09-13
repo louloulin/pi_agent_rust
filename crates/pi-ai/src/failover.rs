@@ -320,7 +320,7 @@ pub fn provider_is_disabled(
 ) -> bool {
     let in_list = |list: &[String]| {
         list.iter()
-            .any(|entry| pi_provider_metadata::provider_ids_match(entry.trim(), provider))
+            .any(|entry| crate::provider_metadata::provider_ids_match(entry.trim(), provider))
     };
     if let Some(scope_list) = scope.and_then(|ov| ov.disabled_providers.as_deref())
         && in_list(scope_list)

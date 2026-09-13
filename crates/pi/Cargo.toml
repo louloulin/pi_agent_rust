@@ -89,6 +89,7 @@ clap_complete = { workspace = true }
 pi-ai = { workspace = true }
 pi-agent-core = { workspace = true }
 pi-coding-agent = { workspace = true }
+pi-error = { workspace = true }
 pi-tui = { workspace = true }
 pi-telemetry = { workspace = true }
 pi-protocol = { workspace = true }
@@ -218,9 +219,9 @@ full = [
     "bpe-tokens",
     "rich_rust/full",
 ]
-bpe-tokens = ["pi_ai::token_count/bpe-tokens"]
+bpe-tokens = ["pi-ai/bpe-tokens"]
 url-pdf = ["dep:pdf-extract"]
-profiler = ["dep:pprof", "pi_telemetry::profiler/profiler"]
+profiler = ["dep:pprof", "pi-telemetry/profiler"]
 tui = [
     "dep:crossterm",
     "dep:bubbletea",

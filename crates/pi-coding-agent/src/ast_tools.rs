@@ -23,8 +23,8 @@
 //! rolls back already-written files from the staged originals.
 //! `action: "reject"` discards the proposal with zero writes.
 
-use crate::error::{Error, Result};
-use crate::model::{ContentBlock, TextContent};
+use pi_error::{Error, Result};
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 use ast_grep_core::{AstGrep, Pattern};
 use ast_grep_language::SupportLang;

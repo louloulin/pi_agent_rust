@@ -20,7 +20,7 @@ use async_trait::async_trait;
 use serde_json::Value;
 use std::path::{Path, PathBuf};
 
-use crate::model::{ContentBlock, TextContent};
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 
 /// Build an MCP manager while enforcing the established workspace-trust
@@ -33,7 +33,7 @@ pub fn bootstrap_with_project_trust(
     global_dir: &Path,
     cli_paths: &[PathBuf],
     project_trusted: bool,
-) -> crate::error::Result<McpManager> {
+) -> pi_error::Result<McpManager> {
     let discovery =
         config::discover_with_project_trust(cwd, global_dir, cli_paths, project_trusted);
     Ok(McpManager::new(cwd, global_dir, discovery))
@@ -152,7 +152,7 @@ impl Tool for McpTool {
         _tool_call_id: &str,
         input: Value,
         _on_update: Option<Box<dyn Fn(ToolUpdate) + Send + Sync>>,
-    ) -> crate::error::Result<ToolOutput> {
+    ) -> pi_error::Result<ToolOutput> {
         let result = self
             .manager
             .call_tool(&self.server, &self.tool_name, input)

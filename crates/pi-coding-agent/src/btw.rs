@@ -11,9 +11,9 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
-use crate::error::Result;
-use crate::model::{Message, UserContent, UserMessage};
-use crate::provider::Provider;
+use pi_error::Result;
+use pi_ai::model::{Message, UserContent, UserMessage};
+use pi_ai::provider::Provider;
 
 /// System contract for side questions (omp btw-user.md semantics).
 pub const BTW_SYSTEM_PROMPT: &str = "You are answering an ephemeral side question about the \
@@ -69,7 +69,7 @@ impl BtwClient {
         } else {
             format!("Current work context:\n{context_summary}\n\nSide question: {question}")
         };
-        let context = crate::provider::Context {
+        let context = pi_ai::provider::Context {
             system_prompt: Some(BTW_SYSTEM_PROMPT.to_string().into()),
             messages: vec![Message::User(UserMessage {
                 content: UserContent::Text(user_text),
@@ -78,7 +78,7 @@ impl BtwClient {
             .into(),
             tools: Vec::new().into(),
         };
-        let options = crate::provider::StreamOptions {
+        let options = pi_ai::provider::StreamOptions {
             max_tokens: Some(ANSWER_MAX_TOKENS),
             api_key: self.api_key.clone(),
             ..Default::default()
@@ -87,16 +87,16 @@ impl BtwClient {
         let mut answer = String::new();
         while let Some(event) = stream.next().await {
             match event {
-                Ok(crate::model::StreamEvent::TextDelta { delta, .. }) => {
+                Ok(pi_ai::model::StreamEvent::TextDelta { delta, .. }) => {
                     answer.push_str(&delta);
                 }
-                Ok(crate::model::StreamEvent::Done { .. }) => break,
+                Ok(pi_ai::model::StreamEvent::Done { .. }) => break,
                 Ok(_) => {}
                 Err(err) => return Err(err),
             }
         }
         if answer.trim().is_empty() {
-            return Err(crate::error::Error::api(
+            return Err(pi_error::Error::api(
                 "side question returned empty reply",
             ));
         }
@@ -129,10 +129,10 @@ pub fn build_context_summary(messages: &[Message]) -> String {
             Message::Assistant(assistant) => {
                 for block in &assistant.content {
                     match block {
-                        crate::model::ContentBlock::Text(t) => {
+                        pi_ai::model::ContentBlock::Text(t) => {
                             message_pieces.push(format!("assistant: {}", truncate(&t.text, 400)));
                         }
-                        crate::model::ContentBlock::ToolCall(call) => {
+                        pi_ai::model::ContentBlock::ToolCall(call) => {
                             message_pieces.push(format!("assistant ran tool {}", call.name));
                         }
                         _ => {}
@@ -141,7 +141,7 @@ pub fn build_context_summary(messages: &[Message]) -> String {
             }
             Message::ToolResult(result) => {
                 let first = result.content.iter().find_map(|block| match block {
-                    crate::model::ContentBlock::Text(t) => Some(t.text.clone()),
+                    pi_ai::model::ContentBlock::Text(t) => Some(t.text.clone()),
                     _ => None,
                 });
                 message_pieces.push(format!(
@@ -196,9 +196,9 @@ mod tests {
                 timestamp: 0,
             }),
             Message::Assistant(
-                crate::model::AssistantMessage {
-                    content: vec![crate::model::ContentBlock::ToolCall(
-                        crate::model::ToolCall {
+                pi_ai::model::AssistantMessage {
+                    content: vec![pi_ai::model::ContentBlock::ToolCall(
+                        pi_ai::model::ToolCall {
                             id: "c1".into(),
                             name: "bash".into(),
                             arguments: serde_json::json!({ "command": "cargo test" }),

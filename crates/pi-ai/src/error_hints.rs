@@ -11,7 +11,7 @@
 //! - Never suggest destructive actions
 //! - Prefer specific, actionable guidance over generic messages
 
-use crate::error::Error;
+use pi_error::Error;
 use std::fmt::Write as _;
 
 /// A remediation hint for an error.

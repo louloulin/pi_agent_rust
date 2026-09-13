@@ -14,7 +14,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use pi_model::StopReason;
+use pi_ai::model::StopReason;
 
 /// Schema/marker tag carried in nudge messages and logs.
 pub const TURN_RECOVERY_SCHEMA: &str = "pi.turn_recovery.v1";

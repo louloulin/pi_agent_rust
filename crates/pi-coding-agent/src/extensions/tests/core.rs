@@ -1,6 +1,8 @@
 //! Core extension manager, protocol, policy, and tool bridge tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 const RESETTABLE_EXTENSION_SOURCE: &str = r#"
         export default function init(pi) {

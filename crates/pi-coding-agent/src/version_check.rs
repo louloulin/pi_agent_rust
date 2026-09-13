@@ -7,7 +7,7 @@
 
 #![forbid(unsafe_code)]
 
-pub use pi_version::*;
+pub use crate::version::*;
 
 use std::time::Duration;
 
@@ -17,7 +17,7 @@ use std::time::Duration;
 /// a dependency on `pi-version` for that purpose.
 pub struct ClientHttpFetch<'a>(pub &'a crate::http::client::Client);
 
-impl<'a> pi_version::HttpFetch for ClientHttpFetch<'a> {
+impl<'a> crate::version::HttpFetch for ClientHttpFetch<'a> {
     async fn fetch_release(&self, url: &str, timeout: Duration) -> pi_error::Result<(u16, String)> {
         let response = self
             .0

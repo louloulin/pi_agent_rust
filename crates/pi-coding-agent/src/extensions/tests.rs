@@ -4,6 +4,8 @@
 // private integration seams. The router imports that full test-only surface;
 // each child module then inherits it through its local `super::*`.
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 use jsonschema::Validator;
 use tempfile::tempdir;
 

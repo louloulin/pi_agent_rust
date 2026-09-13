@@ -140,7 +140,7 @@ pub mod fuzz_exports {
         ToolCall, ToolResultMessage, Usage, UserContent, UserMessage,
     };
     pub use pi_session_backends::session::{Session, SessionEntry, SessionHeader, SessionMessage};
-    pub use pi_protocol::sse::{SseEvent, SseParser};
+    pub use pi_ai::sse::{SseEvent, SseParser};
     pub use pi_coding_agent::tools::{fuzz_normalize_dot_segments, fuzz_resolve_path};
 
     pub use pi_ai::providers::anthropic::fuzz::Processor as AnthropicProcessor;

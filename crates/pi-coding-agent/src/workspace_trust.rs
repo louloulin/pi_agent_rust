@@ -26,7 +26,7 @@
 //! consent and are deliberately not gated here.
 
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest as _, Sha256};
 use std::collections::BTreeMap;

@@ -10,8 +10,8 @@
 
 use async_trait::async_trait;
 use futures::Stream;
-pub use pi_model::StreamEvent;
-use pi_model::{Message, ThinkingLevel};
+pub use crate::model::StreamEvent;
+use crate::model::{Message, ThinkingLevel};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::collections::HashMap;
@@ -298,7 +298,7 @@ pub struct Model {
 // Input types supported by a model. Moved to `pi-provider-metadata` so the
 // catalog constants and the runtime `Model::input` vectors share one
 // definition; re-exported here to keep `crate::provider::InputType` stable.
-pub use pi_provider_metadata::InputType;
+pub use crate::provider_metadata::InputType;
 
 /// Model pricing per million tokens.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -327,7 +327,7 @@ impl ModelCost {
     /// is authoritative and kept as `total`; otherwise `total` is the sum of
     /// the components. Mirrors upstream pi's `calculateCost`.
     #[allow(clippy::cast_precision_loss)] // Token counts within practical range won't lose precision
-    pub fn price_usage(&self, usage: &mut pi_model::Usage) {
+    pub fn price_usage(&self, usage: &mut crate::model::Usage) {
         let per_million = |rate: f64, tokens: u64| (rate / 1_000_000.0) * tokens as f64;
         let provider_reported_total = usage.cost.total;
         usage.cost.input = per_million(self.input, usage.input);
@@ -675,13 +675,13 @@ mod tests {
     #[test]
     fn price_usage_fills_components_and_total_from_catalog_rates() {
         let model = test_model();
-        let mut usage = pi_model::Usage {
+        let mut usage = crate::model::Usage {
             input: 1000,
             output: 500,
             cache_read: 2000,
             cache_write: 1000,
             total_tokens: 4500,
-            cost: pi_model::Cost::default(),
+            cost: crate::model::Cost::default(),
         };
         model.cost.price_usage(&mut usage);
         let close = |a: f64, b: f64| (a - b).abs() < 1e-12;
@@ -711,15 +711,15 @@ mod tests {
     #[test]
     fn price_usage_keeps_provider_reported_total() {
         let model = test_model();
-        let mut usage = pi_model::Usage {
+        let mut usage = crate::model::Usage {
             input: 1000,
             output: 500,
             cache_read: 0,
             cache_write: 0,
             total_tokens: 1500,
-            cost: pi_model::Cost {
+            cost: crate::model::Cost {
                 total: 0.0421,
-                ..pi_model::Cost::default()
+                ..crate::model::Cost::default()
             },
         };
         model.cost.price_usage(&mut usage);

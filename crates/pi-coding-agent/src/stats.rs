@@ -14,7 +14,7 @@
 //! original implementation lived at `crates/pi/src/stats.rs`; the legacy
 //! module now re-exports these items so existing call sites
 //! (`use crate::stats::*`, `crate::stats::STATS_SCHEMA`,
-//! `pi::stats::StatsAggregator`, etc.) keep working unchanged.
+//! `crate::stats::StatsAggregator`, etc.) keep working unchanged.
 
 #![forbid(unsafe_code)]
 
@@ -625,7 +625,7 @@ mod tests {
     #[test]
     fn probe_accepts_writer_shaped_session_lines() {
         // Guard against reader/writer schema drift: feed the aggregator lines
-        // that match the shape produced by `pi::session::SessionMessage`'s
+        // that match the shape produced by `crate::session::SessionMessage`'s
         // JSON serializer (`{"type":"message", "id":..., "timestamp":...,
         // "message":{...}}`). The legacy crate owns a stronger cross-crate
         // drift test that builds these via the real SessionMessage type;

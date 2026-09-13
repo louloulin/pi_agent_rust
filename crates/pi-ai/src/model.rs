@@ -9,7 +9,7 @@ use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
 
-pub use pi_provider_metadata::InputType;
+pub use crate::provider_metadata::InputType;
 
 /// Maximum number of visible ASCII characters retained from an image MIME type.
 pub const MAX_IMAGE_MIME_TYPE_LEN: usize = 80;

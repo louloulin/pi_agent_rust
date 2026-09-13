@@ -1,10 +1,13 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-tui`: Terminal UI
-//! rendering and input handling.
-//!
-//! Most of the TUI surface currently lives inlined inside `crates/pi`
-//! (`interactive_ftui.rs`, `interactive/agent.rs`, `interactive/commands.rs`,
-//! `tui.rs`, `keybindings.rs`, `theme.rs`). Future Phase-2 rounds will
-//! extract a `pi-ui` core leaf crate and re-export it through this
-//! aggregator.
+//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-tui`:
+//! Terminal UI rendering and input handling. After Round 18 the files
+//! that previously lived here were absorbed into `pi-coding-agent` to
+//! break the `pi-coding-agent ↔ pi-tui` cycle. This crate remains so
+//! the 11-package surface mirrors the upstream repository structure;
+//! downstream consumers should depend on `pi-coding-agent` instead.
 
 #![forbid(unsafe_code)]
+
+// Empty: all TUI / interactive / autocomplete / terminal_images modules
+// were moved to `pi-coding-agent` in Round 18 to break the dependency
+// cycle. This crate is retained as a marker so `crates/pi`'s facade
+// can still re-export a `tui` namespace.

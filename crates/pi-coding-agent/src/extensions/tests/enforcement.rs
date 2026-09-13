@@ -1,6 +1,8 @@
 //! Enforcement state machine tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ====================================================================
 // SEC-3.4: Enforcement state machine tests

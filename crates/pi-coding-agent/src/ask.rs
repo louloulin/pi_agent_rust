@@ -12,7 +12,7 @@
 //! which hosts install; a session with no handler (print/JSON mode, SDK
 //! embedders without UI) resolves through [`AskPolicy`] instead of hanging.
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 
@@ -845,8 +845,8 @@ impl crate::tools::Tool for AskTool {
             "autoAnswered": auto,
         });
         Ok(crate::tools::ToolOutput {
-            content: vec![crate::model::ContentBlock::Text(
-                crate::model::TextContent::new(render_answers(&request, &response, auto)),
+            content: vec![pi_ai::model::ContentBlock::Text(
+                pi_ai::model::TextContent::new(render_answers(&request, &response, auto)),
             )],
             details: Some(details),
             is_error: false,
@@ -978,7 +978,7 @@ mod tests {
                 )
                 .await
                 .expect("auto-answer");
-            let crate::model::ContentBlock::Text(text) = &output.content[0] else {
+            let pi_ai::model::ContentBlock::Text(text) = &output.content[0] else {
                 unreachable!("ask renders text");
             };
             assert!(text.text.contains("non-interactive session"));
@@ -1025,7 +1025,7 @@ mod tests {
                 )
                 .await
                 .expect("handler answer");
-            let crate::model::ContentBlock::Text(text) = &output.content[0] else {
+            let pi_ai::model::ContentBlock::Text(text) = &output.content[0] else {
                 unreachable!("ask renders text");
             };
             assert!(text.text.contains("A: B"));
@@ -1096,7 +1096,7 @@ mod tests {
             );
             let (output, ()) = futures::join!(execute, responder);
             let output = output.expect("round trip");
-            let crate::model::ContentBlock::Text(text) = &output.content[0] else {
+            let pi_ai::model::ContentBlock::Text(text) = &output.content[0] else {
                 unreachable!("ask renders text");
             };
             assert!(text.text.contains("A: B"));

@@ -17,7 +17,7 @@
 //! state-driven: they consume the same `todo_list.v1` payload carried in the
 //! tool result's `details`, never bespoke side channels.
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 
 /// Schema identifier for the persisted state and the tool-result details.
@@ -549,8 +549,8 @@ impl crate::tools::Tool for TodoTool {
         drop(session);
 
         Ok(crate::tools::ToolOutput {
-            content: vec![crate::model::ContentBlock::Text(
-                crate::model::TextContent::new(list.render()),
+            content: vec![pi_ai::model::ContentBlock::Text(
+                pi_ai::model::TextContent::new(list.render()),
             )],
             details: Some(serde_json::json!({
                 "schema": TODO_LIST_SCHEMA,
@@ -831,7 +831,7 @@ mod tests {
                 .content
                 .first()
                 .and_then(|block| match block {
-                    crate::model::ContentBlock::Text(text) => Some(text.text.clone()),
+                    pi_ai::model::ContentBlock::Text(text) => Some(text.text.clone()),
                     _ => None,
                 })
                 .expect("view must render text");

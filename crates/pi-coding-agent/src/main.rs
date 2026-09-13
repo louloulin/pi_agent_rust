@@ -22,40 +22,40 @@ use asupersync::runtime::{RuntimeBuilder, RuntimeHandle};
 use asupersync::sync::{Mutex, OwnedMutexGuard};
 use bubbletea::{Cmd, KeyMsg, KeyType, Message as BubbleMessage, Program, quit};
 use clap::error::ErrorKind;
-use pi::agent::{
+use crate::agent::{
     AbortHandle, Agent, AgentConfig, AgentEvent, AgentSession, PreWarmedExtensionRuntime,
 };
-use pi::app::StartupError;
-use pi::auth::{AuthCredential, AuthStorage};
-use pi::cli;
-use pi::compaction::ResolvedCompactionSettings;
-use pi::config::Config;
-use pi::config::SettingsScope;
+use crate::app::StartupError;
+use crate::auth::{AuthCredential, AuthStorage};
+use crate::cli;
+use crate::compaction::ResolvedCompactionSettings;
+use crate::config::Config;
+use crate::config::SettingsScope;
 use pi::extension_index::{
     DEFAULT_INDEX_MAX_AGE, ExtensionIndex, ExtensionIndexEntry, ExtensionIndexStore,
     ExtensionSafetyProvenance,
 };
-use pi::extensions::{
+use crate::extensions::{
     ALL_CAPABILITIES, Capability, ExtensionLoadSpec, ExtensionRegion, ExtensionRuntimeHandle,
     JsExtensionRuntimeHandle, NativeRustExtensionRuntimeHandle, PolicyDecision,
     resolve_extension_load_spec,
 };
 use pi::extensions_js::PiJsRuntimeConfig;
-use pi::model::{AssistantMessage, ContentBlock, StopReason, ThinkingLevel};
-use pi::models::{
+use pi_ai::model::{AssistantMessage, ContentBlock, StopReason, ThinkingLevel};
+use crate::models::{
     ExtensionProviderBinding, ModelEntry, ModelRegistry, default_models_path,
     extension_provider_bindings, fetched_models_path,
 };
 use pi::package_manager::{
     PackageEntry, PackageManager, PackageScope, ResolvedPaths, ResolvedResource, ResourceOrigin,
 };
-use pi::provider::InputType;
+use pi_ai::provider::InputType;
 use pi::provider_metadata::{self, PROVIDER_METADATA};
 use pi::providers;
-use pi::resources::{ResourceCliOptions, ResourceLoader};
-use pi::session::Session;
-use pi::session_index::SessionIndex;
-use pi::swarm_progress_slo::{
+use crate::resources::{ResourceCliOptions, ResourceLoader};
+use crate::session::Session;
+use crate::session_index::SessionIndex;
+use crate::swarm_progress_slo::{
     ProgressSloEvaluationInput, ProgressSloReport, SWARM_PROGRESS_SLO_SCHEMA, evaluate_progress_slo,
 };
 use pi::swarm_replay::{
@@ -64,8 +64,8 @@ use pi::swarm_replay::{
     SwarmReplayTrace, default_swarm_replay_baseline_policies,
     evaluate_swarm_replay_baseline_policies, replay_swarm_trace,
 };
-use pi::tools::ToolRegistry;
-use pi::tui::PiConsole;
+use crate::tools::ToolRegistry;
+use crate::tui::PiConsole;
 use pi::validation_broker::{
     VALIDATION_BROKER_CLI_LEASE_MUTATION_SCHEMA, VALIDATION_BROKER_CLI_PLAN_SCHEMA,
     VALIDATION_BROKER_CLI_STATUS_SCHEMA, VALIDATION_BROKER_DECISION_SCHEMA,
@@ -176,7 +176,7 @@ fn main() {
     // `/share` uses a gated copy of Pi on Windows so the real `gh` child cannot
     // spawn until its wrapper is covered by kill-on-close Job discipline.
     #[cfg(windows)]
-    if let Some(exit_code) = pi::tools::run_windows_share_job_child_if_requested() {
+    if let Some(exit_code) = crate::tools::run_windows_share_job_child_if_requested() {
         std::process::exit(exit_code);
     }
 
@@ -196,7 +196,7 @@ fn main() {
     if std::env::var_os("PI_PROFILE").is_some_and(|v| v != "0" && !v.is_empty())
         || std::env::args().any(|arg| arg == "--profile")
     {
-        let _ = pi::profiler::write_snapshot(&pi::config::Config::global_dir());
+        let _ = pi::profiler::write_snapshot(&crate::config::Config::global_dir());
     }
 
     if let Err(err) = result {
@@ -526,19 +526,19 @@ async fn resolve_selection_with_auth(
     allow_setup_prompt: bool,
     extension_bindings: &[ExtensionProviderBinding],
     extra_entries: &[ModelEntry],
-) -> Result<Option<(pi::app::ModelSelection, Option<String>)>> {
+) -> Result<Option<(crate::app::ModelSelection, Option<String>)>> {
     loop {
         let scoped_models = if scoped_patterns.is_empty() {
             Vec::new()
         } else {
-            pi::app::resolve_model_scope(
+            crate::app::resolve_model_scope(
                 scoped_patterns,
                 model_registry,
                 has_cli_api_key_override(cli.api_key.as_deref()),
             )
         };
 
-        let selection = match pi::app::select_model_and_thinking(
+        let selection = match crate::app::select_model_and_thinking(
             cli,
             config,
             session,
@@ -566,7 +566,7 @@ async fn resolve_selection_with_auth(
             }
         };
 
-        match pi::app::resolve_api_key(auth, cli, &selection.model_entry) {
+        match crate::app::resolve_api_key(auth, cli, &selection.model_entry) {
             // Structured SAP credentials are deliberately resolved in the provider, after
             // custom-header precedence is known. Eager exchange here would touch auth.json or
             // the network even when a complete Authorization override (or authHeader:false)
@@ -610,8 +610,8 @@ fn build_extension_bootstrap_selection(
     config: &Config,
     model_registry: &ModelRegistry,
     models_path: &Path,
-) -> Result<pi::app::ModelSelection> {
-    let model_entry = pi::app::bootstrap_model_entry(model_registry).ok_or_else(|| {
+) -> Result<crate::app::ModelSelection> {
+    let model_entry = crate::app::bootstrap_model_entry(model_registry).ok_or_else(|| {
         anyhow::Error::new(StartupError::NoModelsAvailable {
             models_path: models_path.to_path_buf(),
         })
@@ -621,7 +621,7 @@ fn build_extension_bootstrap_selection(
         .as_deref()
         .and_then(|value| value.parse::<ThinkingLevel>().ok());
 
-    Ok(pi::app::ModelSelection {
+    Ok(crate::app::ModelSelection {
         thinking_level: model_entry
             .clamp_thinking_level(thinking_level.unwrap_or(ThinkingLevel::XHigh)),
         model_entry,
@@ -662,11 +662,11 @@ fn main_impl() -> Result<()> {
     validate_theme_path_spec(cli.theme.as_deref(), &cwd)?;
 
     // Crash capture (bd-cv653.7.12): bundles land under the agent dir;
-    let crash_agent_dir = pi::config::Config::global_dir();
-    pi::crash::install(&crash_agent_dir, None);
-    let _ = pi::crash::emit_startup_notice(&crash_agent_dir);
+    let crash_agent_dir = crate::config::Config::global_dir();
+    crate::crash::install(&crash_agent_dir, None);
+    let _ = crate::crash::emit_startup_notice(&crash_agent_dir);
     if cli.crash_test {
-        pi::crash::record_operation("crash-test injected panic".to_string());
+        crate::crash::record_operation("crash-test injected panic".to_string());
         panic!("pi --crash-test: intentional panic for bundle verification");
     }
     // Sampling profiler (bd-cv653.7.12.1): opt-in via --profile /
@@ -939,14 +939,14 @@ fn main_impl() -> Result<()> {
         && cli.mode.as_deref().is_none_or(|mode| mode.ne("rpc"))
     {
         let stdin_content = read_piped_stdin()?;
-        pi::app::apply_piped_stdin(&mut cli, stdin_content);
+        crate::app::apply_piped_stdin(&mut cli, stdin_content);
     }
 
     if !cli.print && cli.mode.is_none() && !cli.message_args().is_empty() {
         cli.print = true;
     }
 
-    pi::app::normalize_cli(&mut cli);
+    crate::app::normalize_cli(&mut cli);
 
     let early_mode = cli.mode.clone().unwrap_or_else(|| {
         if !cli.print && cli.export.is_none() {
@@ -976,7 +976,7 @@ fn main_impl() -> Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .with_target(false)
-        .with_writer(|| pi::tui::TuiAwareLogWriter)
+        .with_writer(|| crate::tui::TuiAwareLogWriter)
         .init();
 
     // Run the application
@@ -994,7 +994,7 @@ fn main_impl() -> Result<()> {
     // survivors so no orphan daemons outlive the session.
     pi::jobs::kill_all();
     // Non-detached hub services are session-scoped too (bd-cv653.5.4).
-    pi::hub::kill_session_services();
+    crate::hub::kill_session_services();
     match result {
         Ok(()) => std::process::exit(0),
         Err(err) => report_fatal_error_and_exit(&err),
@@ -1059,9 +1059,9 @@ fn is_usage_error(err: &anyhow::Error) -> bool {
 
 fn validate_theme_path_spec(theme_spec: Option<&str>, cwd: &Path) -> Result<()> {
     if let Some(theme_spec) = theme_spec
-        && pi::theme::looks_like_theme_path(theme_spec)
+        && crate::theme::looks_like_theme_path(theme_spec)
     {
-        pi::theme::Theme::resolve_spec(theme_spec, cwd).map_err(anyhow::Error::new)?;
+        crate::theme::Theme::resolve_spec(theme_spec, cwd).map_err(anyhow::Error::new)?;
     }
     Ok(())
 }
@@ -1084,7 +1084,7 @@ fn policy_default_toggle_example(default_permissive: bool) -> serde_json::Value 
 }
 
 fn extension_policy_migration_guardrails(
-    resolved: &pi::config::ResolvedExtensionPolicy,
+    resolved: &crate::config::ResolvedExtensionPolicy,
 ) -> serde_json::Value {
     serde_json::json!({
         "default_profile": "permissive",
@@ -1110,7 +1110,7 @@ fn extension_policy_migration_guardrails(
 }
 
 const fn maybe_print_extension_policy_migration_notice(
-    _resolved: &pi::config::ResolvedExtensionPolicy,
+    _resolved: &crate::config::ResolvedExtensionPolicy,
 ) {
 }
 
@@ -1215,7 +1215,7 @@ fn capability_remediation(capability: Capability, decision: PolicyDecision) -> s
     })
 }
 
-fn print_resolved_extension_policy(resolved: &pi::config::ResolvedExtensionPolicy) -> Result<()> {
+fn print_resolved_extension_policy(resolved: &crate::config::ResolvedExtensionPolicy) -> Result<()> {
     let capability_decisions = ALL_CAPABILITIES
         .iter()
         .map(|capability| {
@@ -1291,7 +1291,7 @@ fn print_resolved_extension_policy(resolved: &pi::config::ResolvedExtensionPolic
     Ok(())
 }
 
-fn print_resolved_repair_policy(resolved: &pi::config::ResolvedRepairPolicy) -> Result<()> {
+fn print_resolved_repair_policy(resolved: &crate::config::ResolvedRepairPolicy) -> Result<()> {
     let payload = serde_json::json!({
         "requested_mode": resolved.requested_mode,
         "effective_mode": resolved.effective_mode,
@@ -1323,7 +1323,7 @@ async fn run(
     // @-file processing, the tool registry, and the interactive host so
     // /add-dir + /remove-dir mutate one live root set (the additional-roots
     // Arc<RwLock> is shared across clones).
-    let mut workspace = pi::workspace::WorkspaceHandle::single(&cwd);
+    let mut workspace = crate::workspace::WorkspaceHandle::single(&cwd);
 
     // #210: install the effective proxy configuration before any HTTP client
     // is constructed, so provider calls, OAuth, update checks, URL reads, and
@@ -1406,23 +1406,23 @@ async fn run(
             .ok()
             .and_then(|global| global.trust_all_workspaces)
             .unwrap_or(false);
-        let inputs = pi::workspace_trust::TrustInputs {
+        let inputs = crate::workspace_trust::TrustInputs {
             cli_trust: cli.trust,
             trust_all_workspaces: trust_all,
-            env_override: std::env::var(pi::workspace_trust::TRUST_ENV_VAR).ok(),
+            env_override: std::env::var(crate::workspace_trust::TRUST_ENV_VAR).ok(),
             interactive: interactive_allowed,
         };
-        let state = pi::workspace_trust::establish(
+        let state = crate::workspace_trust::establish(
             &cwd,
-            &pi::workspace_trust::WorkspaceTrustStore::default_path(),
+            &crate::workspace_trust::WorkspaceTrustStore::default_path(),
             &inputs,
             prompt_workspace_trust,
         )?;
         if !state.trusted {
-            if state.source == pi::workspace_trust::TrustSource::NonInteractive {
+            if state.source == crate::workspace_trust::TrustSource::NonInteractive {
                 eprintln!(
                     "Warning: workspace not trusted (non-interactive session); project-local executable configuration was skipped. Pass --trust once, set {}=trusted, or launch interactively to decide.",
-                    pi::workspace_trust::TRUST_ENV_VAR
+                    crate::workspace_trust::TRUST_ENV_VAR
                 );
             } else {
                 eprintln!(
@@ -1546,7 +1546,7 @@ async fn run(
         .policy;
     let prewarm_repair = config.resolve_repair_policy_with_metadata(cli.repair_policy.as_deref());
     let prewarm_repair_mode = if prewarm_repair.source.eq("default") {
-        pi::extensions::RepairPolicyMode::AutoStrict
+        crate::extensions::RepairPolicyMode::AutoStrict
     } else {
         prewarm_repair.effective_mode
     };
@@ -1570,7 +1570,7 @@ async fn run(
     // Session undo recorder (bd-cv653.3.13): write/edit/hashline_edit snapshot
     // file content through it so /undo and /redo can roll back. Created before
     // the extension pre-warm so the runtime's hostcall registry shares it.
-    let session_mutation_recorder = Arc::new(pi::undo::FileMutationRecorder::default());
+    let session_mutation_recorder = Arc::new(crate::undo::FileMutationRecorder::default());
 
     // One tool registry for the whole session (bd-4t6oz): the extension
     // runtime pre-warmed below and the Agent constructed later resolve tools
@@ -1578,7 +1578,7 @@ async fn run(
     // undo/workspace policy and see tools mounted after boot (extension
     // wrappers, MCP tools, plan tools).
     let shared_enabled_tools = cli.enabled_tools();
-    let shared_tools = pi::tools::SharedToolRegistry::new(ToolRegistry::with_mutation_recorder(
+    let shared_tools = crate::tools::SharedToolRegistry::new(ToolRegistry::with_mutation_recorder(
         &shared_enabled_tools,
         &cwd,
         Some(&config),
@@ -1593,7 +1593,7 @@ async fn run(
             if ftui_requested || resources.extensions().is_empty() {
                 None
             } else {
-                let pre_mgr = pi::extensions::ExtensionManager::new();
+                let pre_mgr = crate::extensions::ExtensionManager::new();
                 pre_mgr.set_cwd(cwd.display().to_string());
 
                 // The runtime resolves tools through the session's shared
@@ -1642,7 +1642,7 @@ async fn run(
                 ))
             }
         } else {
-            let pre_mgr = pi::extensions::ExtensionManager::new();
+            let pre_mgr = crate::extensions::ExtensionManager::new();
             pre_mgr.set_cwd(cwd.display().to_string());
             // Same shared registry as the JS pre-warm (bd-4t6oz).
             let pre_tools = shared_tools.clone();
@@ -1701,7 +1701,7 @@ async fn run(
         }
         report
     } else {
-        pi::auth::OAuthRefreshReport::default()
+        crate::auth::OAuthRefreshReport::default()
     };
 
     // Prune stale credentials that are well past expiry and lack refresh metadata.
@@ -1754,7 +1754,7 @@ async fn run(
         return Ok(());
     }
 
-    pi::app::validate_rpc_args(&cli)?;
+    crate::app::validate_rpc_args(&cli)?;
 
     // Explicit --add-dir roots must be live BEFORE @file arguments are
     // scope-checked below, or `pi --add-dir /extra "@/extra/notes.md"`
@@ -1762,13 +1762,13 @@ async fn run(
     // session roots are layered later (they need the session open).
     for dir in &cli.add_dir {
         let canonical =
-            pi::workspace::validate_new_root(dir).map_err(|e| anyhow::anyhow!("--add-dir: {e}"))?;
+            crate::workspace::validate_new_root(dir).map_err(|e| anyhow::anyhow!("--add-dir: {e}"))?;
         workspace.add_root(&canonical);
     }
 
     let mut messages: Vec<String> = cli.message_args().iter().map(ToString::to_string).collect();
     let file_args: Vec<String> = cli.file_args().iter().map(ToString::to_string).collect();
-    let initial = pi::app::prepare_initial_message(
+    let initial = crate::app::prepare_initial_message(
         &cwd,
         &file_args,
         &mut messages,
@@ -1804,7 +1804,7 @@ async fn run(
         .as_deref()
         .and_then(|overrides| pi::failover::best_scope_override(overrides, &cwd));
     let scoped_patterns = if let Some(models_arg) = &cli.models {
-        pi::app::parse_models_arg(models_arg)
+        crate::app::parse_models_arg(models_arg)
     } else if let Some(scope_models) = scope_override.and_then(|ov| ov.enabled_models.clone()) {
         scope_models
     } else {
@@ -1814,7 +1814,7 @@ async fn run(
     let scoped_models = if scoped_patterns.is_empty() {
         Vec::new()
     } else {
-        pi::app::resolve_model_scope(
+        crate::app::resolve_model_scope(
             &scoped_patterns,
             &model_registry,
             has_cli_api_key_override(cli.api_key.as_deref()),
@@ -1852,7 +1852,7 @@ async fn run(
     // blocking resume; `add_root` dedups against the explicit flags.
     {
         for root in session.additional_roots() {
-            if let Err(err) = pi::workspace::validate_new_root(&root) {
+            if let Err(err) = crate::workspace::validate_new_root(&root) {
                 eprintln!("Warning: skipping restored workspace root: {err}");
             } else {
                 workspace.add_root(&root);
@@ -1916,11 +1916,11 @@ async fn run(
     // (scoped-rule activation). `--no-context-files` (gh #216) disables the
     // import too: they are ambient project instructions like AGENTS.md.
     let foreign_rules = if config.foreign_rules_enabled() && !test_mode && !cli.no_context_files {
-        pi::context_files::discover_foreign_rules(&cwd)
+        crate::context_files::discover_foreign_rules(&cwd)
     } else {
-        pi::context_files::ForeignRules::default()
+        crate::context_files::ForeignRules::default()
     };
-    let system_prompt = pi::app::build_system_prompt(
+    let system_prompt = crate::app::build_system_prompt(
         &cli,
         &cwd,
         &enabled_tools,
@@ -1939,25 +1939,25 @@ async fn run(
     let provider =
         providers::create_provider(&selection.model_entry, None).map_err(anyhow::Error::new)?;
     let stream_options =
-        pi::app::build_stream_options(&config, resolved_key.clone(), &selection, &session);
+        crate::app::build_stream_options(&config, resolved_key.clone(), &selection, &session);
     // CLI flag wins; fall back to PI_MAX_TOOL_ITERATIONS env, then default.
     // `clamp_max_tool_iterations` keeps invalid values out of the loop and
     // emits a warning instead of failing the run.
     let max_tool_iterations = if cli.max_tool_iterations.is_some() {
-        pi::agent::clamp_max_tool_iterations(cli.max_tool_iterations)
+        crate::agent::clamp_max_tool_iterations(cli.max_tool_iterations)
     } else {
-        pi::agent::resolved_max_tool_iterations_default()
+        crate::agent::resolved_max_tool_iterations_default()
     };
     // Approval mode (bd-cv653.3.19): CLI flags override config.
     let approval_mode = if cli.yolo {
-        pi::approval::ApprovalMode::Yolo
+        crate::approval::ApprovalMode::Yolo
     } else if let Some(ref m) = cli.approval_mode {
-        pi::approval::ApprovalMode::from_setting(Some(m))
+        crate::approval::ApprovalMode::from_setting(Some(m))
     } else {
         config.approval_mode()
     };
     let dual_confirm_classes = config.approval_dual_confirm_classes();
-    let approval_state = pi::approval::ApprovalState::new(
+    let approval_state = crate::approval::ApprovalState::new(
         approval_mode,
         cli.plan_yolo || config.plan_auto_approve(),
         dual_confirm_classes,
@@ -1972,7 +1972,7 @@ async fn run(
             .model_entry
             .model
             .input
-            .contains(&pi::provider::InputType::Image),
+            .contains(&pi_ai::provider::InputType::Image),
         fail_closed_hooks: config.fail_closed_hooks(),
         tool_approval: None,
         keyword_settings: config.keywords.clone(),
@@ -2012,7 +2012,7 @@ async fn run(
     if enabled_tools.contains(&"todo") {
         let todo_session = Arc::clone(&agent_session.session);
         agent_session.agent.extend_tools(vec![
-            Box::new(pi::todo::TodoTool::new(todo_session)) as Box<dyn pi::tools::Tool>
+            Box::new(crate::todo::TodoTool::new(todo_session)) as Box<dyn crate::tools::Tool>
         ]);
     }
     // submit_plan shares the agent's plan-mode state (bd-cv653.3.5); it is
@@ -2025,10 +2025,10 @@ async fn run(
             .extend_tools(vec![Box::new(pi::plan::SubmitPlanTool::new(
                 plan_state.clone(),
                 auto_approve,
-            )) as Box<dyn pi::tools::Tool>]);
+            )) as Box<dyn crate::tools::Tool>]);
         if cli.plan_mode {
             plan_state.enter_planning();
-            let cx = pi::agent_cx::AgentCx::for_request();
+            let cx = crate::agent_cx::AgentCx::for_request();
             if let Ok(mut inner) = agent_session.session.lock(cx.cx()).await {
                 inner.append_custom_entry(
                     "plan_mode".to_string(),
@@ -2040,8 +2040,8 @@ async fn run(
     // The advisor (bd-cv653.3.3): build the runtime only when the advisor
     // role resolves a model AND its credentials exist — otherwise the session
     // carries None and the hook never runs (zero-overhead rule).
-    if let Some(resolution) = pi::app::resolve_role_model(
-        pi::models::ModelRole::Advisor,
+    if let Some(resolution) = crate::app::resolve_role_model(
+        crate::models::ModelRole::Advisor,
         &cli,
         &config,
         &model_registry,
@@ -2049,15 +2049,15 @@ async fn run(
     .filter(|_| config.advisor_enabled())
     {
         let entry = resolution.model_entry;
-        let key = pi::models::resolve_model_key(cli.api_key.as_deref(), &auth, &entry);
+        let key = crate::models::resolve_model_key(cli.api_key.as_deref(), &auth, &entry);
         let credentialed =
-            !pi::models::model_requires_configured_credential(&entry) || key.is_some();
+            !crate::models::model_requires_configured_credential(&entry) || key.is_some();
         if credentialed {
             let label = format!("{}/{}", entry.model.provider, entry.model.id);
-            match pi::providers::create_provider(&entry, None) {
+            match crate::providers::create_provider(&entry, None) {
                 Ok(advisor_provider) => {
                     agent_session.advisor = Some(
-                        pi::advisor::AdvisorRuntime::new(advisor_provider, label)
+                        crate::advisor::AdvisorRuntime::new(advisor_provider, label)
                             .with_timeout(std::time::Duration::from_secs(
                                 config.advisor_timeout_secs(),
                             ))
@@ -2080,12 +2080,12 @@ async fn run(
         }
     }
     let ask_tool = enabled_tools.contains(&"ask").then(|| {
-        let tool = pi::ask::AskTool::new(pi::ask::AskPolicy::from_config(
+        let tool = crate::ask::AskTool::new(crate::ask::AskPolicy::from_config(
             config.ask_policy.as_deref(),
         ));
         agent_session
             .agent
-            .extend_tools(vec![Box::new(tool.clone()) as Box<dyn pi::tools::Tool>]);
+            .extend_tools(vec![Box::new(tool.clone()) as Box<dyn crate::tools::Tool>]);
         tool
     });
     // Approval prompts (issue #196): route calls the approval mode gates
@@ -2097,7 +2097,7 @@ async fn run(
     if let Some(ask) = &ask_tool {
         agent_session
             .agent
-            .set_tool_approval(Some(pi::ask::approval_handler_via_ask(
+            .set_tool_approval(Some(crate::ask::approval_handler_via_ask(
                 ask.clone(),
                 approval_state.clone(),
             )));
@@ -2106,9 +2106,9 @@ async fn run(
     // The /btw side-question client (bd-cv653.3.16): bound to the smol
     // role when it resolves AND credentials exist; interactive-only.
     let btw_client =
-        pi::app::resolve_role_model(pi::models::ModelRole::Smol, &cli, &config, &model_registry)
+        crate::app::resolve_role_model(crate::models::ModelRole::Smol, &cli, &config, &model_registry)
             .and_then(|resolution| {
-                pi::btw::BtwClient::for_model_entry(
+                crate::btw::BtwClient::for_model_entry(
                     &resolution.model_entry,
                     cli.api_key.as_deref(),
                     &auth,
@@ -2117,11 +2117,11 @@ async fn run(
     // Rebinding factory (bd-9jgrt): lets `/model smol <spec>` rebuild the
     // /btw client mid-session against fresh on-disk credentials.
     let btw_api_key = cli.api_key.clone();
-    let btw_factory: pi::btw::BtwClientFactory = std::sync::Arc::new(move |entry| {
-        let Ok(auth) = pi::auth::AuthStorage::load(pi::config::Config::auth_path()) else {
+    let btw_factory: crate::btw::BtwClientFactory = std::sync::Arc::new(move |entry| {
+        let Ok(auth) = crate::auth::AuthStorage::load(crate::config::Config::auth_path()) else {
             return None;
         };
-        pi::btw::BtwClient::for_model_entry(entry, btw_api_key.as_deref(), &auth)
+        crate::btw::BtwClient::for_model_entry(entry, btw_api_key.as_deref(), &auth)
     });
 
     // MCP client (bd-cv653.6.1): discover server configs (CLI > .pi >
@@ -2136,7 +2136,7 @@ async fn run(
     } else {
         Some(std::sync::Arc::new(pi::mcp::bootstrap_with_project_trust(
             &cwd,
-            &pi::config::Config::global_dir(),
+            &crate::config::Config::global_dir(),
             &cli.mcp_config,
             workspace_trusted,
         )?))
@@ -2182,7 +2182,7 @@ async fn run(
             // Compatibility-first default for extension-heavy workloads:
             // if the user did not choose a repair policy explicitly, prefer
             // aggressive deterministic repairs while capability policy stays enforced.
-            pi::extensions::RepairPolicyMode::AutoStrict
+            crate::extensions::RepairPolicyMode::AutoStrict
         } else {
             resolved_repair_policy.effective_mode
         };
@@ -2203,7 +2203,7 @@ async fn run(
                 Some(resolved_ext_policy.policy),
                 Some(effective_repair_policy),
                 pre_warmed,
-                pi::agent::ExtensionHostConfiguration {
+                crate::agent::ExtensionHostConfiguration {
                     ui_handler: None,
                     persist_permission_decisions: true,
                     cli_flags: extension_flags.clone(),
@@ -2235,7 +2235,7 @@ async fn run(
             if !extension_bindings.is_empty() || !extension_model_entries.is_empty() {
                 // Build the refresh map from provider bindings so OAuth-only
                 // providers remain reachable without declared model rows.
-                let ext_oauth_configs: std::collections::HashMap<String, pi::models::OAuthConfig> =
+                let ext_oauth_configs: std::collections::HashMap<String, crate::models::OAuthConfig> =
                     extension_bindings
                         .iter()
                         .filter_map(|binding| {
@@ -2285,7 +2285,7 @@ async fn run(
                     } else {
                         String::new()
                     };
-                    let system_prompt = pi::app::build_system_prompt(
+                    let system_prompt = crate::app::build_system_prompt(
                         &cli,
                         &cwd,
                         &enabled_tools,
@@ -2308,7 +2308,7 @@ async fn run(
     } else if !ftui_requested && !extension_flags.is_empty() {
         let rendered = extension_flags
             .iter()
-            .map(pi::cli::ExtensionCliFlag::display_name)
+            .map(crate::cli::ExtensionCliFlag::display_name)
             .collect::<Vec<_>>()
             .join(", ");
         tracing::debug!(
@@ -2336,7 +2336,7 @@ async fn run(
 
     if has_extensions && !ftui_requested {
         let session_snapshot = {
-            let cx = pi::agent_cx::AgentCx::for_request();
+            let cx = crate::agent_cx::AgentCx::for_request();
             let session = agent_session
                 .session
                 .lock(cx.cx())
@@ -2377,7 +2377,7 @@ async fn run(
         agent_session.agent.set_keyword_max_thinking_level(
             selection
                 .model_entry
-                .clamp_thinking_level(pi::model::ThinkingLevel::Max),
+                .clamp_thinking_level(pi_ai::model::ThinkingLevel::Max),
         );
         agent_session
             .agent
@@ -2410,13 +2410,13 @@ async fn run(
     }
 
     {
-        let cx = pi::agent_cx::AgentCx::for_request();
+        let cx = crate::agent_cx::AgentCx::for_request();
         let mut session = agent_session
             .session
             .lock(cx.cx())
             .await
             .map_err(|e| anyhow::anyhow!(e.to_string()))?;
-        pi::app::update_session_for_selection(&mut session, &selection);
+        crate::app::update_session_for_selection(&mut session, &selection);
     }
 
     if let Some(message) = &selection.fallback_message {
@@ -2427,7 +2427,7 @@ async fn run(
     agent_session.set_auth_storage(auth.clone());
 
     let history = {
-        let cx = pi::agent_cx::AgentCx::for_request();
+        let cx = crate::agent_cx::AgentCx::for_request();
         let session = agent_session
             .session
             .lock(cx.cx())
@@ -2524,7 +2524,7 @@ async fn run(
                 package_dir: Some(package_dir.clone()),
                 mcp: Some(pi::sdk::McpSessionOptions {
                     config_paths: cli.mcp_config.clone(),
-                    global_dir: Some(pi::config::Config::global_dir()),
+                    global_dir: Some(crate::config::Config::global_dir()),
                 }),
                 // Approval gating (issue #196): the ftui stack previously
                 // dropped the approval mode entirely; thread the same state
@@ -2533,7 +2533,7 @@ async fn run(
                 approval_state: Some(approval_state.clone()),
                 ..Default::default()
             };
-            let theme = pi::theme::Theme::resolve(&config, &cwd);
+            let theme = crate::theme::Theme::resolve(&config, &cwd);
             let ftui_models = model_registry
                 .get_available()
                 .into_iter()
@@ -2542,7 +2542,7 @@ async fn run(
             // /resume picker entries: this cwd's saved sessions, newest first
             // (same index the session picker uses). Failures degrade to an
             // empty list — /resume then reports "no saved sessions".
-            let ftui_sessions = pi::session_index::SessionIndex::new()
+            let ftui_sessions = crate::session_index::SessionIndex::new()
                 .list_sessions(Some(&cwd.display().to_string()))
                 .unwrap_or_default()
                 .into_iter()
@@ -2554,15 +2554,15 @@ async fn run(
                     (label, meta.path)
                 })
                 .collect::<Vec<_>>();
-            pi::interactive_ftui::run(
+            crate::interactive_ftui::run(
                 options,
                 &theme,
                 cli.inline,
                 ftui_models,
                 ftui_sessions,
                 config.markdown_spacing(),
-                pi::interactive_ftui::AutocompleteLaunch {
-                    catalog: pi::autocomplete::AutocompleteCatalog::from_resources(&resources),
+                crate::interactive_ftui::AutocompleteLaunch {
+                    catalog: crate::autocomplete::AutocompleteCatalog::from_resources(&resources),
                     cwd: cwd.clone(),
                     max_visible: config
                         .autocomplete_max_visible
@@ -2591,7 +2591,7 @@ async fn run(
                 )
             })
             .collect::<Vec<_>>();
-        let title_model_entry = pi::app::titling_model_entry(&cli, &config, &model_registry);
+        let title_model_entry = crate::app::titling_model_entry(&cli, &config, &model_registry);
 
         Box::pin(run_interactive_mode(
             agent_session,
@@ -2621,15 +2621,15 @@ async fn run(
         // `hub agent steer` / peer bus messages reach the running child.
         if let Some(steer_file) = std::env::var_os("PI_SUBAGENT_STEER_FILE") {
             let steer_path = std::path::PathBuf::from(steer_file);
-            let steering_fetcher: pi::agent::MessageFetcher = std::sync::Arc::new(move || {
+            let steering_fetcher: crate::agent::MessageFetcher = std::sync::Arc::new(move || {
                 let path = steer_path.clone();
                 Box::pin(async move {
                     pi::agent_hub::drain_steer_file(&path)
                         .into_iter()
                         .map(|body| {
-                            pi::agent::QueuedAgentMessage::generated(pi::model::Message::User(
-                                pi::model::UserMessage {
-                                    content: pi::model::UserContent::Text(body),
+                            crate::agent::QueuedAgentMessage::generated(pi_ai::model::Message::User(
+                                pi_ai::model::UserMessage {
+                                    content: pi_ai::model::UserContent::Text(body),
                                     timestamp: std::time::SystemTime::now()
                                         .duration_since(std::time::UNIX_EPOCH)
                                         .map_or(0, |d| {
@@ -2640,7 +2640,7 @@ async fn run(
                         })
                         .collect()
                 })
-                    as futures::future::BoxFuture<'static, Vec<pi::agent::QueuedAgentMessage>>
+                    as futures::future::BoxFuture<'static, Vec<crate::agent::QueuedAgentMessage>>
             });
             agent_session
                 .agent
@@ -2678,7 +2678,7 @@ async fn run(
     // session; flushing this throwaway bootstrap session afterward could make
     // stale state the last writer to the same session path.
     if !cli.no_session && !ftui_requested {
-        let cx = pi::agent_cx::AgentCx::for_request();
+        let cx = crate::agent_cx::AgentCx::for_request();
         if let Ok(mut guard) = OwnedMutexGuard::lock(Arc::clone(&session_handle), &cx).await
             && let Err(e) = guard.flush_autosave_on_shutdown().await
         {
@@ -2719,25 +2719,25 @@ fn establish_package_subcommand_trust(cwd: &Path, cli_trust: bool) -> Result<boo
         .ok()
         .and_then(|global| global.trust_all_workspaces)
         .unwrap_or(false);
-    let inputs = pi::workspace_trust::TrustInputs {
+    let inputs = crate::workspace_trust::TrustInputs {
         cli_trust,
         trust_all_workspaces,
-        env_override: std::env::var(pi::workspace_trust::TRUST_ENV_VAR).ok(),
+        env_override: std::env::var(crate::workspace_trust::TRUST_ENV_VAR).ok(),
         // Package subcommands do not run the interactive agent UI. Project
         // configuration therefore requires a stored decision or an explicit
         // --trust/env/global override.
         interactive: false,
     };
-    let state = pi::workspace_trust::establish(
+    let state = crate::workspace_trust::establish(
         cwd,
-        &pi::workspace_trust::WorkspaceTrustStore::default_path(),
+        &crate::workspace_trust::WorkspaceTrustStore::default_path(),
         &inputs,
         prompt_workspace_trust,
     )?;
     if !state.trusted {
         eprintln!(
             "Warning: workspace not trusted; project-local package configuration is disabled for this subcommand. Pass --trust once or set {}=trusted to enable it.",
-            pi::workspace_trust::TRUST_ENV_VAR
+            crate::workspace_trust::TRUST_ENV_VAR
         );
     }
     Ok(state.trusted)
@@ -2770,10 +2770,10 @@ async fn handle_subcommand(
             handle_worktree(cwd, &action, older_than_days)?;
         }
         cli::Commands::Completions { shell } => {
-            pi::completions::print_script(&shell, &mut std::io::stdout().lock())?;
+            crate::completions::print_script(&shell, &mut std::io::stdout().lock())?;
         }
         cli::Commands::Complete { flag, prefix } => {
-            pi::completions::complete(&flag, &prefix, &mut std::io::stdout().lock())?;
+            crate::completions::complete(&flag, &prefix, &mut std::io::stdout().lock())?;
         }
         cli::Commands::Token { input } => {
             handle_token(&input)?;
@@ -2961,11 +2961,11 @@ async fn handle_subcommand(
         }
         cli::Commands::Usage { format, refresh } => {
             let auth = AuthStorage::load(Config::auth_path())?;
-            let rows = pi::usage::gather_usage(&auth, refresh).await;
+            let rows = crate::usage::gather_usage(&auth, refresh).await;
             if format == "json" {
-                println!("{}", pi::usage::render_usage_json(&rows));
+                println!("{}", crate::usage::render_usage_json(&rows));
             } else {
-                println!("{}", pi::usage::render_usage_text(&rows));
+                println!("{}", crate::usage::render_usage_text(&rows));
             }
         }
         cli::Commands::Web {
@@ -4484,8 +4484,8 @@ struct ContextPreviewReport<'a> {
     generated_at_utc: String,
     command: ContextPreviewCommandProvenance,
     graph: ContextPreviewGraphSummary,
-    request: &'a pi::semantic_workspace_graph::ContextBundleRequest,
-    bundle: &'a pi::semantic_workspace_graph::SemanticContextBundle,
+    request: &'a crate::semantic_workspace_graph::ContextBundleRequest,
+    bundle: &'a crate::semantic_workspace_graph::SemanticContextBundle,
 }
 
 #[derive(Debug, Serialize)]
@@ -4531,9 +4531,9 @@ fn handle_context_preview_blocking(
         );
     }
 
-    let graph = pi::semantic_workspace_graph::SemanticWorkspaceGraphBuilder::new(cwd).build()?;
+    let graph = crate::semantic_workspace_graph::SemanticWorkspaceGraphBuilder::new(cwd).build()?;
     let generated_at_utc = chrono::Utc::now().to_rfc3339();
-    let request = pi::semantic_workspace_graph::ContextBundleRequest {
+    let request = crate::semantic_workspace_graph::ContextBundleRequest {
         query,
         bead_id,
         changed_paths,
@@ -4543,12 +4543,12 @@ fn handle_context_preview_blocking(
         session_id: None,
         generated_at_utc: Some(generated_at_utc.clone()),
         cache_ttl_seconds: 15 * 60,
-        budget: pi::semantic_workspace_graph::ContextBundleBudget {
+        budget: crate::semantic_workspace_graph::ContextBundleBudget {
             max_items,
             max_bytes,
         },
     };
-    let planner = pi::semantic_workspace_graph::SemanticContextBundlePlanner::new(&graph);
+    let planner = crate::semantic_workspace_graph::SemanticContextBundlePlanner::new(&graph);
     let bundle = planner.plan(&request);
     let report = ContextPreviewReport {
         schema: "pi.context_bundle_preview.v1",
@@ -4723,7 +4723,7 @@ fn print_context_preview_text(report: &ContextPreviewReport<'_>) {
 }
 
 fn print_context_preview_stale_suppressions(
-    suppressions: &[pi::semantic_workspace_graph::ContextBundleExclusion],
+    suppressions: &[crate::semantic_workspace_graph::ContextBundleExclusion],
 ) {
     println!();
     println!("Stale Evidence Suppressions");
@@ -4773,7 +4773,7 @@ fn spawn_session_index_maintenance() {
     // Cleanup can be slow if there are many temp files, so we don't want to block main.
     std::thread::spawn(move || {
         // Clean up old bash tool logs in background
-        pi::tools::cleanup_temp_files();
+        crate::tools::cleanup_temp_files();
 
         if index.should_reindex(MAX_INDEX_AGE)
             && let Err(err) = index.reindex_all()
@@ -5094,7 +5094,7 @@ fn handle_profile(input: Option<&Path>, top: usize) -> Result<()> {
     let path = if let Some(path) = input {
         path.to_path_buf()
     } else {
-        let dir = pi::profiler::profiles_dir(&pi::config::Config::global_dir());
+        let dir = pi::profiler::profiles_dir(&crate::config::Config::global_dir());
         let mut snapshots: Vec<PathBuf> = std::fs::read_dir(&dir)
             .map_err(|e| {
                 anyhow::anyhow!(
@@ -5138,7 +5138,7 @@ async fn handle_handoff(
         if path.exists() {
             Session::open(&path.to_string_lossy()).await?
         } else {
-            let index = pi::session_index::SessionIndex::new();
+            let index = crate::session_index::SessionIndex::new();
             let cwd_str = cwd.display().to_string();
             let sessions = index.list_sessions(Some(&cwd_str))?;
             if let Some(matching) = sessions.iter().find(|s| s.id == spec) {
@@ -5148,7 +5148,7 @@ async fn handle_handoff(
             }
         }
     } else {
-        let index = pi::session_index::SessionIndex::new();
+        let index = crate::session_index::SessionIndex::new();
         let cwd_str = cwd.display().to_string();
         let sessions = index.list_sessions(Some(&cwd_str))?;
         if let Some(latest) = sessions.first() {
@@ -5182,20 +5182,20 @@ fn handle_stats(
 ) -> Result<()> {
     // Test/e2e seam (bd-cv653.7.7): lanes point this at a synthetic corpus.
     let sessions_dir = std::env::var("PI_STATS_SESSIONS_DIR")
-        .map_or_else(|_| pi::config::Config::sessions_dir(), PathBuf::from);
-    let files = pi::stats::collect_session_files(&sessions_dir, project);
-    let filter = pi::stats::StatsFilter {
+        .map_or_else(|_| crate::config::Config::sessions_dir(), PathBuf::from);
+    let files = crate::stats::collect_session_files(&sessions_dir, project);
+    let filter = crate::stats::StatsFilter {
         since,
         until,
         provider,
         model,
     };
-    let report = pi::stats::aggregate(&files, &filter);
+    let report = crate::stats::aggregate(&files, &filter);
     let rendered = match format {
         "json" => serde_json::to_string_pretty(&report)
             .map_err(|e| anyhow::anyhow!("stats serialization failed: {e}"))?,
-        "markdown" | "md" => pi::stats::render_markdown(&report),
-        _ => pi::stats::render_text(&report),
+        "markdown" | "md" => crate::stats::render_markdown(&report),
+        _ => crate::stats::render_text(&report),
     };
     println!("{rendered}");
     Ok(())
@@ -5392,7 +5392,7 @@ fn handle_commit(
         if p.is_file()
             && let Ok(content) = fs::read_to_string(&p)
         {
-            pi::commit_split::ConflictScanner::check_content(&content, file)?;
+            crate::commit_split::ConflictScanner::check_content(&content, file)?;
         }
     }
 
@@ -5409,10 +5409,10 @@ fn handle_commit(
         })?;
 
     let diff_str = String::from_utf8_lossy(&diff_out.stdout);
-    let hunks = pi::commit_split::DiffParser::parse_unified_diff(&diff_str).unwrap_or_default();
+    let hunks = crate::commit_split::DiffParser::parse_unified_diff(&diff_str).unwrap_or_default();
 
     // 5. Plan commits
-    let options = pi::commit_split::CommitOptions {
+    let options = crate::commit_split::CommitOptions {
         dry_run,
         include_lockfiles,
         all_untracked: stage_all,
@@ -5420,7 +5420,7 @@ fn handle_commit(
         custom_prefix: custom_msg.map(ToString::to_string),
     };
 
-    let plan = pi::commit_split::CommitPlanner::plan(&hunks, &changed_files, &options)?;
+    let plan = crate::commit_split::CommitPlanner::plan(&hunks, &changed_files, &options)?;
 
     if plan.units.is_empty() {
         println!("No eligible files to commit (check --include-lockfiles if lockfiles only).");
@@ -5442,7 +5442,7 @@ fn handle_commit(
     }
 
     // 6. Execute commits
-    let results = pi::commit_split::CommitExecutor::execute(cwd, &plan, &options)?;
+    let results = crate::commit_split::CommitExecutor::execute(cwd, &plan, &options)?;
     let successful = results.iter().filter(|r| r.success).count();
     println!(
         "\nSuccessfully created {successful}/{} atomic commits.",
@@ -5463,8 +5463,8 @@ fn handle_commit(
 /// `pi self-update [--version vX.Y.Z] [--check]` (bd-cv653.7.10): verified in-place
 /// binary upgrades with package manager detection and fail-closed SHA-256 verification.
 async fn handle_self_update(version: Option<&str>, check: bool) -> Result<()> {
-    let updater = pi::self_update::SelfUpdater::new();
-    let options = pi::self_update::SelfUpdateOptions {
+    let updater = crate::self_update::SelfUpdater::new();
+    let options = crate::self_update::SelfUpdateOptions {
         version: version.map(ToString::to_string),
         check,
         custom_manifest_url: None,
@@ -5473,10 +5473,10 @@ async fn handle_self_update(version: Option<&str>, check: bool) -> Result<()> {
 
     let status = updater.run(&options).await?;
     match status {
-        pi::self_update::SelfUpdateStatus::AlreadyUpToDate { current_version } => {
+        crate::self_update::SelfUpdateStatus::AlreadyUpToDate { current_version } => {
             println!("Pi is already up to date (v{current_version}).");
         }
-        pi::self_update::SelfUpdateStatus::CheckResult {
+        crate::self_update::SelfUpdateStatus::CheckResult {
             current_version,
             latest_version,
             is_newer,
@@ -5486,7 +5486,7 @@ async fn handle_self_update(version: Option<&str>, check: bool) -> Result<()> {
             println!("Latest release  : v{latest_version}");
             if is_newer {
                 println!("An update is available (v{current_version} -> v{latest_version}).");
-                if manager == pi::self_update::PackageManager::Manual {
+                if manager == crate::self_update::PackageManager::Manual {
                     println!("Run `pi self-update` to perform an in-place upgrade.");
                 } else if let Some(cmd) = manager.upgrade_command() {
                     println!("Pi is installed via package manager. Run `{cmd}` to update.");
@@ -5495,14 +5495,14 @@ async fn handle_self_update(version: Option<&str>, check: bool) -> Result<()> {
                 println!("You are on the latest version.");
             }
         }
-        pi::self_update::SelfUpdateStatus::ManagedExternally {
+        crate::self_update::SelfUpdateStatus::ManagedExternally {
             manager: _,
             upgrade_command,
         } => {
             println!("Pi is installed via a package manager.");
             println!("Please update via: {upgrade_command}");
         }
-        pi::self_update::SelfUpdateStatus::Updated {
+        crate::self_update::SelfUpdateStatus::Updated {
             previous_version,
             new_version,
             backup_path,
@@ -5589,7 +5589,7 @@ fn handle_gc(
     restore: Option<&str>,
     format: &str,
 ) -> Result<()> {
-    let days = pi::gc::parse_retention_days(older_than).ok_or_else(|| {
+    let days = crate::gc::parse_retention_days(older_than).ok_or_else(|| {
         pi::error::Error::Validation(format!(
             "Invalid retention window format '{older_than}'. Expected e.g. 30d, 7d, 24h, 14."
         ))
@@ -5604,7 +5604,7 @@ fn handle_gc(
         dry_run || !yes
     };
 
-    let options = pi::gc::GcOptions {
+    let options = crate::gc::GcOptions {
         older_than_days: days,
         keep_last,
         prune_caches: caches,
@@ -5616,7 +5616,7 @@ fn handle_gc(
         custom_ledger_path: None,
     };
 
-    let result = pi::gc::GarbageCollector::run(&options)?;
+    let result = crate::gc::GarbageCollector::run(&options)?;
 
     match format {
         "json" => {
@@ -5641,7 +5641,7 @@ fn handle_gc(
 fn handle_worktree(cwd: &std::path::Path, action: &str, older_than_days: u64) -> Result<()> {
     match action {
         "list" => {
-            let mine = pi::worktree_iso::list_mine(cwd)?;
+            let mine = crate::worktree_iso::list_mine(cwd)?;
             if mine.is_empty() {
                 println!("No pi-iso agent worktrees under {}", cwd.display());
             } else {
@@ -5652,7 +5652,7 @@ fn handle_worktree(cwd: &std::path::Path, action: &str, older_than_days: u64) ->
             }
         }
         "clean" => {
-            let reaped = pi::worktree_iso::reap_stale(
+            let reaped = crate::worktree_iso::reap_stale(
                 cwd,
                 std::time::Duration::from_secs(older_than_days.saturating_mul(86_400)),
             )?;
@@ -7040,7 +7040,7 @@ fn handle_session_migrate(path: &str, dry_run: bool) -> Result<()> {
 
     for jsonl_path in &jsonl_files {
         if dry_run {
-            match pi::session::migrate_dry_run(jsonl_path) {
+            match crate::session::migrate_dry_run(jsonl_path) {
                 Ok(verification) => {
                     let status = if verification.entry_count_match
                         && verification.hash_chain_match
@@ -7067,7 +7067,7 @@ fn handle_session_migrate(path: &str, dry_run: bool) -> Result<()> {
             }
         } else {
             let correlation_id = uuid::Uuid::new_v4().to_string();
-            match pi::session::migrate_jsonl_to_v2(jsonl_path, &correlation_id) {
+            match crate::session::migrate_jsonl_to_v2(jsonl_path, &correlation_id) {
                 Ok(event) => {
                     println!(
                         "[migrated] {}: migration_id={}, entries_match={}, hash_match={}, index_ok={}",
@@ -7104,7 +7104,7 @@ fn handle_doctor(
     fix: bool,
     only: Option<&str>,
 ) -> Result<()> {
-    use pi::doctor::{CheckCategory, DoctorOptions};
+    use crate::doctor::{CheckCategory, DoctorOptions};
 
     let only_set = if let Some(raw) = only {
         let mut parsed = std::collections::HashSet::new();
@@ -7145,7 +7145,7 @@ fn handle_doctor(
         only: only_set,
     };
 
-    let report = pi::doctor::run_doctor(&opts)?;
+    let report = crate::doctor::run_doctor(&opts)?;
 
     match format {
         "json" => {
@@ -7160,7 +7160,7 @@ fn handle_doctor(
     }
 
     // Exit with code 1 if any failures (useful for CI)
-    if matches!(report.overall, pi::doctor::Severity::Fail) {
+    if matches!(report.overall, crate::doctor::Severity::Fail) {
         std::process::exit(1);
     }
 
@@ -7376,7 +7376,7 @@ fn append_file_fingerprint(hasher: &mut Sha256, path: &Path) -> bool {
 fn list_models_cache_path(models_path: &Path) -> Option<PathBuf> {
     let mut hasher = Sha256::new();
     hasher.update(env!("CARGO_PKG_VERSION").as_bytes());
-    hasher.update(pi::models::model_catalog_cache_fingerprint().to_le_bytes());
+    hasher.update(crate::models::model_catalog_cache_fingerprint().to_le_bytes());
     if !append_file_fingerprint(&mut hasher, &Config::auth_path())
         || !append_file_fingerprint(&mut hasher, models_path)
         || !append_file_fingerprint(&mut hasher, &fetched_models_path(models_path))
@@ -7454,7 +7454,7 @@ async fn handle_fetch_models(
     // models.json SAP routes continue through the normal exchange path.
     if pi::provider_metadata::canonical_provider_id(provider)
         .is_some_and(|canonical| canonical == "sap-ai-core")
-        && !pi::providers::model_fetch::provider_model_catalog_route_is_configured(provider)?
+        && !crate::providers::model_fetch::provider_model_catalog_route_is_configured(provider)?
     {
         bail!(
             "provider {provider:?} has no built-in or models.json routing configuration for live model discovery"
@@ -7465,7 +7465,7 @@ async fn handle_fetch_models(
     // complete custom Authorization header cannot be delayed or rejected by an
     // unrelated auth.json lock. The plan keeps configured fallback credentials
     // lazy and reuses the already-resolved route headers for the actual request.
-    let fetch_plan = pi::providers::prepare_provider_model_catalog_fetch(provider)?;
+    let fetch_plan = crate::providers::prepare_provider_model_catalog_fetch(provider)?;
     let api_key = if fetch_plan.requires_runtime_api_key() {
         // Use the normal credential resolver: an explicit CLI override wins,
         // then stored OAuth/Bearer credentials, provider environment variables,
@@ -7481,7 +7481,7 @@ async fn handle_fetch_models(
 
     let used_static_fallback = matches!(
         catalog.source(),
-        pi::providers::ModelCatalogSource::StaticFallback
+        crate::providers::ModelCatalogSource::StaticFallback
     );
 
     if persist {
@@ -7492,7 +7492,7 @@ async fn handle_fetch_models(
             );
         }
         let models_path = default_models_path(&Config::global_dir());
-        let fetched_path = pi::providers::persist_provider_model_catalog(&models_path, &catalog)?;
+        let fetched_path = crate::providers::persist_provider_model_catalog(&models_path, &catalog)?;
         eprintln!(
             "Persisted {} models for {provider:?} to {}",
             catalog.models().len(),
@@ -7568,7 +7568,7 @@ where
         if pi::provider_metadata::canonical_provider_id(provider)
             .is_some_and(|canonical| canonical == "sap-ai-core")
         {
-            return Ok(pi::auth::resolve_sap_auth_candidate(key)
+            return Ok(crate::auth::resolve_sap_auth_candidate(key)
                 .await?
                 .unwrap_or_default());
         }
@@ -7576,12 +7576,12 @@ where
     }
     match AuthStorage::load_with_lock_timeout_classified(
         auth_path,
-        pi::auth::AUTH_RESOLUTION_LOCK_TIMEOUT,
+        crate::auth::AUTH_RESOLUTION_LOCK_TIMEOUT,
     ) {
         Ok(mut auth) => {
             let requested_oauth_expired = matches!(
                 auth.credential_status(provider),
-                pi::auth::CredentialStatus::OAuthExpired { .. }
+                crate::auth::CredentialStatus::OAuthExpired { .. }
             );
             let refresh_error = if requested_oauth_expired {
                 auth.refresh_expired_oauth_tokens().await.err()
@@ -7605,10 +7605,10 @@ where
             }
             Ok(resolved)
         }
-        Err(failure @ pi::auth::AuthStorageLoadFailure::LockTimeout(_)) => {
+        Err(failure @ crate::auth::AuthStorageLoadFailure::LockTimeout(_)) => {
             Err(anyhow::Error::new(failure.into_error()))
         }
-        Err(pi::auth::AuthStorageLoadFailure::Other(error)) => {
+        Err(crate::auth::AuthStorageLoadFailure::Other(error)) => {
             tracing::warn!(
                 provider,
                 error = %error,
@@ -7617,7 +7617,7 @@ where
             if pi::provider_metadata::canonical_provider_id(provider)
                 .is_some_and(|canonical| canonical == "sap-ai-core")
             {
-                Ok(pi::auth::resolve_ambient_sap_auth_token()
+                Ok(crate::auth::resolve_ambient_sap_auth_token()
                     .await?
                     .unwrap_or_default())
             } else {
@@ -7634,7 +7634,7 @@ async fn resolve_provider_api_key_from_auth(provider: &str, auth: &AuthStorage) 
     if pi::provider_metadata::canonical_provider_id(provider)
         .is_some_and(|canonical| canonical == "sap-ai-core")
     {
-        return Ok(pi::auth::resolve_sap_auth_token(auth, None)
+        return Ok(crate::auth::resolve_sap_auth_token(auth, None)
             .await?
             .unwrap_or_default());
     }
@@ -8008,10 +8008,10 @@ async fn run_first_time_setup(
         }
         SetupCredentialKind::OAuthPkce => {
             let start = match provider.provider {
-                "openai-codex" => pi::auth::start_openai_codex_oauth()?,
-                "anthropic" => pi::auth::start_anthropic_oauth()?,
-                "google-gemini-cli" => pi::auth::start_google_gemini_cli_oauth()?,
-                "google-antigravity" => pi::auth::start_google_antigravity_oauth()?,
+                "openai-codex" => crate::auth::start_openai_codex_oauth()?,
+                "anthropic" => crate::auth::start_anthropic_oauth()?,
+                "google-gemini-cli" => crate::auth::start_google_gemini_cli_oauth()?,
+                "google-antigravity" => crate::auth::start_google_antigravity_oauth()?,
                 _ => {
                     console.render_warning(&format!(
                         "OAuth login is not supported for {} in this setup flow. Start Pi and run /login {} instead.",
@@ -8036,8 +8036,8 @@ result in account suspension/ban. Prefer using an Anthropic API key (ANTHROPIC_A
                 start
                     .redirect_uri
                     .as_deref()
-                    .filter(|uri| pi::auth::redirect_uri_needs_callback_server(uri))
-                    .and_then(|uri| match pi::auth::start_oauth_callback_server(uri) {
+                    .filter(|uri| crate::auth::redirect_uri_needs_callback_server(uri))
+                    .and_then(|uri| match crate::auth::start_oauth_callback_server(uri) {
                         Ok(server) => {
                             tracing::info!(port = server.port, "OAuth callback server listening");
                             Some(server)
@@ -8119,16 +8119,16 @@ result in account suspension/ban. Prefer using an Anthropic API key (ANTHROPIC_A
 
             match start.provider.as_str() {
                 "openai-codex" => {
-                    pi::auth::complete_openai_codex_oauth(code_input, &start.verifier).await?
+                    crate::auth::complete_openai_codex_oauth(code_input, &start.verifier).await?
                 }
                 "anthropic" => {
-                    pi::auth::complete_anthropic_oauth(code_input, &start.verifier).await?
+                    crate::auth::complete_anthropic_oauth(code_input, &start.verifier).await?
                 }
                 "google-gemini-cli" => {
-                    pi::auth::complete_google_gemini_cli_oauth(code_input, &start.verifier).await?
+                    crate::auth::complete_google_gemini_cli_oauth(code_input, &start.verifier).await?
                 }
                 "google-antigravity" => {
-                    pi::auth::complete_google_antigravity_oauth(code_input, &start.verifier).await?
+                    crate::auth::complete_google_antigravity_oauth(code_input, &start.verifier).await?
                 }
                 other => {
                     console.render_warning(&format!(
@@ -8147,7 +8147,7 @@ result in account suspension/ban. Prefer using an Anthropic API key (ANTHROPIC_A
                 return Ok(false);
             }
 
-            let device = pi::auth::start_kimi_code_device_flow().await?;
+            let device = crate::auth::start_kimi_code_device_flow().await?;
             let verification_url = device
                 .verification_uri_complete
                 .clone()
@@ -8178,23 +8178,23 @@ Code expires in {} seconds.\n",
                     return Ok(false);
                 }
 
-                match pi::auth::poll_kimi_code_device_flow(&device.device_code).await {
-                    pi::auth::DeviceFlowPollResult::Success(cred) => break cred,
-                    pi::auth::DeviceFlowPollResult::Pending => {
+                match crate::auth::poll_kimi_code_device_flow(&device.device_code).await {
+                    crate::auth::DeviceFlowPollResult::Success(cred) => break cred,
+                    crate::auth::DeviceFlowPollResult::Pending => {
                         console.render_info("Authorization still pending. Complete the browser step and poll again.");
                     }
-                    pi::auth::DeviceFlowPollResult::SlowDown => {
+                    crate::auth::DeviceFlowPollResult::SlowDown => {
                         console.render_info("Authorization server asked to slow down. Wait a few seconds and poll again.");
                     }
-                    pi::auth::DeviceFlowPollResult::Expired => {
+                    crate::auth::DeviceFlowPollResult::Expired => {
                         console.render_warning("Device code expired. Run setup again.");
                         return Ok(false);
                     }
-                    pi::auth::DeviceFlowPollResult::AccessDenied => {
+                    crate::auth::DeviceFlowPollResult::AccessDenied => {
                         console.render_warning("Access denied. Run setup again.");
                         return Ok(false);
                     }
-                    pi::auth::DeviceFlowPollResult::Error(err) => {
+                    crate::auth::DeviceFlowPollResult::Error(err) => {
                         console.render_warning(&format!("OAuth polling failed: {err}"));
                         return Ok(false);
                     }
@@ -8404,7 +8404,7 @@ fn print_model_table<R: ModelTableRow>(rows: &[R]) {
 /// Interactive first-use workspace-trust prompt (GH #151). Returns
 /// `Ok(true)` to trust; EOF and empty answers deny.
 fn prompt_workspace_trust(
-    surface: &pi::workspace_trust::WorkspaceTrustSurface,
+    surface: &crate::workspace_trust::WorkspaceTrustSurface,
 ) -> pi::PiResult<bool> {
     const MAX_LISTED_ENTRIES: usize = 10;
 
@@ -8499,7 +8499,7 @@ async fn export_session(input_path: &str, output_path: Option<&str>) -> Result<P
     }
 
     let session = Session::open(input_path).await?;
-    let html = pi::app::render_session_html(&session);
+    let html = crate::app::render_session_html(&session);
     let output_path = output_path.map_or_else(|| default_export_path(input), PathBuf::from);
 
     if let Some(parent) = output_path.parent()
@@ -8546,7 +8546,7 @@ async fn run_rpc_mode(
     cli_api_key: Option<String>,
     auth: AuthStorage,
     runtime_handle: RuntimeHandle,
-    ask_tool: Option<pi::ask::AskTool>,
+    ask_tool: Option<crate::ask::AskTool>,
 ) -> Result<()> {
     use futures::FutureExt;
 
@@ -8635,7 +8635,7 @@ async fn run_print_mode(
     resources: &ResourceLoader,
     runtime_handle: RuntimeHandle,
     config: &Config,
-    approval_state: &pi::approval::ApprovalState,
+    approval_state: &crate::approval::ApprovalState,
     failover_ctx: Option<FailoverResolution<'_>>,
 ) -> Result<()> {
     if mode.ne("text") && mode.ne("json") {
@@ -8643,7 +8643,7 @@ async fn run_print_mode(
     }
 
     if mode.eq("json") {
-        let cx = pi::agent_cx::AgentCx::for_request();
+        let cx = crate::agent_cx::AgentCx::for_request();
         let session = session
             .session
             .lock(cx.cx())
@@ -8672,7 +8672,7 @@ async fn run_print_mode(
         let text_stream_state = Arc::clone(&text_stream_state_for_events);
         let coalescer = extensions
             .as_ref()
-            .map(|m| pi::extensions::EventCoalescer::new(m.clone()));
+            .map(|m| crate::extensions::EventCoalescer::new(m.clone()));
         move |event: AgentEvent| {
             if emit_json_events {
                 emit_json_event(&event);
@@ -8734,7 +8734,7 @@ async fn run_print_mode(
     let mut sent_prompts = 0usize;
 
     if let Some(initial) = initial {
-        let content = pi::app::build_initial_content(&initial);
+        let content = crate::app::build_initial_content(&initial);
         reset_print_text_stream_state(&text_stream_state);
         let message = run_print_prompt_with_retry(
             session,
@@ -8841,7 +8841,7 @@ impl PrintTextStreamState {
 const fn streamed_text_delta(event: &AgentEvent) -> Option<&str> {
     match event {
         AgentEvent::MessageUpdate {
-            assistant_message_event: pi::model::AssistantMessageEvent::TextDelta { delta, .. },
+            assistant_message_event: pi_ai::model::AssistantMessageEvent::TextDelta { delta, .. },
             ..
         } => Some(delta.as_str()),
         _ => None,
@@ -8914,7 +8914,7 @@ fn finish_print_text_response(
                 console.render_markdown_with_indent(&markdown, code_block_indent);
             }
         } else {
-            pi::app::output_final_text(message);
+            crate::app::output_final_text(message);
         }
         return Ok(());
     }
@@ -9021,7 +9021,7 @@ async fn restore_print_retry_tail(
     session: &mut AgentSession,
     require_incomplete_tail: bool,
 ) -> Result<()> {
-    let cx = pi::agent_cx::AgentCx::for_request();
+    let cx = crate::agent_cx::AgentCx::for_request();
     let mut inner = OwnedMutexGuard::lock(Arc::clone(&session.session), &cx)
         .await
         .map_err(|err| anyhow::anyhow!("retry restoration session lock failed: {err}"))?;
@@ -9136,12 +9136,12 @@ async fn try_print_failover(
                         && m.model.id.eq_ignore_ascii_case(model_id)
                 })
                 .cloned()
-                .or_else(|| pi::models::ad_hoc_model_entry(provider, model_id))
+                .or_else(|| crate::models::ad_hoc_model_entry(provider, model_id))
         })();
         cursor += 1;
         let Some(entry) = candidate else { continue };
-        let key = pi::models::resolve_model_key(ctx.cli_api_key, ctx.auth, &entry);
-        if pi::models::model_requires_configured_credential(&entry) && key.is_none() {
+        let key = crate::models::resolve_model_key(ctx.cli_api_key, ctx.auth, &entry);
+        if crate::models::model_requires_configured_credential(&entry) && key.is_none() {
             continue; // never fail over into an auth error
         }
 
@@ -9156,7 +9156,7 @@ async fn try_print_failover(
         // candidate. The live transcript and provider/options stay untouched
         // if restoration, the inner lock, or persistence fails.
         let session_store = Arc::clone(&session.session);
-        let cx = pi::agent_cx::AgentCx::for_request();
+        let cx = crate::agent_cx::AgentCx::for_request();
         let mut inner = OwnedMutexGuard::lock(session_store, &cx)
             .await
             .map_err(|err| anyhow::anyhow!("failover session lock failed: {err}"))?;
@@ -9220,7 +9220,7 @@ async fn try_print_failover(
         session.agent.replace_messages(restored_messages);
         session.agent.set_provider(provider_impl);
         session.agent.set_keyword_max_thinking_level(
-            entry.clamp_thinking_level(pi::model::ThinkingLevel::Max),
+            entry.clamp_thinking_level(pi_ai::model::ThinkingLevel::Max),
         );
         session
             .agent
@@ -9275,7 +9275,7 @@ async fn try_print_failover(
 async fn run_print_prompt_with_retry<H, EH>(
     session: &mut AgentSession,
     config: &Config,
-    abort_signal: &pi::agent::AbortSignal,
+    abort_signal: &crate::agent::AbortSignal,
     make_event_handler: &H,
     retry_enabled: bool,
     max_retries: u32,
@@ -9525,7 +9525,7 @@ where
                     // Rotation bookkeeping (bd-cv653.3.2): restoration is the
                     // precondition for mutating credential cooldown state.
                     if let Some((provider_name, Some(key))) = quota_credential.as_ref() {
-                        pi::auth::report_provider_rate_limit(provider_name, key);
+                        crate::auth::report_provider_rate_limit(provider_name, key);
                     }
                     // Credential rotation (bd-cv653.3.2): re-resolve the key so
                     // a backed-off credential rotates to its healthy sibling on
@@ -9578,7 +9578,7 @@ where
                     };
                     if swapped.is_some() {
                         if let Some((provider_name, Some(key))) = quota_credential.as_ref() {
-                            pi::auth::report_provider_rate_limit(provider_name, key);
+                            crate::auth::report_provider_rate_limit(provider_name, key);
                         }
                         failed_over = true;
                         failovers_this_turn += 1;
@@ -9592,7 +9592,7 @@ where
                         continue;
                     }
                     if let Some((provider_name, Some(key))) = quota_credential.as_ref() {
-                        pi::auth::report_provider_rate_limit(provider_name, key);
+                        crate::auth::report_provider_rate_limit(provider_name, key);
                     }
                     if retry_count > 0 && is_json {
                         emit_json_event(&AgentEvent::AutoRetryEnd {
@@ -9625,10 +9625,10 @@ async fn run_interactive_mode(
     package_manager: PackageManager,
     cwd: PathBuf,
     runtime_handle: RuntimeHandle,
-    workspace: pi::workspace::WorkspaceHandle,
-    ask_tool: Option<pi::ask::AskTool>,
-    btw_client: Option<Arc<pi::btw::BtwClient>>,
-    btw_factory: Option<pi::btw::BtwClientFactory>,
+    workspace: crate::workspace::WorkspaceHandle,
+    ask_tool: Option<crate::ask::AskTool>,
+    btw_client: Option<Arc<crate::btw::BtwClient>>,
+    btw_factory: Option<crate::btw::BtwClientFactory>,
     mcp_manager: Option<std::sync::Arc<pi::mcp::McpManager>>,
 ) -> Result<()> {
     let mut pending = Vec::new();
@@ -9640,13 +9640,13 @@ async fn run_interactive_mode(
             .to_string();
         let expanded_source = resources.expand_input(&initial.keyword_scan_source);
         initial.text = generated_prefix + &expanded_source;
-        pending.push(pi::interactive::PendingInput::ContentWithKeywordSource {
-            content: pi::app::build_initial_content(&initial),
+        pending.push(crate::interactive::PendingInput::ContentWithKeywordSource {
+            content: crate::app::build_initial_content(&initial),
             keyword_scan_source: initial.keyword_scan_source,
         });
     }
     for message in messages {
-        pending.push(pi::interactive::PendingInput::Text(message));
+        pending.push(crate::interactive::PendingInput::Text(message));
     }
 
     let AgentSession {
@@ -9657,7 +9657,7 @@ async fn run_interactive_mode(
     } = session;
     // Extract manager for the interactive loop; the region stays alive to
     let extensions = region.as_ref().map(|r| r.manager().clone());
-    let interactive_result = pi::interactive::run_interactive(
+    let interactive_result = crate::interactive::run_interactive(
         agent,
         session,
         config,
@@ -9691,7 +9691,7 @@ async fn run_interactive_mode(
     Ok(())
 }
 
-type InitialMessage = pi::app::InitialMessage;
+type InitialMessage = crate::app::InitialMessage;
 
 fn read_piped_stdin() -> Result<Option<String>> {
     if io::stdin().is_terminal() {
@@ -9855,9 +9855,9 @@ mod tests {
         resources
             .extend_with_paths(
                 root.path(),
-                &pi::resources::ExtensionResourcePaths {
+                &crate::resources::ExtensionResourcePaths {
                     prompt_paths: vec![first.clone()],
-                    ..pi::resources::ExtensionResourcePaths::default()
+                    ..crate::resources::ExtensionResourcePaths::default()
                 },
             )
             .expect("configured prompt failures remain non-fatal");
@@ -9880,9 +9880,9 @@ mod tests {
         resources
             .extend_with_paths(
                 root.path(),
-                &pi::resources::ExtensionResourcePaths {
+                &crate::resources::ExtensionResourcePaths {
                     prompt_paths: vec![second.clone()],
-                    ..pi::resources::ExtensionResourcePaths::default()
+                    ..crate::resources::ExtensionResourcePaths::default()
                 },
             )
             .expect("extension-discovered prompt failures remain non-fatal");
@@ -10455,14 +10455,14 @@ mod tests {
     }
     #[test]
     fn apply_extension_cli_flags_ignores_unknown_flags() {
-        let manager = pi::extensions::ExtensionManager::new();
+        let manager = crate::extensions::ExtensionManager::new();
         let flags = vec![cli::ExtensionCliFlag {
             name: "plan".to_string(),
             value: Some("ship-it".to_string()),
         }];
 
         futures::executor::block_on(async {
-            pi::extensions::apply_cli_flags(&manager, &flags)
+            crate::extensions::apply_cli_flags(&manager, &flags)
                 .await
                 .expect("unknown extension flag should be ignored");
         });
@@ -10509,7 +10509,7 @@ mod tests {
             name: "dry-run".to_string(),
             value: None,
         };
-        let value = pi::extensions::coerce_cli_flag_value(&flag, "bool").expect("coerce bool");
+        let value = crate::extensions::coerce_cli_flag_value(&flag, "bool").expect("coerce bool");
         assert_eq!(value, Value::Bool(true));
     }
 
@@ -10519,7 +10519,7 @@ mod tests {
             name: "dry-run".to_string(),
             value: Some("maybe".to_string()),
         };
-        let err = pi::extensions::coerce_cli_flag_value(&flag, "bool")
+        let err = crate::extensions::coerce_cli_flag_value(&flag, "bool")
             .expect_err("invalid bool should fail");
         assert!(err.to_string().contains("Invalid boolean value"));
     }
@@ -10666,7 +10666,7 @@ mod tests {
         .expect("write models.json");
         let binding = ExtensionProviderBinding {
             provider: "Acme".to_string(),
-            oauth_config: Some(pi::models::OAuthConfig {
+            oauth_config: Some(crate::models::OAuthConfig {
                 auth_url: "https://auth.example.test/authorize".to_string(),
                 token_url: "https://auth.example.test/token".to_string(),
                 client_id: "acme-client".to_string(),
@@ -11424,12 +11424,12 @@ mod tests {
     #[test]
     fn print_mode_retry_delay_first_attempt_is_base() {
         let config = Config {
-            retry: Some(pi::config::RetrySettings {
+            retry: Some(crate::config::RetrySettings {
                 enabled: Some(true),
                 max_retries: Some(3),
                 base_delay_ms: Some(2000),
                 max_delay_ms: Some(60_000),
-                ..pi::config::RetrySettings::default()
+                ..crate::config::RetrySettings::default()
             }),
             ..Config::default()
         };
@@ -11439,12 +11439,12 @@ mod tests {
     #[test]
     fn print_mode_retry_delay_doubles_each_attempt() {
         let config = Config {
-            retry: Some(pi::config::RetrySettings {
+            retry: Some(crate::config::RetrySettings {
                 enabled: Some(true),
                 max_retries: Some(5),
                 base_delay_ms: Some(1000),
                 max_delay_ms: Some(60_000),
-                ..pi::config::RetrySettings::default()
+                ..crate::config::RetrySettings::default()
             }),
             ..Config::default()
         };
@@ -11455,12 +11455,12 @@ mod tests {
     #[test]
     fn print_mode_retry_delay_capped_at_max() {
         let config = Config {
-            retry: Some(pi::config::RetrySettings {
+            retry: Some(crate::config::RetrySettings {
                 enabled: Some(true),
                 max_retries: Some(10),
                 base_delay_ms: Some(2000),
                 max_delay_ms: Some(10_000),
-                ..pi::config::RetrySettings::default()
+                ..crate::config::RetrySettings::default()
             }),
             ..Config::default()
         };
@@ -11470,7 +11470,7 @@ mod tests {
 
     #[test]
     fn is_retryable_prompt_result_identifies_retryable_errors() {
-        use pi::model::{AssistantMessage, Usage};
+        use pi_ai::model::{AssistantMessage, Usage};
 
         let retryable = AssistantMessage {
             content: vec![],
@@ -11507,7 +11507,7 @@ mod tests {
     /// stable prefix is the only reliable signal left.
     #[test]
     fn is_retryable_prompt_result_rejects_session_persistence_marker() {
-        use pi::model::{AssistantMessage, Usage};
+        use pi_ai::model::{AssistantMessage, Usage};
 
         let build_error_turn = |flattened: String| AssistantMessage {
             content: vec![],
@@ -11554,7 +11554,7 @@ mod tests {
 
     #[async_trait::async_trait]
     #[allow(clippy::unnecessary_literal_bound)]
-    impl pi::provider::Provider for PersistencePoisonProvider {
+    impl pi_ai::provider::Provider for PersistencePoisonProvider {
         fn name(&self) -> &str {
             "persist-poison"
         }
@@ -11566,11 +11566,11 @@ mod tests {
         }
         async fn stream(
             &self,
-            context: &pi::provider::Context<'_>,
-            _options: &pi::provider::StreamOptions,
+            context: &pi_ai::provider::Context<'_>,
+            _options: &pi_ai::provider::StreamOptions,
         ) -> pi::error::Result<
             std::pin::Pin<
-                Box<dyn futures::Stream<Item = pi::error::Result<pi::model::StreamEvent>> + Send>,
+                Box<dyn futures::Stream<Item = pi::error::Result<pi_ai::model::StreamEvent>> + Send>,
             >,
         > {
             use std::sync::atomic::Ordering;
@@ -11578,13 +11578,13 @@ mod tests {
             let have_tool_result = context.messages.iter().any(|message| {
                 matches!(
                     message,
-                    pi::model::Message::ToolResult(result) if result.tool_call_id == "step1"
+                    pi_ai::model::Message::ToolResult(result) if result.tool_call_id == "step1"
                 )
             });
             if !have_tool_result {
                 self.tool_call_emissions.fetch_add(1, Ordering::SeqCst);
                 let message = AssistantMessage {
-                    content: vec![ContentBlock::ToolCall(pi::model::ToolCall {
+                    content: vec![ContentBlock::ToolCall(pi_ai::model::ToolCall {
                         id: "step1".to_string(),
                         name: "write".to_string(),
                         arguments: json!({ "path": self.write_path, "content": "hello" }),
@@ -11593,7 +11593,7 @@ mod tests {
                     api: self.api().to_string(),
                     provider: self.name().to_string(),
                     model: self.model_id().to_string(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::ToolUse,
                     stop_details: None,
                     error_message: None,
@@ -11604,15 +11604,15 @@ mod tests {
                     api: message.api.clone(),
                     provider: message.provider.clone(),
                     model: message.model.clone(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::Stop,
                     stop_details: None,
                     error_message: None,
                     timestamp: 0,
                 };
                 return Ok(Box::pin(futures::stream::iter(vec![
-                    Ok(pi::model::StreamEvent::Start { partial }),
-                    Ok(pi::model::StreamEvent::Done {
+                    Ok(pi_ai::model::StreamEvent::Start { partial }),
+                    Ok(pi_ai::model::StreamEvent::Done {
                         reason: message.stop_reason,
                         message,
                     }),
@@ -11662,13 +11662,13 @@ mod tests {
                 write_path: write_path.to_string_lossy().into_owned(),
             });
             let agent = Agent::new(
-                Arc::clone(&provider) as Arc<dyn pi::provider::Provider>,
+                Arc::clone(&provider) as Arc<dyn pi_ai::provider::Provider>,
                 ToolRegistry::new(&["write"], &cwd, None),
                 AgentConfig {
                     max_tool_iterations: 8,
-                    stream_options: pi::provider::StreamOptions {
+                    stream_options: pi_ai::provider::StreamOptions {
                         api_key: Some("test-key".to_string()),
-                        ..pi::provider::StreamOptions::default()
+                        ..pi_ai::provider::StreamOptions::default()
                     },
                     ..AgentConfig::default()
                 },
@@ -11680,12 +11680,12 @@ mod tests {
                 ResolvedCompactionSettings::default(),
             );
             let config = Config {
-                retry: Some(pi::config::RetrySettings {
+                retry: Some(crate::config::RetrySettings {
                     enabled: Some(true),
                     max_retries: Some(3),
                     base_delay_ms: Some(0),
                     max_delay_ms: Some(0),
-                    ..pi::config::RetrySettings::default()
+                    ..crate::config::RetrySettings::default()
                 }),
                 ..Config::default()
             };
@@ -11746,7 +11746,7 @@ mod tests {
 
         #[async_trait::async_trait]
         #[allow(clippy::unnecessary_literal_bound)]
-        impl pi::provider::Provider for MarkerProvider {
+        impl pi_ai::provider::Provider for MarkerProvider {
             fn name(&self) -> &str {
                 "persist-marker"
             }
@@ -11758,12 +11758,12 @@ mod tests {
             }
             async fn stream(
                 &self,
-                _context: &pi::provider::Context<'_>,
-                _options: &pi::provider::StreamOptions,
+                _context: &pi_ai::provider::Context<'_>,
+                _options: &pi_ai::provider::StreamOptions,
             ) -> pi::error::Result<
                 std::pin::Pin<
                     Box<
-                        dyn futures::Stream<Item = pi::error::Result<pi::model::StreamEvent>>
+                        dyn futures::Stream<Item = pi::error::Result<pi_ai::model::StreamEvent>>
                             + Send,
                     >,
                 >,
@@ -11775,7 +11775,7 @@ mod tests {
                     api: self.api().to_string(),
                     provider: self.name().to_string(),
                     model: self.model_id().to_string(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::Error,
                     stop_details: None,
                     error_message: Some(format!(
@@ -11789,15 +11789,15 @@ mod tests {
                     api: message.api.clone(),
                     provider: message.provider.clone(),
                     model: message.model.clone(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::Stop,
                     stop_details: None,
                     error_message: None,
                     timestamp: 0,
                 };
                 Ok(Box::pin(futures::stream::iter(vec![
-                    Ok(pi::model::StreamEvent::Start { partial }),
-                    Ok(pi::model::StreamEvent::Done {
+                    Ok(pi_ai::model::StreamEvent::Start { partial }),
+                    Ok(pi_ai::model::StreamEvent::Done {
                         reason: message.stop_reason,
                         message,
                     }),
@@ -11815,7 +11815,7 @@ mod tests {
                 stream_calls: std::sync::atomic::AtomicUsize::new(0),
             });
             let agent = Agent::new(
-                Arc::clone(&provider) as Arc<dyn pi::provider::Provider>,
+                Arc::clone(&provider) as Arc<dyn pi_ai::provider::Provider>,
                 ToolRegistry::new(&[], Path::new("."), None),
                 AgentConfig::default(),
             );
@@ -11827,12 +11827,12 @@ mod tests {
                 ResolvedCompactionSettings::default(),
             );
             let config = Config {
-                retry: Some(pi::config::RetrySettings {
+                retry: Some(crate::config::RetrySettings {
                     enabled: Some(true),
                     max_retries: Some(3),
                     base_delay_ms: Some(0),
                     max_delay_ms: Some(0),
-                    ..pi::config::RetrySettings::default()
+                    ..crate::config::RetrySettings::default()
                 }),
                 ..Config::default()
             };
@@ -11885,7 +11885,7 @@ mod tests {
                                key: &str,
                                header_name: &str| {
                 ModelEntry {
-                    model: pi::provider::Model {
+                    model: pi_ai::provider::Model {
                         id: model_id.to_string(),
                         name: model_id.to_string(),
                         api: api.to_string(),
@@ -11893,7 +11893,7 @@ mod tests {
                         base_url: base_url.to_string(),
                         reasoning: false,
                         input: vec![InputType::Text],
-                        cost: pi::provider::ModelCost {
+                        cost: pi_ai::provider::ModelCost {
                             input: 0.0,
                             output: 0.0,
                             cache_read: 0.0,
@@ -11935,7 +11935,7 @@ mod tests {
             );
             fallback.model.context_window = 4_096;
             fallback.model.max_tokens = 2_048;
-            fallback.compat = Some(pi::models::CompatConfig {
+            fallback.compat = Some(crate::models::CompatConfig {
                 tool_call_dialect: Some(pi::dialects::Dialect::Xmlish),
                 ..Default::default()
             });
@@ -11948,22 +11948,22 @@ mod tests {
                 .headers
                 .clone_from(&primary.headers);
             agent.stream_options_mut().max_tokens = Some(primary.model.max_tokens);
-            agent.stream_options_mut().thinking_level = Some(pi::model::ThinkingLevel::High);
+            agent.stream_options_mut().thinking_level = Some(pi_ai::model::ThinkingLevel::High);
             agent.set_model_accepts_images(true);
 
             let session_temp = tempfile::tempdir().expect("session tempdir");
             let mut stored = Session::create_with_dir(Some(session_temp.path().join("sessions")));
-            stored.append_message(pi::session::SessionMessage::User {
-                content: pi::model::UserContent::Text("hello".to_string()),
+            stored.append_message(crate::session::SessionMessage::User {
+                content: pi_ai::model::UserContent::Text("hello".to_string()),
                 timestamp: Some(0),
             });
-            stored.append_message(pi::session::SessionMessage::Assistant {
+            stored.append_message(crate::session::SessionMessage::Assistant {
                 message: AssistantMessage {
                     content: Vec::new(),
                     api: "openai-completions".to_string(),
                     provider: "openai".to_string(),
                     model: "primary-model".to_string(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::Error,
                     stop_details: None,
                     error_message: Some("server error".to_string()),
@@ -11986,7 +11986,7 @@ mod tests {
                 .await
                 .expect("durable same-provider restoration");
             {
-                let cx = pi::agent_cx::AgentCx::for_request();
+                let cx = crate::agent_cx::AgentCx::for_request();
                 let inner = OwnedMutexGuard::lock(Arc::clone(&session_store), &cx)
                     .await
                     .expect("restored Session lock");
@@ -12002,10 +12002,10 @@ mod tests {
                         .iter()
                         .all(|entry| !matches!(
                             entry,
-                            pi::session::SessionEntry::Message(message)
+                            crate::session::SessionEntry::Message(message)
                                 if matches!(
                                     &message.message,
-                                    pi::session::SessionMessage::Assistant { message }
+                                    crate::session::SessionMessage::Assistant { message }
                                         if message.stop_reason == StopReason::Error
                                 )
                         ))
@@ -12020,17 +12020,17 @@ mod tests {
                     .iter()
                     .all(|entry| !matches!(
                         entry,
-                        pi::session::SessionEntry::Message(message)
+                        crate::session::SessionEntry::Message(message)
                             if matches!(
                                 &message.message,
-                                pi::session::SessionMessage::Assistant { message }
+                                crate::session::SessionMessage::Assistant { message }
                                     if message.stop_reason == StopReason::Error
                             )
                     ))
             );
 
             let mut config = Config::default();
-            config.retry = Some(pi::config::RetrySettings {
+            config.retry = Some(crate::config::RetrySettings {
                 fallback_chains: Some(std::collections::HashMap::from([(
                     "default".to_string(),
                     vec!["anthropic/fallback-model".to_string()],
@@ -12063,17 +12063,17 @@ mod tests {
             assert_eq!(agent_session.agent.provider().name(), "openai");
 
             {
-                let cx = pi::agent_cx::AgentCx::for_request();
+                let cx = crate::agent_cx::AgentCx::for_request();
                 let mut inner = OwnedMutexGuard::lock(Arc::clone(&session_store), &cx)
                     .await
                     .expect("seed second failed tail");
-                inner.append_message(pi::session::SessionMessage::Assistant {
+                inner.append_message(crate::session::SessionMessage::Assistant {
                     message: AssistantMessage {
                         content: Vec::new(),
                         api: "openai-completions".to_string(),
                         provider: "openai".to_string(),
                         model: "primary-model".to_string(),
-                        usage: pi::model::Usage::default(),
+                        usage: pi_ai::model::Usage::default(),
                         stop_reason: StopReason::Error,
                         stop_details: None,
                         error_message: Some("server error".to_string()),
@@ -12123,7 +12123,7 @@ mod tests {
             );
             assert_eq!(
                 agent_session.agent.stream_options().thinking_level,
-                Some(pi::model::ThinkingLevel::Off)
+                Some(pi_ai::model::ThinkingLevel::Off)
             );
             assert!(!agent_session.agent.model_accepts_images());
             assert_eq!(
@@ -12131,7 +12131,7 @@ mod tests {
                 4_096
             );
             {
-                let cx = pi::agent_cx::AgentCx::for_request();
+                let cx = crate::agent_cx::AgentCx::for_request();
                 let inner = OwnedMutexGuard::lock(Arc::clone(&session_store), &cx)
                     .await
                     .expect("failover Session lock");
@@ -12156,7 +12156,7 @@ mod tests {
                     .iter()
                     .any(|entry| matches!(
                         entry,
-                        pi::session::SessionEntry::ModelChange(change)
+                        crate::session::SessionEntry::ModelChange(change)
                             if change.provider == "anthropic"
                                 && change.model_id == "fallback-model"
                                 && change.role.as_deref() == Some("failover")
@@ -12174,10 +12174,10 @@ mod tests {
                     .iter()
                     .all(|entry| !matches!(
                         entry,
-                        pi::session::SessionEntry::Message(message)
+                        crate::session::SessionEntry::Message(message)
                             if matches!(
                                 &message.message,
-                                pi::session::SessionMessage::Assistant { message }
+                                crate::session::SessionMessage::Assistant { message }
                                     if message.stop_reason == StopReason::Error
                             )
                     ))
@@ -12202,7 +12202,7 @@ mod tests {
         runtime.block_on(async move {
             let model_entry =
                 |provider: &str, model_id: &str, api: &str, key: Option<&str>| ModelEntry {
-                    model: pi::provider::Model {
+                    model: pi_ai::provider::Model {
                         id: model_id.to_string(),
                         name: model_id.to_string(),
                         api: api.to_string(),
@@ -12214,7 +12214,7 @@ mod tests {
                         },
                         reasoning: false,
                         input: vec![InputType::Text],
-                        cost: pi::provider::ModelCost {
+                        cost: pi_ai::provider::ModelCost {
                             input: 0.0,
                             output: 0.0,
                             cache_read: 0.0,
@@ -12270,7 +12270,7 @@ mod tests {
             });
             let config_with_chain = |entries: &[&str]| {
                 let mut config = Config::default();
-                config.retry = Some(pi::config::RetrySettings {
+                config.retry = Some(crate::config::RetrySettings {
                     fallback_chains: Some(std::collections::HashMap::from([(
                         "default".to_string(),
                         entries.iter().map(|entry| (*entry).to_string()).collect(),
@@ -12361,7 +12361,7 @@ mod tests {
             .expect("runtime build");
         runtime.block_on(async move {
             let entry = ModelEntry {
-                model: pi::provider::Model {
+                model: pi_ai::provider::Model {
                     id: "primary-model".to_string(),
                     name: "primary-model".to_string(),
                     api: "openai-completions".to_string(),
@@ -12369,7 +12369,7 @@ mod tests {
                     base_url: "https://api.openai.com/v1".to_string(),
                     reasoning: true,
                     input: vec![InputType::Text, InputType::Image],
-                    cost: pi::provider::ModelCost {
+                    cost: pi_ai::provider::ModelCost {
                         input: 0.0,
                         output: 0.0,
                         cache_read: 0.0,
@@ -12392,17 +12392,17 @@ mod tests {
             std::fs::create_dir_all(&blocked_path).expect("create blocking directory");
             let mut stored = Session::in_memory();
             stored.path = Some(blocked_path);
-            stored.append_message(pi::session::SessionMessage::User {
-                content: pi::model::UserContent::Text("hello".to_string()),
+            stored.append_message(crate::session::SessionMessage::User {
+                content: pi_ai::model::UserContent::Text("hello".to_string()),
                 timestamp: Some(0),
             });
-            stored.append_message(pi::session::SessionMessage::Assistant {
+            stored.append_message(crate::session::SessionMessage::Assistant {
                 message: AssistantMessage {
                     content: Vec::new(),
                     api: "openai-completions".to_string(),
                     provider: "openai".to_string(),
                     model: "primary-model".to_string(),
-                    usage: pi::model::Usage::default(),
+                    usage: pi_ai::model::Usage::default(),
                     stop_reason: StopReason::Error,
                     stop_details: None,
                     error_message: Some("server error".to_string()),
@@ -12414,7 +12414,7 @@ mod tests {
             let mut agent = Agent::new(provider, tools, AgentConfig::default());
             agent.stream_options_mut().api_key = Some("primary-key".to_string());
             agent.stream_options_mut().max_tokens = Some(entry.model.max_tokens);
-            agent.stream_options_mut().thinking_level = Some(pi::model::ThinkingLevel::High);
+            agent.stream_options_mut().thinking_level = Some(pi_ai::model::ThinkingLevel::High);
             agent.set_model_accepts_images(true);
             let mut agent_session = AgentSession::new(
                 agent,
@@ -12431,7 +12431,7 @@ mod tests {
                 .await
                 .expect_err("unwritable candidate must fail restoration");
             assert!(error.to_string().contains("SESSION_PERSISTENCE_FAILED"));
-            let cx = pi::agent_cx::AgentCx::for_request();
+            let cx = crate::agent_cx::AgentCx::for_request();
             let inner = OwnedMutexGuard::lock(Arc::clone(&session_store), &cx)
                 .await
                 .expect("Session lock");
@@ -12460,12 +12460,12 @@ mod tests {
             fallback.api_key = Some("fallback-key".to_string());
             fallback.headers =
                 std::collections::HashMap::from([("x-fallback".to_string(), "true".to_string())]);
-            fallback.compat = Some(pi::models::CompatConfig {
+            fallback.compat = Some(crate::models::CompatConfig {
                 tool_call_dialect: Some(pi::dialects::Dialect::Xmlish),
                 ..Default::default()
             });
             let mut config = Config::default();
-            config.retry = Some(pi::config::RetrySettings {
+            config.retry = Some(crate::config::RetrySettings {
                 fallback_chains: Some(std::collections::HashMap::from([(
                     "default".to_string(),
                     vec!["anthropic/fallback-model".to_string()],
@@ -12513,7 +12513,7 @@ mod tests {
             assert_eq!(agent_session.agent.stream_options().max_tokens, Some(1_536));
             assert_eq!(
                 agent_session.agent.stream_options().thinking_level,
-                Some(pi::model::ThinkingLevel::High)
+                Some(pi_ai::model::ThinkingLevel::High)
             );
             assert!(agent_session.agent.model_accepts_images());
             assert_eq!(agent_session.agent.tool_call_dialect(), original_dialect);
@@ -12548,7 +12548,7 @@ mod tests {
     /// typed kind is gone by the time the message string is in hand.
     #[test]
     fn transient_connection_drop_retried_end_to_end() {
-        use pi::model::{AssistantMessage, Usage};
+        use pi_ai::model::{AssistantMessage, Usage};
 
         let build_error_turn = |flattened: String| AssistantMessage {
             content: vec![],
@@ -12622,19 +12622,19 @@ mod tests {
     #[test]
     fn streamed_text_delta_only_matches_text_delta_updates() {
         let partial = Arc::new(AssistantMessage {
-            content: vec![ContentBlock::Text(pi::model::TextContent::new("hello"))],
+            content: vec![ContentBlock::Text(pi_ai::model::TextContent::new("hello"))],
             api: "test-api".to_string(),
             provider: "test-provider".to_string(),
             model: "test-model".to_string(),
-            usage: pi::model::Usage::default(),
+            usage: pi_ai::model::Usage::default(),
             stop_reason: StopReason::Stop,
             stop_details: None,
             error_message: None,
             timestamp: 0,
         });
         let delta_event = AgentEvent::MessageUpdate {
-            message: pi::model::Message::Assistant(Arc::clone(&partial)),
-            assistant_message_event: pi::model::AssistantMessageEvent::TextDelta {
+            message: pi_ai::model::Message::Assistant(Arc::clone(&partial)),
+            assistant_message_event: pi_ai::model::AssistantMessageEvent::TextDelta {
                 content_index: 0,
                 delta: " world".to_string(),
                 partial,
@@ -12643,12 +12643,12 @@ mod tests {
         assert_eq!(streamed_text_delta(&delta_event), Some(" world"));
 
         let start_event = AgentEvent::MessageStart {
-            message: pi::model::Message::assistant(AssistantMessage {
+            message: pi_ai::model::Message::assistant(AssistantMessage {
                 content: Vec::new(),
                 api: "test-api".to_string(),
                 provider: "test-provider".to_string(),
                 model: "test-model".to_string(),
-                usage: pi::model::Usage::default(),
+                usage: pi_ai::model::Usage::default(),
                 stop_reason: StopReason::Stop,
                 stop_details: None,
                 error_message: None,
@@ -12660,11 +12660,11 @@ mod tests {
 
     fn accumulated_assistant_message(text: &str) -> Arc<AssistantMessage> {
         Arc::new(AssistantMessage {
-            content: vec![ContentBlock::Text(pi::model::TextContent::new(text))],
+            content: vec![ContentBlock::Text(pi_ai::model::TextContent::new(text))],
             api: "test-api".to_string(),
             provider: "test-provider".to_string(),
             model: "test-model".to_string(),
-            usage: pi::model::Usage::default(),
+            usage: pi_ai::model::Usage::default(),
             stop_reason: StopReason::Stop,
             stop_details: None,
             error_message: None,
@@ -12678,8 +12678,8 @@ mod tests {
     fn print_mode_json_record_message_update_is_delta_only() {
         let partial = accumulated_assistant_message(&"x".repeat(10_000));
         let event = AgentEvent::MessageUpdate {
-            message: pi::model::Message::Assistant(Arc::clone(&partial)),
-            assistant_message_event: pi::model::AssistantMessageEvent::TextDelta {
+            message: pi_ai::model::Message::Assistant(Arc::clone(&partial)),
+            assistant_message_event: pi_ai::model::AssistantMessageEvent::TextDelta {
                 content_index: 0,
                 delta: "tail".to_string(),
                 partial: Arc::clone(&partial),
@@ -12703,8 +12703,8 @@ mod tests {
 
         // Terminal variants keep their once-per-message payload.
         let done = AgentEvent::MessageUpdate {
-            message: pi::model::Message::Assistant(Arc::clone(&partial)),
-            assistant_message_event: pi::model::AssistantMessageEvent::Done {
+            message: pi_ai::model::Message::Assistant(Arc::clone(&partial)),
+            assistant_message_event: pi_ai::model::AssistantMessageEvent::Done {
                 reason: StopReason::Stop,
                 message: Arc::clone(&partial),
             },
@@ -12720,7 +12720,7 @@ mod tests {
 
         // Other events are untouched.
         let end = AgentEvent::MessageEnd {
-            message: pi::model::Message::Assistant(partial),
+            message: pi_ai::model::Message::Assistant(partial),
         };
         assert_eq!(
             print_mode_json_record(&end).unwrap(),
@@ -12741,8 +12741,8 @@ mod tests {
                 text.push_str(&delta);
                 let partial = accumulated_assistant_message(&text);
                 let event = AgentEvent::MessageUpdate {
-                    message: pi::model::Message::Assistant(Arc::clone(&partial)),
-                    assistant_message_event: pi::model::AssistantMessageEvent::TextDelta {
+                    message: pi_ai::model::Message::Assistant(Arc::clone(&partial)),
+                    assistant_message_event: pi_ai::model::AssistantMessageEvent::TextDelta {
                         content_index: 0,
                         delta,
                         partial,

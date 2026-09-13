@@ -1,6 +1,8 @@
 //! Security alert, kill-switch, trust, and ownership tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ====================================================================
 // SEC-5.1: Security alert builder and emission tests
@@ -967,7 +969,7 @@ fn dispatch_event_value_returns_none_when_no_hooks() {
 fn dispatch_tool_call_returns_none_when_no_hooks() {
     asupersync::test_utils::run_test(|| async {
         let mgr = ExtensionManager::new();
-        let tool_call = crate::model::ToolCall {
+        let tool_call = pi_ai::model::ToolCall {
             id: "tc-1".to_string(),
             name: "read".to_string(),
             arguments: json!({"path": "/tmp/test"}),
@@ -983,7 +985,7 @@ fn dispatch_tool_call_returns_none_when_no_hooks() {
 fn dispatch_tool_result_returns_none_when_no_hooks() {
     asupersync::test_utils::run_test(|| async {
         let mgr = ExtensionManager::new();
-        let tool_call = crate::model::ToolCall {
+        let tool_call = pi_ai::model::ToolCall {
             id: "tc-1".to_string(),
             name: "read".to_string(),
             arguments: json!({"path": "/tmp/test"}),

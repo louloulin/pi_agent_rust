@@ -6,8 +6,8 @@
 
 use crate::auth::{AuthStorage, CredentialStatus};
 use crate::config::Config;
-use crate::error::Result;
-use crate::provider_metadata::provider_auth_env_keys;
+use pi_error::Result;
+use pi_ai::provider_metadata::provider_auth_env_keys;
 use crate::resource_governor::{
     AdmissionAction, HostResourceBudgets, HostResourceSample, ResourceOperationKind,
     ResourceRequest, SwarmAdmissionController, SwarmCapacityDimension,
@@ -13890,14 +13890,14 @@ fn doctor_swarm_context_intelligence_json_reports_posture() {
             serde_json::to_string(&invalid_header).expect("serialize invalid session header");
         crate::session_sqlite::run_on_sqlite_thread(|| {
             let conn = crate::session_sqlite::SqliteConnection::open_read_write(&path)
-                .map_err(|err| crate::error::Error::session(err.to_string()))?;
+                .map_err(|err| pi_error::Error::session(err.to_string()))?;
             conn.execute_sync(
                 "UPDATE pi_session_header SET json = ?1",
                 &[fsqlite::SqliteValue::from(invalid_json)],
             )
-            .map_err(|err| crate::error::Error::session(err.to_string()))?;
+            .map_err(|err| pi_error::Error::session(err.to_string()))?;
             conn.close()
-                .map_err(|err| crate::error::Error::session(err.to_string()))
+                .map_err(|err| pi_error::Error::session(err.to_string()))
         })
         .expect("corrupt sqlite header row");
         assert!(!is_session_healthy(&path));

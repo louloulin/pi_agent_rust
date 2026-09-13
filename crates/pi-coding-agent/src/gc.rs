@@ -23,7 +23,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use serde::{Deserialize, Serialize};
 
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 /// Schema tag for the garbage collection audit ledger.
 pub const GC_LEDGER_SCHEMA: &str = "pi.gc.v1";

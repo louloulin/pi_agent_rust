@@ -10,8 +10,8 @@
 //! - Domain allowlist validation & safety controls
 //! - Deterministic Mock / VCR execution for CI and offline testing
 
-use crate::error::{Error, Result};
-use crate::model::{ContentBlock, TextContent};
+use pi_error::{Error, Result};
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};

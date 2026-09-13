@@ -3,17 +3,13 @@ name = "pi-client"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/pi-client: client-side integrations (web_remote, web_search, xdev). After Round 17, pi-web-remote is inlined here."
+description = "Phase-2 placeholder mirroring @earendil-works/pi-client. Round 18 absorbed all client modules into pi-coding-agent to break the dependency cycle."
 
 [lints]
 workspace = true
 
 [dependencies]
-serde = { workspace = true }
-serde_json = { workspace = true }
+# Round 18: pi-client is now an empty placeholder. All client files
+# moved to pi-coding-agent to break the pi-coding-agent ↔ pi-client
+# cycle.
 anyhow = { workspace = true }
-chrono = { workspace = true }
-tracing = { workspace = true }
-
-[dev-dependencies]
-serde_json = { workspace = true }

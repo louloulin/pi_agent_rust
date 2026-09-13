@@ -1,6 +1,8 @@
 //! Exec mediation and secret broker tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // SEC-4.3: Exec mediation and secret broker tests (bd-zh0hj)

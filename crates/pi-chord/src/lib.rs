@@ -1,21 +1,13 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-chord`: the hostcall /
-//! buffer / file-lock runtime. After Round 17, every Phase-1 leaf has been
-//! inlined directly here.
+//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-chord`: the
+//! hostcall / buffer / file-lock runtime. After Round 18 the files that
+//! previously lived here were moved into `pi-coding-agent` to break the
+//! `pi-coding-agent ↔ pi-chord` cyclic dependency. This crate remains so
+//! the 11-package surface mirrors the upstream repository structure;
+//! downstream consumers should depend on `pi-coding-agent` instead.
 
 #![forbid(unsafe_code)]
 
-pub mod buffer_shim;
-pub mod file_lock;
-pub mod hostcall_amac;
-pub mod hostcall_egraph;
-pub mod hostcall_io_uring_lane;
-pub mod hostcall_queue;
-pub mod hostcall_rewrite;
-pub mod hostcall_s3_fifo;
-pub mod hostcall_superinstructions;
-pub mod hostcall_trace_jit;
-pub mod http_shim;
-pub mod swarm_activity_ledger;
-pub mod swarm_flight_recorder;
-pub mod swarm_progress_slo;
-pub mod swarm_replay;
+// Empty: all hostcall / buffer / file-lock / swarm modules were moved to
+// `pi-coding-agent` in Round 18 to break the dependency cycle. This crate
+// is retained as a marker so `crates/pi`'s facade can still re-export a
+// `chord` namespace.

@@ -10,8 +10,8 @@
 //! - Stack layering: this module emits structured verdicts; rendering is the
 //!   transcript card registry's job (bd-cv653.9.2) — no bespoke painting here.
 
-use crate::model::Message;
-use crate::provider::Provider;
+use pi_ai::model::Message;
+use pi_ai::provider::Provider;
 use serde_json::Value;
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -85,7 +85,7 @@ pub fn build_digest(messages: &[Message]) -> TurnDigest {
             Message::Assistant(assistant) => {
                 for block in &assistant.content {
                     match block {
-                        crate::model::ContentBlock::ToolCall(call) => {
+                        pi_ai::model::ContentBlock::ToolCall(call) => {
                             digest.tool_call_count += 1;
                             match call.name.as_str() {
                                 "write" | "edit" | "hashline_edit" | "ast_edit" => {
@@ -110,7 +110,7 @@ pub fn build_digest(messages: &[Message]) -> TurnDigest {
                                 _ => {}
                             }
                         }
-                        crate::model::ContentBlock::Text(text) => {
+                        pi_ai::model::ContentBlock::Text(text) => {
                             digest.final_text =
                                 text.text.chars().take(MAX_FINAL_TEXT_CHARS).collect();
                         }
@@ -125,7 +125,7 @@ pub fn build_digest(messages: &[Message]) -> TurnDigest {
                     .content
                     .iter()
                     .filter_map(|block| match block {
-                        crate::model::ContentBlock::Text(t) => Some(t.text.clone()),
+                        pi_ai::model::ContentBlock::Text(t) => Some(t.text.clone()),
                         _ => None,
                     })
                     .collect::<Vec<_>>()
@@ -394,18 +394,18 @@ impl AdvisorRuntime {
         AdvisorOutcome::Inject(verdict)
     }
 
-    async fn call_advisor(&self, digest: &TurnDigest) -> crate::error::Result<String> {
+    async fn call_advisor(&self, digest: &TurnDigest) -> pi_error::Result<String> {
         use futures::StreamExt;
-        let context = crate::provider::Context {
+        let context = pi_ai::provider::Context {
             system_prompt: Some(REVIEW_SYSTEM_PROMPT.to_string().into()),
-            messages: vec![crate::model::Message::User(crate::model::UserMessage {
-                content: crate::model::UserContent::Text(digest_prompt(digest)),
+            messages: vec![pi_ai::model::Message::User(pi_ai::model::UserMessage {
+                content: pi_ai::model::UserContent::Text(digest_prompt(digest)),
                 timestamp: chrono::Utc::now().timestamp_millis(),
             })]
             .into(),
             tools: Vec::new().into(),
         };
-        let options = crate::provider::StreamOptions {
+        let options = pi_ai::provider::StreamOptions {
             max_tokens: Some(512),
             api_key: self.api_key.clone(),
             ..Default::default()
@@ -414,14 +414,14 @@ impl AdvisorRuntime {
         let mut text = String::new();
         while let Some(event) = stream.next().await {
             match event {
-                Ok(crate::model::StreamEvent::TextDelta { delta, .. }) => text.push_str(&delta),
-                Ok(crate::model::StreamEvent::Done { .. }) => break,
+                Ok(pi_ai::model::StreamEvent::TextDelta { delta, .. }) => text.push_str(&delta),
+                Ok(pi_ai::model::StreamEvent::Done { .. }) => break,
                 Ok(_) => {}
                 Err(err) => return Err(err),
             }
         }
         if text.trim().is_empty() {
-            return Err(crate::error::Error::api("advisor returned empty reply"));
+            return Err(pi_error::Error::api("advisor returned empty reply"));
         }
         Ok(text)
     }
@@ -505,40 +505,40 @@ mod tests {
     #[test]
     fn digest_collects_files_commands_errors_and_text() {
         let messages = vec![
-            Message::User(crate::model::UserMessage {
-                content: crate::model::UserContent::Text("fix it".to_string()),
+            Message::User(pi_ai::model::UserMessage {
+                content: pi_ai::model::UserContent::Text("fix it".to_string()),
                 timestamp: 0,
             }),
-            Message::Assistant(Arc::new(crate::model::AssistantMessage {
+            Message::Assistant(Arc::new(pi_ai::model::AssistantMessage {
                 content: vec![
-                    crate::model::ContentBlock::ToolCall(crate::model::ToolCall {
+                    pi_ai::model::ContentBlock::ToolCall(pi_ai::model::ToolCall {
                         id: "1".to_string(),
                         name: "edit".to_string(),
                         arguments: serde_json::json!({"path": "src/a.rs"}),
                         thought_signature: None,
                     }),
-                    crate::model::ContentBlock::ToolCall(crate::model::ToolCall {
+                    pi_ai::model::ContentBlock::ToolCall(pi_ai::model::ToolCall {
                         id: "2".to_string(),
                         name: "bash".to_string(),
                         arguments: serde_json::json!({"command": "cargo test"}),
                         thought_signature: None,
                     }),
-                    crate::model::ContentBlock::Text(crate::model::TextContent::new("done")),
+                    pi_ai::model::ContentBlock::Text(pi_ai::model::TextContent::new("done")),
                 ],
                 api: "x".to_string(),
                 provider: "y".to_string(),
                 model: "z".to_string(),
-                usage: crate::model::Usage::default(),
-                stop_reason: crate::model::StopReason::Stop,
+                usage: pi_ai::model::Usage::default(),
+                stop_reason: pi_ai::model::StopReason::Stop,
                 stop_details: None,
                 error_message: None,
                 timestamp: 0,
             })),
-            Message::ToolResult(Arc::new(crate::model::ToolResultMessage {
+            Message::ToolResult(Arc::new(pi_ai::model::ToolResultMessage {
                 tool_call_id: "2".to_string(),
                 tool_name: "bash".to_string(),
-                content: vec![crate::model::ContentBlock::Text(
-                    crate::model::TextContent::new("permission denied"),
+                content: vec![pi_ai::model::ContentBlock::Text(
+                    pi_ai::model::TextContent::new("permission denied"),
                 )],
                 is_error: true,
                 details: None,
@@ -557,8 +557,8 @@ mod tests {
 
     #[test]
     fn digest_flags_trivial_turns() {
-        let messages = vec![Message::User(crate::model::UserMessage {
-            content: crate::model::UserContent::Text("hi".to_string()),
+        let messages = vec![Message::User(pi_ai::model::UserMessage {
+            content: pi_ai::model::UserContent::Text("hi".to_string()),
             timestamp: 0,
         })];
         let digest = build_digest(&messages);

@@ -26,7 +26,7 @@ pub type Rank = u32;
 use std::collections::BinaryHeap;
 
 // Local error surface for the BPE leaf. The legacy `bpe.rs` referenced the
-// meta-crate's `crate::error::{Result, Error::validation}`; no caller of
+// meta-crate's `pi_error::{Result, Error::validation}`; no caller of
 // `CoreBPE::new` observed the concrete error type, so we keep it leaf-local
 // instead of dragging the entire `pi-error` enum (3300+ lines) into this
 // dependency surface.

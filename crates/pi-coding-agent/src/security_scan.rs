@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 pub const SCAN_SCHEMA: &str = "pi.security-scan/v1";
 /// SARIF version emitted by `run`.
@@ -609,7 +609,7 @@ pub fn findings_from_sarif(text: &str) -> Vec<Finding> {
 // Tool surface
 // ---------------------------------------------------------------------------
 
-use crate::model::{ContentBlock, TextContent};
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput};
 use serde_json::{Value, json};
 

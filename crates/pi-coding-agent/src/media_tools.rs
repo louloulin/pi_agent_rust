@@ -7,8 +7,8 @@
 //! spill heavy binary outputs to disk artifacts (never raw inlined base64 in messages),
 //! and support VCR cassette / deterministic test execution.
 
-use crate::error::{Error, Result};
-use crate::model::{ContentBlock, TextContent};
+use pi_error::{Error, Result};
+use pi_ai::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
@@ -451,8 +451,8 @@ impl Tool for ReadMediaTool {
                 "read_media",
                 format!(
                     "media file is {} ({size} bytes), above the {} cap ({} bytes); raise media.maxBytes or trim the file",
-                    crate::model::format_media_size(size),
-                    crate::model::format_media_size(self.max_bytes),
+                    pi_ai::model::format_media_size(size),
+                    pi_ai::model::format_media_size(self.max_bytes),
                     self.max_bytes
                 ),
             ));
@@ -469,7 +469,7 @@ impl Tool for ReadMediaTool {
                 "read_media",
                 format!(
                     "media file grew past the {} cap while being read",
-                    crate::model::format_media_size(self.max_bytes)
+                    pi_ai::model::format_media_size(self.max_bytes)
                 ),
             ));
         }
@@ -477,18 +477,18 @@ impl Tool for ReadMediaTool {
         let name = target_path
             .file_name()
             .and_then(|n| n.to_str())
-            .and_then(crate::model::sanitize_media_name);
+            .and_then(pi_ai::model::sanitize_media_name);
 
         let note = format!(
             "Read media file {} [{mime_type}, {}]",
             name.as_deref().unwrap_or(path_str),
-            crate::model::format_media_size(size)
+            pi_ai::model::format_media_size(size)
         );
 
         Ok(ToolOutput {
             content: vec![
                 ContentBlock::Text(TextContent::new(note)),
-                ContentBlock::Media(crate::model::MediaContent {
+                ContentBlock::Media(pi_ai::model::MediaContent {
                     data,
                     mime_type: mime_type.to_string(),
                     name,

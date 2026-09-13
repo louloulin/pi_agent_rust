@@ -10,7 +10,7 @@ use std::process::Command;
 
 use serde::{Deserialize, Serialize};
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::memory::screen_secrets;
 
 /// File category used for commit ordering priority and scoring.

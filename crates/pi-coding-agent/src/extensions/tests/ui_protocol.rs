@@ -1,6 +1,8 @@
 //! UI routing, protocol adapter, and typed opcode tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // bd-2hz.4: UI method routing through shared dispatcher + taxonomy

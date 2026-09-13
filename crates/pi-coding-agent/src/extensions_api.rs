@@ -7,7 +7,7 @@ use crate::agent::AgentEvent;
 use crate::config::Config;
 use crate::connectors::Connector;
 use crate::connectors::http::HttpConnector;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::extension_events::{ToolCallEventResult, ToolResultEventResult};
 use crate::extensions_js::{
     ExtensionRepairEvent, ExtensionToolDef, HostcallKind, HostcallRequest, PiJsRuntime,
@@ -25,7 +25,7 @@ use crate::hostcall_superinstructions::{
 use crate::hostcall_trace_jit::{GuardContext, TraceJitCompiler};
 use crate::permissions::{PermissionStore, PersistedDecision};
 use crate::resources::ExtensionResourcePaths;
-use crate::scheduler::HostcallOutcome;
+use pi_agent_core::scheduler::HostcallOutcome;
 use crate::session::SessionMessage;
 use crate::tools::ToolRegistry;
 use ast_grep_core::{AstGrep, Pattern};
@@ -844,9 +844,9 @@ pub struct HostcallReactorMesh {
     rejected_enqueues: u64,
     total_dispatched: u64,
     /// NUMA-aware slab pool for tracking per-shard resource utilization.
-    numa_pool: Option<crate::scheduler::NumaSlabPool>,
+    numa_pool: Option<pi_agent_core::scheduler::NumaSlabPool>,
     /// Thread affinity advice derived from the reactor's core mapping.
-    affinity_advice: Vec<crate::scheduler::ThreadAffinityAdvice>,
+    affinity_advice: Vec<pi_agent_core::scheduler::ThreadAffinityAdvice>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -11732,7 +11732,7 @@ impl JsExtensionRuntimeHandle {
                 let cold_init_started = Instant::now();
                 let init_config = warm_pool.make_config();
                 let init = PiJsRuntime::with_clock_and_config_with_policy(
-                    crate::scheduler::WallClock,
+                    pi_agent_core::scheduler::WallClock,
                     init_config.clone(),
                     Some(runtime_policy.clone()),
                 )
@@ -13682,7 +13682,7 @@ async fn build_js_runtime_shards(
         let shard_config = js_runtime_shard_config(warm_pool, shard_count, shard_index)?;
 
         let runtime = PiJsRuntime::with_clock_and_config_with_policy_for_extension(
-            crate::scheduler::WallClock,
+            pi_agent_core::scheduler::WallClock,
             shard_config,
             Some(policy.clone()),
             extension_id.clone(),

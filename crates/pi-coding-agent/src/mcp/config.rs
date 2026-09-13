@@ -989,10 +989,10 @@ pub fn discover_with_project_trust(
 /// # Errors
 ///
 /// Returns an error when the file exists but is not valid JSON.
-pub fn read_project_config(path: &Path) -> Result<Value, crate::error::Error> {
+pub fn read_project_config(path: &Path) -> Result<Value, pi_error::Error> {
     match read_bounded_config(path) {
         Ok(content) => serde_json::from_str(&content).map_err(|err| {
-            crate::error::Error::tool(
+            pi_error::Error::tool(
                 "mcp",
                 format!("[MCP_CONFIG_INVALID] {}: {err}", path.display()),
             )
@@ -1001,12 +1001,12 @@ pub fn read_project_config(path: &Path) -> Result<Value, crate::error::Error> {
             Ok(serde_json::json!({ "mcpServers": {} }))
         }
         Err(err) if err.kind() == std::io::ErrorKind::InvalidData => {
-            Err(crate::error::Error::tool(
+            Err(pi_error::Error::tool(
                 "mcp",
                 format!("[MCP_CONFIG_INVALID] {}: {err}", path.display()),
             ))
         }
-        Err(err) => Err(crate::error::Error::tool(
+        Err(err) => Err(pi_error::Error::tool(
             "mcp",
             format!("[MCP_CONFIG_IO] cannot read {}: {err}", path.display()),
         )),
@@ -1018,20 +1018,20 @@ pub fn read_project_config(path: &Path) -> Result<Value, crate::error::Error> {
 /// # Errors
 ///
 /// Returns an error on I/O failure.
-pub fn write_project_config(path: &Path, value: &Value) -> Result<(), crate::error::Error> {
+pub fn write_project_config(path: &Path, value: &Value) -> Result<(), pi_error::Error> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent).map_err(|err| {
-            crate::error::Error::tool(
+            pi_error::Error::tool(
                 "mcp",
                 format!("[MCP_CONFIG_IO] cannot create {}: {err}", parent.display()),
             )
         })?;
     }
     let rendered = serde_json::to_string_pretty(value).map_err(|err| {
-        crate::error::Error::tool("mcp", format!("[MCP_CONFIG_IO] serialize failed: {err}"))
+        pi_error::Error::tool("mcp", format!("[MCP_CONFIG_IO] serialize failed: {err}"))
     })?;
     if rendered.len().saturating_add(1) > MAX_MCP_CONFIG_BYTES {
-        return Err(crate::error::Error::tool(
+        return Err(pi_error::Error::tool(
             "mcp",
             format!(
                 "[MCP_CONFIG_INVALID] rendered MCP config exceeds {MAX_MCP_CONFIG_BYTES} bytes"
@@ -1039,7 +1039,7 @@ pub fn write_project_config(path: &Path, value: &Value) -> Result<(), crate::err
         ));
     }
     std::fs::write(path, format!("{rendered}\n")).map_err(|err| {
-        crate::error::Error::tool(
+        pi_error::Error::tool(
             "mcp",
             format!("[MCP_CONFIG_IO] cannot write {}: {err}", path.display()),
         )

@@ -1,6 +1,8 @@
 //! Shared hostcall dispatcher and policy-boundary tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // Shared dispatcher tests (bd-1uy.1.3)

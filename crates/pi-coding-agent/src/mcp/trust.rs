@@ -25,7 +25,7 @@ use serde::{Deserialize, Serialize};
 #[cfg(unix)]
 use sha2::{Digest as _, Sha256};
 
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 
 /// Trust record format version.
 const TRUST_SCHEMA_VERSION: u32 = 2;

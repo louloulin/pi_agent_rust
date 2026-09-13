@@ -4,6 +4,8 @@
 // and its in-module conformance tests. It therefore consumes the private policy,
 // connector, manager, and protocol surface as one adapter boundary.
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 use crate::connectors::http::{HttpConnector, HttpConnectorConfig};
 use std::collections::BTreeSet;
@@ -1137,8 +1139,10 @@ impl Instance {
 mod tests {
     use super::super::WasmExtensionHost;
     use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
     use crate::connectors::http::HttpConnectorConfig;
-    use crate::model::{ContentBlock, TextContent};
+    use pi_ai::model::{ContentBlock, TextContent};
     use crate::tools::{Tool, ToolOutput, ToolRegistry, ToolUpdate};
     use asupersync::runtime::RuntimeBuilder;
     use asupersync::time::{sleep, wall_now};

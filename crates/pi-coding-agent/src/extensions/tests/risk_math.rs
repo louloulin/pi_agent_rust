@@ -1,6 +1,8 @@
 //! Runtime-risk math, baseline primitives, and quota tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ========================================================================
 // Quantile selection semantics (bd-xqipg)

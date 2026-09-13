@@ -1,7 +1,7 @@
 //! Configuration loading and management.
 
 use crate::agent::QueueMode;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fs::File;
@@ -79,7 +79,7 @@ pub struct Config {
     /// Secrets vault settings (bd-cv653.7.9).
     pub secrets: Option<crate::secrets::SecretsSettings>,
     /// Magic-keyword settings (bd-cv653.3.6).
-    pub keywords: Option<crate::magic_keywords::KeywordSettings>,
+    pub keywords: Option<pi_ai::magic_keywords::KeywordSettings>,
     /// Advisor settings (bd-cv653.3.3).
     pub advisor: Option<AdvisorSettings>,
     /// LSP tool settings (bd-cv653.1.1).
@@ -442,9 +442,19 @@ pub struct TitlingSettings {
 /// itself); the most specific matching prefix wins over less specific
 /// prefixes and the global settings.
 ///
-/// Defined in `pi-failover` (its only consumer) and re-exported here so
-/// settings parsing keeps the `config::ModelScopeOverride` path.
-pub use pi_failover::ModelScopeOverride;
+/// Defined locally here (mirrors `pi_ai::failover::ModelScopeOverride`),
+/// to avoid pulling pi-coding-agent → pi-ai (pi-ai providers already pull
+/// pi-coding-agent types, creating a cycle).
+#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
+#[serde(default)]
+pub struct ModelScopeOverride {
+    /// Directory prefix this override applies to (absolute or `~`-rooted).
+    pub path: String,
+    #[serde(alias = "enabledModels")]
+    pub enabled_models: Option<Vec<String>>,
+    #[serde(alias = "disabledProviders")]
+    pub disabled_providers: Option<Vec<String>>,
+}
 
 /// Tool load-mode configuration (bd-cv653.1.6).
 ///
@@ -1738,11 +1748,11 @@ fn merge_advisor(
 /// lower-precedence layer when omitted; an explicitly supplied custom-word
 /// list replaces the lower layer's list (including an explicit empty list).
 fn merge_keywords(
-    base: Option<crate::magic_keywords::KeywordSettings>,
-    other: Option<crate::magic_keywords::KeywordSettings>,
-) -> Option<crate::magic_keywords::KeywordSettings> {
+    base: Option<pi_ai::magic_keywords::KeywordSettings>,
+    other: Option<pi_ai::magic_keywords::KeywordSettings>,
+) -> Option<pi_ai::magic_keywords::KeywordSettings> {
     match (base, other) {
-        (Some(base), Some(other)) => Some(crate::magic_keywords::KeywordSettings {
+        (Some(base), Some(other)) => Some(pi_ai::magic_keywords::KeywordSettings {
             ultrathink: other.ultrathink.or(base.ultrathink),
             orchestrate: other.orchestrate.or(base.orchestrate),
             workflowz: other.workflowz.or(base.workflowz),

@@ -9,14 +9,18 @@ description = "Phase-2 aggregator mirroring @earendil-works/pi-telemetry: PMU te
 workspace = true
 
 [dependencies]
-# Aggregator siblings re-exported through the pi facade.
-pi-coding-agent = { workspace = true }
 # Workspace deps required by the inlined Phase-1 leaves.
 anyhow = { workspace = true }
 chrono = { workspace = true }
+pi-error = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+pprof = { workspace = true, optional = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+
+[features]
+default = []
+profiler = ["dep:pprof"]

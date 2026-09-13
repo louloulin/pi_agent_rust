@@ -2,15 +2,15 @@
 //!
 //! Pi provides built-in file, shell, search, editing, and subagent delegation tools.
 //!
-//! Tools are exposed to the model via JSON Schema (see [`crate::provider::ToolDef`]) and executed
+//! Tools are exposed to the model via JSON Schema (see [`pi_ai::provider::ToolDef`]) and executed
 //! locally by the agent loop. Each tool returns structured [`ContentBlock`] output suitable for
 //! rendering in the TUI and for inclusion in provider messages as tool results.
 
 use crate::agent_cx::AgentCx;
 use crate::config::Config;
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::extensions::{safe_canonicalize, strip_unc_prefix};
-use crate::model::{ContentBlock, ImageContent, TextContent};
+use pi_ai::model::{ContentBlock, ImageContent, TextContent};
 use crate::platform::{
     EffectiveModeAccessContext, UNIX_ACCESS_READ, UNIX_ACCESS_SEARCH, UNIX_ACCESS_WRITE,
     ensure_effective_mode_access,

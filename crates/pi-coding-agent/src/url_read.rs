@@ -13,7 +13,7 @@
 //! - The SSRF guard blocks loopback/private/link-local/metadata targets by
 //!   default; `read.urlAllowPrivateTargets` (or the e2e harness) opts out.
 
-use crate::error::Error;
+use pi_error::Error;
 use serde_json::Value;
 
 /// Maximum download size for a URL read (10 MiB before conversion).
@@ -145,7 +145,7 @@ pub async fn fetch(
     url: &str,
     policy: SsrfPolicy,
     mode: UrlReadMode,
-) -> crate::error::Result<UrlReadOutcome> {
+) -> pi_error::Result<UrlReadOutcome> {
     fetch_with_redirects(url, policy, mode, 0).await
 }
 
@@ -156,7 +156,7 @@ fn fetch_with_redirects<'a>(
     mode: UrlReadMode,
     depth: u32,
 ) -> std::pin::Pin<
-    Box<dyn std::future::Future<Output = crate::error::Result<UrlReadOutcome>> + Send + 'a>,
+    Box<dyn std::future::Future<Output = pi_error::Result<UrlReadOutcome>> + Send + 'a>,
 > {
     Box::pin(async move {
         if depth > MAX_REDIRECTS {
@@ -282,7 +282,7 @@ pub fn convert_bytes(
     wire_content_type: &str,
     bytes: &[u8],
     download_truncated: bool,
-) -> crate::error::Result<UrlReadOutcome> {
+) -> pi_error::Result<UrlReadOutcome> {
     let kind = classify(url, wire_content_type, bytes);
     let (content, extractor): (String, &'static str) = match kind {
         UrlContentKind::Pdf => (convert_pdf(bytes)?, "pdf"),
@@ -331,7 +331,7 @@ fn classify(url: &str, content_type: &str, bytes: &[u8]) -> UrlContentKind {
 }
 
 #[cfg(feature = "url-pdf")]
-fn convert_pdf(bytes: &[u8]) -> crate::error::Result<String> {
+fn convert_pdf(bytes: &[u8]) -> pi_error::Result<String> {
     let pages: Vec<String> = pdf_extract::extract_text_from_mem_by_pages(bytes)
         .map_err(|err| Error::tool("read", format!("PDF extraction failed: {err}")))?;
     let mut out = String::new();
@@ -345,7 +345,7 @@ fn convert_pdf(bytes: &[u8]) -> crate::error::Result<String> {
 }
 
 #[cfg(not(feature = "url-pdf"))]
-fn convert_pdf(_bytes: &[u8]) -> crate::error::Result<String> {
+fn convert_pdf(_bytes: &[u8]) -> pi_error::Result<String> {
     Err(Error::tool(
         "read",
         "[PDF_NOT_COMPILED] This build lacks PDF support (opt-in `url-pdf` feature; \
@@ -355,7 +355,7 @@ fn convert_pdf(_bytes: &[u8]) -> crate::error::Result<String> {
     ))
 }
 
-fn convert_notebook(bytes: &[u8]) -> crate::error::Result<String> {
+fn convert_notebook(bytes: &[u8]) -> pi_error::Result<String> {
     let value: Value = serde_json::from_slice(bytes)
         .map_err(|err| Error::tool("read", format!("Notebook parse failed: {err}")))?;
     let cells = value

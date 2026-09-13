@@ -1,6 +1,8 @@
 //! Event classification and timeout policy tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ===================================================================
 // #50: informational-vs-actionable event classification drives the

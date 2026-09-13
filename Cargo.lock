@@ -5575,56 +5575,18 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
- "pi-agent-cx",
- "pi-agent-hub",
- "pi-bpe",
- "pi-buffer-shim",
- "pi-cli",
- "pi-conformance",
- "pi-context-files",
- "pi-crash",
- "pi-crypto-shim",
- "pi-delight",
- "pi-dialects",
- "pi-embedded-assets",
+ "pi-agent-core",
+ "pi-ai",
+ "pi-chord",
+ "pi-client",
+ "pi-coding-agent",
  "pi-error",
- "pi-extension-replay",
- "pi-extension-scoring",
- "pi-failover",
- "pi-file-lock",
- "pi-flake-classifier",
- "pi-gallery",
- "pi-hostcall-io-uring-lane",
- "pi-hostcall-s3-fifo",
- "pi-hostcall-superinstructions",
- "pi-http-shim",
- "pi-jsonrpc",
- "pi-magic-keywords",
- "pi-markdown-rich",
- "pi-model",
- "pi-overlay-system",
- "pi-platform",
- "pi-pmu-telemetry",
- "pi-profiler",
- "pi-provider",
- "pi-provider-metadata",
- "pi-scheduler",
- "pi-secret-screener",
- "pi-secrets",
- "pi-self-update",
- "pi-session-metrics",
- "pi-sse",
- "pi-stats",
- "pi-status-line",
- "pi-stream-rules",
- "pi-swarm-activity-ledger",
- "pi-swarm-progress-slo",
- "pi-token-count",
- "pi-turn-recovery",
- "pi-undo",
- "pi-version",
- "pi-web-remote",
- "pi-workspace",
+ "pi-evals",
+ "pi-protocol",
+ "pi-server",
+ "pi-session-backends",
+ "pi-telemetry",
+ "pi-tui",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5672,327 +5634,163 @@ dependencies = [
 name = "pi-agent-core"
 version = "0.1.0"
 dependencies = [
- "pi-agent-cx",
- "pi-agent-hub",
- "pi-flake-classifier",
- "pi-scheduler",
-]
-
-[[package]]
-name = "pi-agent-cx"
-version = "0.1.0"
-dependencies = [
- "asupersync",
-]
-
-[[package]]
-name = "pi-agent-hub"
-version = "0.1.0"
-dependencies = [
- "dirs",
+ "anyhow",
+ "chrono",
+ "pi-ai",
  "pi-error",
- "pi-secrets",
  "serde",
  "serde_json",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
 name = "pi-ai"
 version = "0.1.0"
 dependencies = [
- "pi-bpe",
- "pi-delight",
- "pi-dialects",
- "pi-embedded-assets",
- "pi-failover",
- "pi-magic-keywords",
- "pi-model",
- "pi-provider",
- "pi-provider-metadata",
- "pi-stream-rules",
- "pi-token-count",
-]
-
-[[package]]
-name = "pi-bpe"
-version = "0.1.0"
-dependencies = [
+ "anyhow",
+ "asupersync",
+ "async-trait",
+ "base64 0.23.1",
  "bstr",
+ "chrono",
+ "crc32c",
+ "dirs",
  "fancy-regex 0.18.0",
+ "flate2",
+ "fsqlite",
+ "futures",
+ "hmac",
+ "json5",
+ "memchr",
+ "pi-error",
+ "regex",
  "rustc-hash",
+ "rustix",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "thiserror 2.0.20",
+ "tiktoken-rs",
+ "tracing",
+ "url",
+ "uuid",
 ]
-
-[[package]]
-name = "pi-buffer-shim"
-version = "0.1.0"
 
 [[package]]
 name = "pi-chord"
 version = "0.1.0"
 dependencies = [
- "pi-buffer-shim",
- "pi-file-lock",
- "pi-hostcall-io-uring-lane",
- "pi-hostcall-s3-fifo",
- "pi-hostcall-superinstructions",
- "pi-http-shim",
-]
-
-[[package]]
-name = "pi-cli"
-version = "0.1.0"
-dependencies = [
- "clap",
- "proptest",
+ "anyhow",
+ "serde_json",
 ]
 
 [[package]]
 name = "pi-client"
 version = "0.1.0"
 dependencies = [
- "pi-web-remote",
+ "anyhow",
 ]
 
 [[package]]
 name = "pi-coding-agent"
 version = "0.1.0"
 dependencies = [
- "pi-cli",
- "pi-conformance",
- "pi-context-files",
- "pi-crash",
- "pi-crypto-shim",
- "pi-extension-replay",
- "pi-extension-scoring",
- "pi-gallery",
- "pi-markdown-rich",
- "pi-overlay-system",
- "pi-platform",
- "pi-secret-screener",
- "pi-secrets",
- "pi-self-update",
- "pi-stats",
- "pi-status-line",
- "pi-swarm-activity-ledger",
- "pi-swarm-progress-slo",
- "pi-turn-recovery",
- "pi-undo",
- "pi-version",
- "pi-workspace",
-]
-
-[[package]]
-name = "pi-conformance"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "proptest",
- "regex",
- "serde",
- "serde_json",
- "sha2 0.11.0",
- "tempfile",
-]
-
-[[package]]
-name = "pi-context-files"
-version = "0.1.0"
-dependencies = [
- "globset",
- "serde",
- "tempfile",
- "tracing",
-]
-
-[[package]]
-name = "pi-crash"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "pi-secrets",
- "serde",
- "serde_json",
- "signal-hook 0.4.4",
- "tracing",
-]
-
-[[package]]
-name = "pi-crypto-shim"
-version = "0.1.0"
-dependencies = [
+ "anyhow",
+ "arboard",
+ "ast-grep-core",
+ "ast-grep-language",
+ "asupersync",
+ "async-trait",
  "base64 0.23.1",
+ "charmed-bubbles",
+ "charmed-bubbletea",
+ "charmed-glamour",
+ "charmed-lipgloss",
+ "chrono",
+ "clap",
+ "clap_complete",
+ "crc32c",
+ "crossterm",
+ "dirs",
+ "flate2",
+ "fs4",
+ "fsqlite",
+ "ftui",
+ "ftui-extras",
+ "futures",
  "getrandom 0.4.3",
+ "glob",
+ "globset",
+ "grep-regex",
  "hmac",
+ "htmd",
+ "ignore",
+ "image",
+ "json5",
+ "jsonschema",
  "md-5 0.11.0",
+ "memchr",
  "pbkdf2",
+ "pdf-extract",
+ "pi-agent-core",
+ "pi-ai",
+ "pi-error",
+ "pi-telemetry",
+ "portable-pty",
  "proptest",
  "regex",
  "ring",
  "rquickjs",
+ "rustix",
  "scrypt",
- "sha1 0.11.0",
- "sha2 0.11.0",
- "tracing",
- "uuid",
-]
-
-[[package]]
-name = "pi-delight"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "pi-dialects"
-version = "0.1.0"
-dependencies = [
+ "semver",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "pi-embedded-assets"
-version = "0.1.0"
-dependencies = [
- "crc32c",
- "flate2",
+ "sha1 0.11.0",
+ "sha2 0.11.0",
+ "signal-hook 0.4.4",
+ "similar",
+ "swc_common",
+ "swc_ecma_ast",
+ "swc_ecma_codegen",
+ "swc_ecma_parser",
+ "swc_ecma_transforms_base",
+ "swc_ecma_transforms_typescript",
+ "sysinfo",
+ "tempfile",
+ "thiserror 2.0.20",
+ "toml 1.1.6+spec-1.1.0",
+ "tracing",
+ "unicode-normalization",
+ "unicode-width",
+ "url",
+ "uuid",
+ "wasmtime",
+ "xxhash-rust",
 ]
 
 [[package]]
 name = "pi-error"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "asupersync",
+ "chrono",
  "fsqlite",
- "pi-provider-metadata",
- "proptest",
  "regex",
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]
 name = "pi-evals"
 version = "0.1.0"
-
-[[package]]
-name = "pi-extension-replay"
-version = "0.1.0"
 dependencies = [
- "proptest",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
-]
-
-[[package]]
-name = "pi-extension-scoring"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "proptest",
- "serde",
- "serde_json",
- "tracing",
-]
-
-[[package]]
-name = "pi-failover"
-version = "0.1.0"
-dependencies = [
- "pi-error",
- "pi-provider-metadata",
- "serde",
-]
-
-[[package]]
-name = "pi-file-lock"
-version = "0.1.0"
-dependencies = [
- "filetime",
- "rustix",
- "tempfile",
-]
-
-[[package]]
-name = "pi-flake-classifier"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-gallery"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-hostcall-io-uring-lane"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-hostcall-s3-fifo"
-version = "0.1.0"
-dependencies = [
- "proptest",
-]
-
-[[package]]
-name = "pi-hostcall-superinstructions"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-http-shim"
-version = "0.1.0"
-
-[[package]]
-name = "pi-jsonrpc"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-magic-keywords"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-markdown-rich"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "pi-model"
-version = "0.1.0"
-dependencies = [
- "pi-provider-metadata",
- "proptest",
- "serde",
- "serde_json",
+ "anyhow",
 ]
 
 [[package]]
@@ -6003,242 +5801,45 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-overlay-system"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "pi-platform"
-version = "0.4.0"
-dependencies = [
- "rustix",
-]
-
-[[package]]
-name = "pi-pmu-telemetry"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "pi-profiler"
-version = "0.1.0"
-dependencies = [
- "pi-pmu-telemetry",
- "pprof",
- "tracing",
-]
-
-[[package]]
 name = "pi-protocol"
 version = "0.1.0"
 dependencies = [
- "pi-jsonrpc",
- "pi-sse",
-]
-
-[[package]]
-name = "pi-provider"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "futures",
- "pi-error",
- "pi-model",
- "pi-provider-metadata",
- "proptest",
- "serde",
+ "anyhow",
  "serde_json",
-]
-
-[[package]]
-name = "pi-provider-metadata"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde",
- "url",
-]
-
-[[package]]
-name = "pi-scheduler"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde_json",
- "tracing",
-]
-
-[[package]]
-name = "pi-secret-screener"
-version = "0.1.0"
-dependencies = [
- "regex",
-]
-
-[[package]]
-name = "pi-secrets"
-version = "0.1.0"
-dependencies = [
- "pi-error",
- "regex",
- "serde",
-]
-
-[[package]]
-name = "pi-self-update"
-version = "0.1.0"
-dependencies = [
- "asupersync",
- "pi-error",
- "pi-version",
- "serde_json",
- "sha2 0.11.0",
- "tracing",
 ]
 
 [[package]]
 name = "pi-server"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+]
 
 [[package]]
 name = "pi-session-backends"
 version = "0.1.0"
-
-[[package]]
-name = "pi-session-metrics"
-version = "0.1.0"
 dependencies = [
- "proptest",
- "serde",
- "tempfile",
- "tracing",
-]
-
-[[package]]
-name = "pi-sse"
-version = "0.1.0"
-dependencies = [
- "futures",
- "memchr",
- "proptest",
- "serde_json",
-]
-
-[[package]]
-name = "pi-stats"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "tempfile",
-]
-
-[[package]]
-name = "pi-status-line"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "pi-stream-rules"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "dirs",
- "pi-error",
- "pi-secret-screener",
- "regex",
- "serde",
- "serde_json",
- "tempfile",
- "uuid",
-]
-
-[[package]]
-name = "pi-swarm-activity-ledger"
-version = "0.1.0"
-dependencies = [
- "serde",
- "serde_json",
- "thiserror 2.0.20",
-]
-
-[[package]]
-name = "pi-swarm-progress-slo"
-version = "0.1.0"
-dependencies = [
- "serde",
+ "anyhow",
 ]
 
 [[package]]
 name = "pi-telemetry"
 version = "0.1.0"
 dependencies = [
- "pi-pmu-telemetry",
- "pi-profiler",
- "pi-session-metrics",
-]
-
-[[package]]
-name = "pi-token-count"
-version = "0.1.0"
-dependencies = [
- "tiktoken-rs",
+ "anyhow",
+ "chrono",
+ "pi-error",
+ "pprof",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]
 name = "pi-tui"
 version = "0.1.0"
-
-[[package]]
-name = "pi-turn-recovery"
-version = "0.1.0"
 dependencies = [
- "pi-model",
- "serde",
- "tracing",
-]
-
-[[package]]
-name = "pi-undo"
-version = "0.1.0"
-dependencies = [
- "serde",
- "sha2 0.11.0",
- "tempfile",
-]
-
-[[package]]
-name = "pi-version"
-version = "0.1.0"
-dependencies = [
- "asupersync",
- "dirs",
- "pi-error",
- "semver",
- "serde_json",
- "tempfile",
- "tracing",
-]
-
-[[package]]
-name = "pi-web-remote"
-version = "0.1.0"
-dependencies = [
- "serde",
-]
-
-[[package]]
-name = "pi-workspace"
-version = "0.1.0"
-dependencies = [
- "pi-error",
+ "anyhow",
 ]
 
 [[package]]

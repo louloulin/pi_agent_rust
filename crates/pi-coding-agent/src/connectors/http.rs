@@ -8,7 +8,7 @@ use crate::connectors::{
     Connector, HostCallErrorCode, HostCallPayload, HostResultPayload, host_result_err,
     host_result_err_with_details, host_result_ok,
 };
-use crate::error::{Error, Result};
+use pi_error::{Error, Result};
 use crate::http::client::Client;
 use asupersync::http::h1::http_client::Scheme;
 use asupersync::http::h1::{ClientError, ParsedUrl};

@@ -1,6 +1,8 @@
 //! Policy explanation and profile transition tests.
 
 use super::*;
+use crate::extensions::*;
+use crate::extensions_api::*;
 
 // ====================================================================
 // SEC-4.4: Policy explanation and profile transition tests

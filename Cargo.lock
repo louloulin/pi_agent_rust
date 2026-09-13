@@ -5888,6 +5888,7 @@ dependencies = [
  "pi-ai",
  "rich_rust",
  "serde",
+ "serde_json",
  "unicode-width",
  "url",
 ]

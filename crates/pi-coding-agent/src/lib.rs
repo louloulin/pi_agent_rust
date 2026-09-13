@@ -19,7 +19,9 @@ pub mod crash;
 pub mod crypto_shim;
 pub mod extension_replay;
 pub mod extension_scoring;
-pub mod gallery;
+// Round 30.3: `gallery` re-housed in `pi-tui`. Re-export it here so
+// binary + tests can keep using `pi_coding_agent::gallery::*`.
+pub use pi_tui::gallery;
 pub mod markdown_rich;
 // Round 30.2: `overlay_system` re-housed in `pi-tui`. Re-export it here
 // so binary + interactive/* callers can keep using

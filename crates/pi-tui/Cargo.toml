@@ -45,3 +45,6 @@ unicode-width = { workspace = true }
 # overlay_system.rs (Round 30.2): unified overlay stack + set-piece
 # surfaces (Esc-stack, toast notifications, welcome / help / picker modals).
 serde = { workspace = true }
+serde_json = { workspace = true }
+# gallery.rs (Round 30.3): visual component gallery harness uses
+# serde_json in the Debug impl fallback (`render_report_json`).

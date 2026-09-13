@@ -17,11 +17,15 @@
 //! - `overlay_system.rs` — unified overlay stack + set-piece surfaces
 //!   (Esc-stack, toast notifications, welcome / help / picker modals)
 //!   (Round 30.2)
+//! - `gallery.rs` — visual component gallery harness: every tool card
+//!   and UI component in every lifecycle state for visual QA / regression
+//!   gating (Round 30.3)
 
 #![forbid(unsafe_code)]
 
 pub mod autocomplete;
 pub mod file_refs;
+pub mod gallery;
 pub mod overlay_system;
 pub mod terminal_images;
 pub mod text_utils;

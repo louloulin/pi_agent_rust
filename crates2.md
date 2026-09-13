@@ -1124,10 +1124,28 @@ Round 30 后(收尾)       : ~64%
 
 **Round 30 累计(本轮 + Round 30.1):** 671 LOC,继续向 pi-tui 收尾。
 
+### Round 30.3 — `gallery.rs` → `pi-tui` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/gallery.rs crates/pi-tui/src/gallery.rs`(134 LOC)
+2. 文件仅依赖 `serde + serde_json`,无 `crate::` 引用,平移成本为 0。
+3. `pi-tui/Cargo.toml` 加 `serde_json = { workspace = true }`(`render_report_json` 用到 `serde_json::to_string_pretty`)。
+4. `pi-tui/src/lib.rs` 加 `pub mod gallery;` + 文档条目。
+5. `pi-coding-agent/src/lib.rs` 把 `pub mod gallery;` 替换为 `pub use pi_tui::gallery;`(re-export,保留 `pi_coding_agent::gallery::GalleryMatrix` 路径)。
+6. `main.rs:3006` 的 `pi_coding_agent::gallery::GalleryMatrix::new()` 路径无需改动。
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished(1 dead_code warning,`GalleryCategory` 枚举)
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 50.59s(0 errors)
+
+**LOC 迁移:** 134 LOC
+
+**Round 30 累计(本轮 + Round 30.1-30.2):** 805 LOC。pi-tui 现在持有 `tui / autocomplete / file_refs / text_utils / terminal_images / overlay_system / gallery` 共 7 个模块。
+
 ### Round 30 后续候选(按文件大小排序)
 | 文件 | LOC | 候选归属 | 风险 |
 |------|-----|---------|------|
-| `gallery.rs` | 134 | `pi-tui`(slideshow helper) | 零依赖 |
 | `completion.rs` | 188 | `pi-tui`(shell completion) | 零依赖 |
 | `btw.rs` | 272 | `pi-ai` 或 `pi-tui` | pi_ai dep |
 | `current_time.rs` | 276 | `pi-tui`(tool impl 较杂) | 有 `crate::tools::*` |
@@ -1139,6 +1157,6 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.18(2026-09-13)
+> 本文档版本:v2.19(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

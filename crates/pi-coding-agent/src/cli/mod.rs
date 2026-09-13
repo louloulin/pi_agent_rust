@@ -2847,3 +2847,7 @@ impl Cli {
         }
     }
 }
+
+// Round 30.5: `completions` re-housed at `cli/completions` so it sits
+// next to the `Cli` derive graph it walks (`crate::cli::Cli::command()`).
+pub mod completions;

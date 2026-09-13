@@ -49,8 +49,12 @@ pub mod bash_mediation;
 pub mod browser;
 pub mod btw;
 pub mod checkpoint;
+// Round 30.5: `completions` re-housed at `cli/completions` (sibling to
+// `cli::Cli` whose derive graph it walks). Re-export it here so
+// `main.rs` (and any test) can keep calling
+// `pi_coding_agent::completions::{print_script, complete}`.
+pub use cli::completions;
 pub mod commit_split;
-pub mod completions;
 pub mod computer;
 pub mod config;
 pub mod conformance_shapes;

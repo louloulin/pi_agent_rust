@@ -71,7 +71,7 @@ pub mod checkpoint;
 // `main.rs` (and any test) can keep calling
 // `pi_coding_agent::completions::{print_script, complete}`.
 pub use cli::completions;
-pub mod commit_split;
+pub use pi_chord::commit_split;
 pub mod computer;
 pub mod config;
 pub mod conformance_shapes;
@@ -169,7 +169,7 @@ pub use pi_protocol::framing;
 pub use pi_protocol::jsonrpc;
 pub mod rpc;
 pub mod sdk;
-pub use pi_protocol::tail;
+pub use pi_protocol::tool_effects::ToolEffects;
 pub mod validation_broker;
 
 // The extensions/ directory predates Round 17; declared as a single

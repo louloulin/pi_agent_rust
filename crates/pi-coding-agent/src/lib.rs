@@ -11,7 +11,7 @@
 #![forbid(unsafe_code)]
 
 // Inlined from the Phase-1 leaves (Round 17).
-pub mod advisor;
+pub use pi_agent_core::advisor;
 pub mod cli;
 pub mod conformance;
 pub mod context_files;

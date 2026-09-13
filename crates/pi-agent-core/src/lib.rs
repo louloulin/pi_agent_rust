@@ -7,5 +7,6 @@
 
 #![forbid(unsafe_code)]
 
+pub mod advisor;
 pub mod flake_classifier;
 pub mod scheduler;

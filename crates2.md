@@ -1187,7 +1187,24 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 35 — `status_line.rs` → `pi-chord` ✅(Powerline status line)
+### Round 36 — `advisor.rs` → `pi-agent-core` ✅(advisor runtime)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/advisor.rs crates/pi-agent-core/src/advisor.rs`(589 LOC，纯 `pi-ai` provider + serde/futures，无 `crate::` 反向依赖)
+2. `pi-agent-core/src/lib.rs` 加 `pub mod advisor;`
+3. `pi-agent-core/Cargo.toml` 补充运行时与测试依赖：`futures`、`proptest`、`tempfile`、`asupersync`
+4. `pi-coding-agent/src/lib.rs` 改为 `pub use pi_agent_core::advisor;`，保持现有 `crate::advisor` 与 `pi_coding_agent::advisor` 调用路径兼容
+5. 同步修复 `pi-chord` crash signal watcher 的 Windows 条件编译与 `signal-hook` iterator feature
+
+**验证:**
+- `cargo check -p pi-agent-core`:✅
+- `cargo test -p pi-agent-core advisor --lib`:✅ 6 passed
+- `cargo check -p pi-chord`:✅
+- `git diff --check`:✅
+
+**说明:**
+`cargo check -p pi-coding-agent --lib` 仍受仓库既有 Windows 问题阻塞：`win32job` 未声明及 `windows_by_handle` 不稳定 API；本轮 advisor 拆分本身已由目标 crate 检查和单元测试验证。
+
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/status_line.rs crates/pi-chord/src/status_line.rs`(487 LOC,纯 std + serde,零 `crate::` 自依赖)

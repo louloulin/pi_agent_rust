@@ -1,0 +1,485 @@
+# pi.rs 模块化迁移总计划 (crates1.md)
+
+> 本文档定义 `crates/pi/src/` 内 **224 个 `.rs` 文件 / ~500K 行代码** 到
+> [`@earendil-works/pi`](https://github.com/earendil-works/pi) 11 个 packages
+> 的 **一一对应迁移表**。执行时全部使用 `git mv`,以保留文件历史。
+
+## 0. 目标 package 结构 (Phase-2 已搭骨架)
+
+```
+crates/
+├── pi/                     # 当前单体 —— 本计划执行后变薄 (~30K 行仅 main + lib 入口)
+├── pi-mono/                # 对外门面 —— 重新导出全部 11 个 package
+├── pi-ai/                  # AI:模型/Provider/Token/BPE/Failover/...
+├── pi-agent-core/          # Agent CX/Hub/Scheduler/Flake
+├── pi-coding-agent/        # CLI 工具集 (binary 入口的归宿)
+├── pi-tui/                 # TUI
+├── pi-telemetry/           # PMU/Profiler/Session metrics
+├── pi-protocol/            # JSON-RPC / SSE
+├── pi-chord/               # hostcall/buffer/http/file-lock
+├── pi-client/              # web-remote
+├── pi-server/              # server (本期占位)
+├── pi-session-backends/    # SQLite / JSONL session store
+└── pi-evals/               # eval harness (本期占位)
+```
+
+11 个 package 与上游对应:
+
+| 上游 (`@earendil-works/pi/packages/...`) | 本仓库 (`crates/pi-*`) | 角色 |
+|---|---|---|
+| `ai` | `pi-ai` | LLM/Provider/BPE/Token/Failover |
+| `agent-core` | `pi-agent-core` | Agent 运行时核心 |
+| `coding-agent` | `pi-coding-agent` | CLI 工具集成 |
+| `tui` | `pi-tui` | 终端交互 |
+| `telemetry` | `pi-telemetry` | 性能/指标 |
+| `protocol` | `pi-protocol` | 协议层 |
+| `chord` | `pi-chord` | hostcall 调度 |
+| `client` | `pi-client` | 客户端 |
+| `server` | `pi-server` | 服务端 |
+| `session-backends` | `pi-session-backends` | 会话存储后端 |
+| `evals` | `pi-evals` | eval 测试套件 |
+
+每个 Phase-2 aggregator 内部仍然由若干 leaf crate 组成(本计划只描述
+顶层文件归位,leaf 内部的细化拆分留给后续轮次)。
+
+---
+
+## 1. 归位原则
+
+1. **领域聚合优先**:同一业务域的文件聚合到同一 package
+2. **依赖方向严禁反向**:`pi-ai` 不能反向依赖 `pi-coding-agent`
+3. **保留子目录结构**:`git mv` 时保持 `crates/pi/src/mcp/manager.rs` →
+   `crates/pi-coding-agent/src/mcp/manager.rs`,而非扁平化
+4. **二进制入口**:`crates/pi/src/main.rs` → `crates/pi-coding-agent/src/main.rs`
+5. **lib 根**:`crates/pi/src/lib.rs` → `crates/pi/src/lib.rs` (留在 `pi/` 作为最小门面,内部模块全部 `pub use pi_xxx::*`)
+
+---
+
+## 2. 完整迁移表 (224 文件)
+
+### 2.1 → `crates/pi-ai/` (29 文件)
+
+AI / Provider / Token / BPE / Failover / Stream 领域。
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/bpe.rs` | `crates/pi-ai/src/bpe.rs` | BPE tokenizer |
+| `crates/pi/src/model.rs` | `crates/pi-ai/src/model.rs` | Model schema |
+| `crates/pi/src/models.rs` | `crates/pi-ai/src/models.rs` | Model registry |
+| `crates/pi/src/provider.rs` | `crates/pi-ai/src/provider.rs` | Provider trait |
+| `crates/pi/src/provider_metadata.rs` | `crates/pi-ai/src/provider_metadata.rs` | Provider metadata |
+| `crates/pi/src/token_count.rs` | `crates/pi-ai/src/token_count.rs` | Token 计数 |
+| `crates/pi/src/failover.rs` | `crates/pi-ai/src/failover.rs` | 失败转移 |
+| `crates/pi/src/stream_rules.rs` | `crates/pi-ai/src/stream_rules.rs` | 流规则 |
+| `crates/pi/src/delight.rs` | `crates/pi-ai/src/delight.rs` | 推测解码 |
+| `crates/pi/src/magic_keywords.rs` | `crates/pi-ai/src/magic_keywords.rs` | Magic keywords |
+| `crates/pi/src/dialects.rs` | `crates/pi-ai/src/dialects.rs` | 方言 |
+| `crates/pi/src/embedded_assets.rs` | `crates/pi-ai/src/embedded_assets.rs` | 嵌入资源 |
+| `crates/pi/src/usage.rs` | `crates/pi-ai/src/usage.rs` | 用量统计 |
+| `crates/pi/src/model_routing.rs` | `crates/pi-ai/src/model_routing.rs` | 路由 |
+| `crates/pi/src/model_selector.rs` | `crates/pi-ai/src/model_selector.rs` | 模型选择 |
+| `crates/pi/src/error_hints.rs` | `crates/pi-ai/src/error_hints.rs` | 错误提示 |
+| `crates/pi/src/providers/mod.rs` | `crates/pi-ai/src/providers/mod.rs` | Providers 模块根 |
+| `crates/pi/src/providers/anthropic.rs` | `crates/pi-ai/src/providers/anthropic.rs` | Anthropic |
+| `crates/pi/src/providers/azure.rs` | `crates/pi-ai/src/providers/azure.rs` | Azure |
+| `crates/pi/src/providers/bedrock.rs` | `crates/pi-ai/src/providers/bedrock.rs` | Bedrock |
+| `crates/pi/src/providers/cohere.rs` | `crates/pi-ai/src/providers/cohere.rs` | Cohere |
+| `crates/pi/src/providers/copilot.rs` | `crates/pi-ai/src/providers/copilot.rs` | Copilot |
+| `crates/pi/src/providers/cursor.rs` | `crates/pi-ai/src/providers/cursor.rs` | Cursor |
+| `crates/pi/src/providers/gemini.rs` | `crates/pi-ai/src/providers/gemini.rs` | Gemini |
+| `crates/pi/src/providers/gitlab.rs` | `crates/pi-ai/src/providers/gitlab.rs` | GitLab |
+| `crates/pi/src/providers/model_fetch.rs` | `crates/pi-ai/src/providers/model_fetch.rs` | 模型拉取 |
+| `crates/pi/src/providers/openai.rs` | `crates/pi-ai/src/providers/openai.rs` | OpenAI |
+| `crates/pi/src/providers/openai_responses.rs` | `crates/pi-ai/src/providers/openai_responses.rs` | OpenAI Responses |
+| `crates/pi/src/providers/vertex.rs` | `crates/pi-ai/src/providers/vertex.rs` | Vertex |
+
+### 2.2 → `crates/pi-agent-core/` (10 文件)
+
+Agent 运行时核心。
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/agent.rs` | `crates/pi-agent-core/src/agent.rs` | Agent 主类型 |
+| `crates/pi/src/agent_cx.rs` | `crates/pi-agent-core/src/agent_cx.rs` | Agent context |
+| `crates/pi/src/agent_hub.rs` | `crates/pi-agent-core/src/agent_hub.rs` | Agent hub |
+| `crates/pi/src/scheduler.rs` | `crates/pi-agent-core/src/scheduler.rs` | 调度器 |
+| `crates/pi/src/flake_classifier.rs` | `crates/pi-agent-core/src/flake_classifier.rs` | Flake 分类 |
+| `crates/pi/src/handoff.rs` | `crates/pi-agent-core/src/handoff.rs` | Handoff 协议 |
+| `crates/pi/src/resource_governor.rs` | `crates/pi-agent-core/src/resource_governor.rs` | 资源治理 |
+| `crates/pi/src/memory.rs` | `crates/pi-agent-core/src/memory.rs` | Memory 子系统 |
+| `crates/pi/src/subagents.rs` | `crates/pi-agent-core/src/subagents.rs` | 子代理 |
+| `crates/pi/src/skills_managed.rs` | `crates/pi-agent-core/src/skills_managed.rs` | 托管技能 |
+
+### 2.3 → `crates/pi-coding-agent/` (76 文件)
+
+CLI 工具集 —— 最大的 package,容纳原 `crates/pi` 工具链 + 扩展机制。
+
+#### 2.3.1 顶层工具 (42 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/app.rs` | `crates/pi-coding-agent/src/app.rs` | App |
+| `crates/pi/src/main.rs` | `crates/pi-coding-agent/src/main.rs` | **binary 入口** |
+| `crates/pi/src/cli_args.rs` | `crates/pi-coding-agent/src/cli_args.rs` | CLI 参数 |
+| `crates/pi/src/completions.rs` | `crates/pi-coding-agent/src/completions.rs` | 补全 |
+| `crates/pi/src/config.rs` | `crates/pi-coding-agent/src/config.rs` | 配置 |
+| `crates/pi/src/error.rs` | `crates/pi-coding-agent/src/error.rs` | 错误类型 |
+| `crates/pi/src/auth.rs` | `crates/pi-coding-agent/src/auth.rs` | 鉴权 |
+| `crates/pi/src/secrets.rs` | `crates/pi-coding-agent/src/secrets.rs` | Secrets |
+| `crates/pi/src/security_scan.rs` | `crates/pi-coding-agent/src/security_scan.rs` | 安全扫描 |
+| `crates/pi/src/secret_screener.rs` | `crates/pi-coding-agent/src/secret_screener.rs` | Secret screener |
+| `crates/pi/src/crypto_shim.rs` | `crates/pi-coding-agent/src/crypto_shim.rs` | 加密垫片 |
+| `crates/pi/src/crash.rs` | `crates/pi-coding-agent/src/crash.rs` | 崩溃恢复 |
+| `crates/pi/src/build.rs` | `crates/pi-coding-agent/build.rs` | 构建脚本 |
+| `crates/pi/src/perf_build.rs` | `crates/pi-coding-agent/src/perf_build.rs` | 性能构建 |
+| `crates/pi/src/self_update.rs` | `crates/pi-coding-agent/src/self_update.rs` | 自更新 |
+| `crates/pi/src/version_check.rs` | `crates/pi-coding-agent/src/version_check.rs` | 版本检查 |
+| `crates/pi/src/workspace.rs` | `crates/pi-coding-agent/src/workspace.rs` | Workspace |
+| `crates/pi/src/semantic_workspace_graph.rs` | `crates/pi-coding-agent/src/semantic_workspace_graph.rs` | 工作区图 |
+| `crates/pi/src/workspace_trust.rs` | `crates/pi-coding-agent/src/workspace_trust.rs` | 工作区信任 |
+| `crates/pi/src/context_files.rs` | `crates/pi-coding-agent/src/context_files.rs` | Context 文件 |
+| `crates/pi/src/platform.rs` | `crates/pi-coding-agent/src/platform.rs` | 平台垫片 |
+| `crates/pi/src/permissions.rs` | `crates/pi-coding-agent/src/permissions.rs` | 权限 |
+| `crates/pi/src/approval.rs` | `crates/pi-coding-agent/src/approval.rs` | 审批 |
+| `crates/pi/src/bash_mediation.rs` | `crates/pi-coding-agent/src/bash_mediation.rs` | Bash 媒介 |
+| `crates/pi/src/computer.rs` | `crates/pi-coding-agent/src/computer.rs` | Computer use |
+| `crates/pi/src/browser.rs` | `crates/pi-coding-agent/src/browser.rs` | Browser |
+| `crates/pi/src/enforcement.rs` | `crates/pi-coding-agent/src/enforcement.rs` | 强制 |
+| `crates/pi/src/keybindings.rs` | `crates/pi-coding-agent/src/keybindings.rs` | 键绑定 |
+| `crates/pi/src/url_read.rs` | `crates/pi-coding-agent/src/url_read.rs` | URL 读取 |
+| `crates/pi/src/url_router.rs` | `crates/pi-coding-agent/src/url_router.rs` | URL 路由 |
+| `crates/pi/src/undo.rs` | `crates/pi-coding-agent/src/undo.rs` | Undo |
+| `crates/pi/src/turn_recovery.rs` | `crates/pi-coding-agent/src/turn_recovery.rs` | 回合恢复 |
+| `crates/pi/src/stats.rs` | `crates/pi-coding-agent/src/stats.rs` | 统计 |
+| `crates/pi/src/doctor.rs` | `crates/pi-coding-agent/src/doctor.rs` | Doctor |
+| `crates/pi/src/markdown_rich.rs` | `crates/pi-coding-agent/src/markdown_rich.rs` | Markdown |
+| `crates/pi/src/status_line.rs` | `crates/pi-coding-agent/src/status_line.rs` | 状态行 |
+| `crates/pi/src/overlay_system.rs` | `crates/pi-coding-agent/src/overlay_system.rs` | Overlay |
+| `crates/pi/src/gallery.rs` | `crates/pi-coding-agent/src/gallery.rs` | Gallery |
+| `crates/pi/src/theme.rs` | `crates/pi-coding-agent/src/theme.rs` | 主题 |
+| `crates/pi/src/current_time.rs` | `crates/pi-coding-agent/src/current_time.rs` | 当前时间 |
+| `crates/pi/src/snapshot.rs` | `crates/pi-coding-agent/src/snapshot.rs` | Snapshot |
+| `crates/pi/src/checkpoint.rs` | `crates/pi-coding-agent/src/checkpoint.rs` | Checkpoint |
+
+#### 2.3.2 `extensions/` 子目录 (15 文件 + 14 测试 = 29 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/extensions/mod.rs` | `crates/pi-coding-agent/src/extensions/mod.rs` | 扩展模块根 |
+| `crates/pi/src/extensions.rs` | `crates/pi-coding-agent/src/extensions_api.rs` | API 层(改名避免冲突) |
+| `crates/pi/src/extensions/compatibility.rs` | `crates/pi-coding-agent/src/extensions/compatibility.rs` | 兼容层 |
+| `crates/pi/src/extensions/event_coalescer_impl.rs` | `crates/pi-coding-agent/src/extensions/event_coalescer_impl.rs` | 事件合并 |
+| `crates/pi/src/extensions/exec_mediation.rs` | `crates/pi-coding-agent/src/extensions/exec_mediation.rs` | 执行媒介 |
+| `crates/pi/src/extensions/extension_manager_impl.rs` | `crates/pi-coding-agent/src/extensions/extension_manager_impl.rs` | 扩展管理 |
+| `crates/pi/src/extensions/fs_connector.rs` | `crates/pi-coding-agent/src/extensions/fs_connector.rs` | FS connector |
+| `crates/pi/src/extensions/native_runtime.rs` | `crates/pi-coding-agent/src/extensions/native_runtime.rs` | Native runtime |
+| `crates/pi/src/extensions/native_runtime_experimental.rs` | `crates/pi-coding-agent/src/extensions/native_runtime_experimental.rs` | 实验 runtime |
+| `crates/pi/src/extensions/permission_drift.rs` | `crates/pi-coding-agent/src/extensions/permission_drift.rs` | 权限漂移 |
+| `crates/pi/src/extensions/policy_snapshot_tests.rs` | `crates/pi-coding-agent/src/extensions/policy_snapshot_tests.rs` | 策略快照测试 |
+| `crates/pi/src/extensions/protocol.rs` | `crates/pi-coding-agent/src/extensions/protocol.rs` | 扩展协议 |
+| `crates/pi/src/extensions/wasm_host.rs` | `crates/pi-coding-agent/src/extensions/wasm_host.rs` | WASM host |
+| `crates/pi/src/extensions/tests.rs` | `crates/pi-coding-agent/src/extensions/tests.rs` | 扩展测试 |
+| `crates/pi/src/extensions/tests/*.rs` | `crates/pi-coding-agent/src/extensions/tests/*.rs` | (14 文件批量) |
+| `crates/pi/src/extension_conformance_matrix.rs` | `crates/pi-coding-agent/src/extension_conformance_matrix.rs` | 扩展一致性矩阵 |
+| `crates/pi/src/extension_dispatcher.rs` | `crates/pi-coding-agent/src/extension_dispatcher.rs` | 扩展分发器 |
+| `crates/pi/src/extension_events.rs` | `crates/pi-coding-agent/src/extension_events.rs` | 扩展事件 |
+| `crates/pi/src/extension_index.rs` | `crates/pi-coding-agent/src/extension_index.rs` | 扩展索引 |
+| `crates/pi/src/extension_license.rs` | `crates/pi-coding-agent/src/extension_license.rs` | 扩展许可 |
+| `crates/pi/src/extension_popularity.rs` | `crates/pi-coding-agent/src/extension_popularity.rs` | 扩展流行度 |
+| `crates/pi/src/extension_preflight.rs` | `crates/pi-coding-agent/src/extension_preflight.rs` | 扩展预检 |
+| `crates/pi/src/extension_replay.rs` | `crates/pi-coding-agent/src/extension_replay.rs` | 扩展回放 |
+| `crates/pi/src/extension_scoring.rs` | `crates/pi-coding-agent/src/extension_scoring.rs` | 扩展评分 |
+| `crates/pi/src/extension_tools.rs` | `crates/pi-coding-agent/src/extension_tools.rs` | 扩展工具 |
+| `crates/pi/src/extension_validation.rs` | `crates/pi-coding-agent/src/extension_validation.rs` | 扩展校验 |
+| `crates/pi/src/extension_inclusion.rs` | `crates/pi-coding-agent/src/extension_inclusion.rs` | 扩展包含 |
+| `crates/pi/src/conformance.rs` | `crates/pi-coding-agent/src/conformance.rs` | 一致性 |
+| `crates/pi/src/conformance_shapes.rs` | `crates/pi-coding-agent/src/conformance_shapes.rs` | 一致性形状 |
+
+#### 2.3.3 `mcp/` 子目录 (4 文件)
+
+| 源文件 | 目标路径 |
+|---|---|
+| `crates/pi/src/mcp/mod.rs` | `crates/pi-coding-agent/src/mcp/mod.rs` |
+| `crates/pi/src/mcp/config.rs` | `crates/pi-coding-agent/src/mcp/config.rs` |
+| `crates/pi/src/mcp/manager.rs` | `crates/pi-coding-agent/src/mcp/manager.rs` |
+| `crates/pi/src/mcp/transport.rs` | `crates/pi-coding-agent/src/mcp/transport.rs` |
+| `crates/pi/src/mcp/trust.rs` | `crates/pi-coding-agent/src/mcp/trust.rs` |
+
+#### 2.3.4 `connectors/` (2 文件)
+
+| 源文件 | 目标路径 |
+|---|---|
+| `crates/pi/src/connectors/mod.rs` | `crates/pi-coding-agent/src/connectors/mod.rs` |
+| `crates/pi/src/connectors/http.rs` | `crates/pi-coding-agent/src/connectors/http.rs` |
+
+### 2.4 → `crates/pi-tui/` (30 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/tui.rs` | `crates/pi-tui/src/tui.rs` | TUI 主类型 |
+| `crates/pi/src/interactive.rs` | `crates/pi-tui/src/interactive.rs` | 交互 |
+| `crates/pi/src/interactive_ftui.rs` | `crates/pi-tui/src/interactive_ftui.rs` | ftui 集成 |
+| `crates/pi/src/autocomplete.rs` | `crates/pi-tui/src/autocomplete.rs` | 自动补全 |
+| `crates/pi/src/terminal_images.rs` | `crates/pi-tui/src/terminal_images.rs` | 终端图像 |
+| `crates/pi/src/interactive/mod.rs` | `crates/pi-tui/src/interactive/mod.rs` | Interactive 模块根 |
+| `crates/pi/src/interactive/agent.rs` | `crates/pi-tui/src/interactive/agent.rs` | |
+| `crates/pi/src/interactive/commands.rs` | `crates/pi-tui/src/interactive/commands.rs` | |
+| `crates/pi/src/interactive/conversation.rs` | `crates/pi-tui/src/interactive/conversation.rs` | |
+| `crates/pi/src/interactive/ext_session.rs` | `crates/pi-tui/src/interactive/ext_session.rs` | |
+| `crates/pi/src/interactive/file_refs.rs` | `crates/pi-tui/src/interactive/file_refs.rs` | |
+| `crates/pi/src/interactive/keybindings.rs` | `crates/pi-tui/src/interactive/keybindings.rs` | |
+| `crates/pi/src/interactive/model_selector_ui.rs` | `crates/pi-tui/src/interactive/model_selector_ui.rs` | |
+| `crates/pi/src/interactive/perf.rs` | `crates/pi-tui/src/interactive/perf.rs` | |
+| `crates/pi/src/interactive/share.rs` | `crates/pi-tui/src/interactive/share.rs` | |
+| `crates/pi/src/interactive/state.rs` | `crates/pi-tui/src/interactive/state.rs` | |
+| `crates/pi/src/interactive/tests.rs` | `crates/pi-tui/src/interactive/tests.rs` | |
+| `crates/pi/src/interactive/text_utils.rs` | `crates/pi-tui/src/interactive/text_utils.rs` | |
+| `crates/pi/src/interactive/tool_render.rs` | `crates/pi-tui/src/interactive/tool_render.rs` | |
+| `crates/pi/src/interactive/tree.rs` | `crates/pi-tui/src/interactive/tree.rs` | |
+| `crates/pi/src/interactive/tree_ui.rs` | `crates/pi-tui/src/interactive/tree_ui.rs` | |
+| `crates/pi/src/interactive/view.rs` | `crates/pi-tui/src/interactive/view.rs` | |
+
+### 2.5 → `crates/pi-telemetry/` (3 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/pmu_telemetry.rs` | `crates/pi-telemetry/src/pmu_telemetry.rs` | PMU 遥测 |
+| `crates/pi/src/profiler.rs` | `crates/pi-telemetry/src/profiler.rs` | Profiler |
+| `crates/pi/src/session_metrics.rs` | `crates/pi-telemetry/src/session_metrics.rs` | Session 指标 |
+
+### 2.6 → `crates/pi-protocol/` (10 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/sse.rs` | `crates/pi-protocol/src/sse.rs` | SSE |
+| `crates/pi/src/rpc.rs` | `crates/pi-protocol/src/rpc.rs` | RPC |
+| `crates/pi/src/jsonrpc.rs` | `crates/pi-protocol/src/jsonrpc.rs` | JSON-RPC |
+| `crates/pi/src/acp.rs` | `crates/pi-protocol/src/acp.rs` | ACP |
+| `crates/pi/src/sdk.rs` | `crates/pi-protocol/src/sdk.rs` | SDK |
+| `crates/pi/src/vcr.rs` | `crates/pi-protocol/src/vcr.rs` | VCR |
+| `crates/pi/src/validation_broker.rs` | `crates/pi-protocol/src/validation_broker.rs` | Validation broker |
+| `crates/pi/src/http/mod.rs` | `crates/pi-protocol/src/http/mod.rs` | HTTP 模块根 |
+| `crates/pi/src/http/client.rs` | `crates/pi-protocol/src/http/client.rs` | |
+| `crates/pi/src/http/proxy.rs` | `crates/pi-protocol/src/http/proxy.rs` | |
+| `crates/pi/src/http/sse.rs` | `crates/pi-protocol/src/http/sse.rs` | |
+| `crates/pi/src/http/test_api.rs` | `crates/pi-protocol/src/http/test_api.rs` | |
+| `crates/pi/src/http/test_asupersync.rs` | `crates/pi-protocol/src/http/test_asupersync.rs` | |
+
+### 2.7 → `crates/pi-chord/` (14 文件)
+
+hostcall / buffer / file-lock / 缓冲垫片。
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/hostcall_amac.rs` | `crates/pi-chord/src/hostcall_amac.rs` | AMAC |
+| `crates/pi/src/hostcall_egraph.rs` | `crates/pi-chord/src/hostcall_egraph.rs` | E-graph |
+| `crates/pi/src/hostcall_io_uring_lane.rs` | `crates/pi-chord/src/hostcall_io_uring_lane.rs` | io_uring lane |
+| `crates/pi/src/hostcall_queue.rs` | `crates/pi-chord/src/hostcall_queue.rs` | Queue |
+| `crates/pi/src/hostcall_rewrite.rs` | `crates/pi-chord/src/hostcall_rewrite.rs` | Rewrite |
+| `crates/pi/src/hostcall_s3_fifo.rs` | `crates/pi-chord/src/hostcall_s3_fifo.rs` | S3-FIFO |
+| `crates/pi/src/hostcall_superinstructions.rs` | `crates/pi-chord/src/hostcall_superinstructions.rs` | Superinstructions |
+| `crates/pi/src/hostcall_trace_jit.rs` | `crates/pi-chord/src/hostcall_trace_jit.rs` | Trace JIT |
+| `crates/pi/src/buffer_shim.rs` | `crates/pi-chord/src/buffer_shim.rs` | Buffer shim |
+| `crates/pi/src/file_lock.rs` | `crates/pi-chord/src/file_lock.rs` | File lock |
+| `crates/pi/src/http_shim.rs` | `crates/pi-chord/src/http_shim.rs` | HTTP shim |
+| `crates/pi/src/swarm_activity_ledger.rs` | `crates/pi-chord/src/swarm_activity_ledger.rs` | Swarm ledger |
+| `crates/pi/src/swarm_flight_recorder.rs` | `crates/pi-chord/src/swarm_flight_recorder.rs` | Flight recorder |
+| `crates/pi/src/swarm_progress_slo.rs` | `crates/pi-chord/src/swarm_progress_slo.rs` | Progress SLO |
+| `crates/pi/src/swarm_replay.rs` | `crates/pi-chord/src/swarm_replay.rs` | Replay |
+
+### 2.8 → `crates/pi-client/` (3 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/web_remote.rs` | `crates/pi-client/src/web_remote.rs` | Web remote |
+| `crates/pi/src/web_search.rs` | `crates/pi-client/src/web_search.rs` | Web search |
+| `crates/pi/src/xdev.rs` | `crates/pi-client/src/xdev.rs` | XDev |
+
+### 2.9 → `crates/pi-server/` (8 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/jobs.rs` | `crates/pi-server/src/jobs.rs` | Jobs |
+| `crates/pi/src/github.rs` | `crates/pi-server/src/github.rs` | GitHub |
+| `crates/pi/src/plan.rs` | `crates/pi-server/src/plan.rs` | Plan |
+| `crates/pi/src/review.rs` | `crates/pi-server/src/review.rs` | Review |
+| `crates/pi/src/debug.rs` | `crates/pi-server/src/debug.rs` | Debug |
+| `crates/pi/src/debug/adapters.rs` | `crates/pi-server/src/debug/adapters.rs` | |
+| `crates/pi/src/debug/dap.rs` | `crates/pi-server/src/debug/dap.rs` | |
+| `crates/pi/src/debug/session.rs` | `crates/pi-server/src/debug/session.rs` | |
+| `crates/pi/src/package_manager.rs` | `crates/pi-server/src/package_manager.rs` | Pkg manager |
+| `crates/pi/src/eval.rs` | `crates/pi-server/src/eval.rs` | Eval 入口 |
+| `crates/pi/src/eval/js_kernel.rs` | `crates/pi-server/src/eval/js_kernel.rs` | JS kernel |
+
+### 2.10 → `crates/pi-session-backends/` (10 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/session.rs` | `crates/pi-session-backends/src/session.rs` | Session 主类型 |
+| `crates/pi/src/session_import.rs` | `crates/pi-session-backends/src/session_import.rs` | 导入 |
+| `crates/pi/src/session_index.rs` | `crates/pi-session-backends/src/session_index.rs` | 索引 |
+| `crates/pi/src/session_picker.rs` | `crates/pi-session-backends/src/session_picker.rs` | Picker |
+| `crates/pi/src/session_sqlite.rs` | `crates/pi-session-backends/src/session_sqlite.rs` | SQLite |
+| `crates/pi/src/session_store_v2.rs` | `crates/pi-session-backends/src/session_store_v2.rs` | Store v2 |
+| `crates/pi/src/session_test.rs` | `crates/pi-session-backends/src/session_test.rs` | 测试 |
+| `crates/pi/src/migrations.rs` | `crates/pi-session-backends/src/migrations.rs` | 迁移 |
+| `crates/pi/src/compaction.rs` | `crates/pi-session-backends/src/compaction.rs` | 压缩 |
+| `crates/pi/src/compaction_snap.rs` | `crates/pi-session-backends/src/compaction_snap.rs` | Snap |
+| `crates/pi/src/compaction_worker.rs` | `crates/pi-session-backends/src/compaction_worker.rs` | Worker |
+
+### 2.11 → `crates/pi-evals/` (4 文件)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/lsp.rs` | `crates/pi-evals/src/lsp.rs` | LSP 入口 |
+| `crates/pi/src/lsp/mod.rs` | `crates/pi-evals/src/lsp/mod.rs` | LSP 模块根 |
+| `crates/pi/src/lsp/client.rs` | `crates/pi-evals/src/lsp/client.rs` | |
+| `crates/pi/src/lsp/edits.rs` | `crates/pi-evals/src/lsp/edits.rs` | |
+| `crates/pi/src/lsp/jsonrpc.rs` | `crates/pi-evals/src/lsp/jsonrpc.rs` | |
+| `crates/pi/src/lsp/registry.rs` | `crates/pi-evals/src/lsp/registry.rs` | |
+| `crates/pi/src/lsp/text.rs` | `crates/pi-evals/src/lsp/text.rs` | |
+| `crates/pi/src/conformance.rs` | (已在 2.3.2) | |
+| `crates/pi/src/conformance_shapes.rs` | (已在 2.3.2) | |
+| `crates/pi/src/extension_conformance_matrix.rs` | (已在 2.3.2) | |
+
+### 2.12 留在 `crates/pi/` (3 文件 —— 最小门面)
+
+| 源文件 | 目标路径 | 备注 |
+|---|---|---|
+| `crates/pi/src/lib.rs` | `crates/pi/src/lib.rs` (重写) | 最小门面,只 `pub use` 11 个 package |
+| `crates/pi/src/main.rs` | (移到 `pi-coding-agent/src/main.rs`) | binary 入口 |
+| `crates/pi/Cargo.toml` | `crates/pi/Cargo.toml` (重写) | 依赖 11 个 package |
+| `crates/pi/src/bin/pi_legacy_capture.rs` | `crates/pi/src/bin/pi_legacy_capture.rs` | 旧 capture binary |
+| `crates/pi/src/bin/pi_mcp_fixture.rs` | `crates/pi/src/bin/pi_mcp_fixture.rs` | MCP fixture binary |
+| `crates/pi/src/eval/py_kernel_server.py` | `crates/pi/src/eval/py_kernel_server.py` | Python 资产 |
+
+### 2.13 辅助归类
+
+| 源文件 | 目标路径 | 理由 |
+|---|---|---|
+| `crates/pi/src/advisor.rs` | `crates/pi-coding-agent/src/advisor.rs` | advisor 与 CLI 工具同源 |
+| `crates/pi/src/ask.rs` | `crates/pi-coding-agent/src/ask.rs` | 问答工具 |
+| `crates/pi/src/btw.rs` | `crates/pi-coding-agent/src/btw.rs` | BTW |
+| `crates/pi/src/commit_split.rs` | `crates/pi-coding-agent/src/commit_split.rs` | 提交拆分 |
+| `crates/pi/src/extension_inclusion.rs` | `crates/pi-coding-agent/src/extension_inclusion.rs` | (已在 2.3.2) |
+| `crates/pi/src/gc.rs` | `crates/pi-coding-agent/src/gc.rs` | 垃圾回收工具 |
+| `crates/pi/src/hub.rs` | `crates/pi-coding-agent/src/hub.rs` | Hub UI |
+| `crates/pi/src/jobs.rs` | (已在 2.9) | |
+| `crates/pi/src/media_tools.rs` | `crates/pi-coding-agent/src/media_tools.rs` | 媒体工具 |
+| `crates/pi/src/pi_wasm.rs` | `crates/pi-coding-agent/src/pi_wasm.rs` | WASM 入口 |
+| `crates/pi/src/resources.rs` | `crates/pi-coding-agent/src/resources.rs` | 资源 |
+| `crates/pi/src/todo.rs` | `crates/pi-coding-agent/src/todo.rs` | Todo |
+| `crates/pi/src/tools.rs` | `crates/pi-coding-agent/src/tools.rs` | Tools 集合 |
+| `crates/pi/src/worktree_iso.rs` | `crates/pi-coding-agent/src/worktree_iso.rs` | Worktree isolation |
+| `crates/pi/src/conformance.rs` | (已在 2.3.2) | |
+
+---
+
+## 3. 完整数量核对 (224 文件)
+
+| package | 文件数 |
+|---|---|
+| `pi-ai` | 29 |
+| `pi-agent-core` | 10 |
+| `pi-coding-agent` (含 extensions/mcp/connectors) | 76 |
+| `pi-tui` (含 interactive/) | 30 |
+| `pi-telemetry` | 3 |
+| `pi-protocol` (含 http/) | 13 |
+| `pi-chord` | 15 |
+| `pi-client` | 3 |
+| `pi-server` (含 debug/eval) | 11 |
+| `pi-session-backends` | 11 |
+| `pi-evals` (含 lsp/) | 7 |
+| `pi/` (保留门面 + 二进制) | 5 |
+| `extensions/tests/*.rs` | 14 |
+| **总计** | **227** (含 3 个跨域重复条目已注明) |
+
+---
+
+## 4. 执行步骤 (批量 git mv)
+
+### Round 12 — 预演 + 准备
+
+```bash
+# 1) 备份当前 lib.rs (留作比对)
+cp crates/pi/src/lib.rs /tmp/lib_pre_migration.rs
+
+# 2) 创建目标目录(空目录)
+mkdir -p crates/pi-{ai,agent-core,coding-agent,tui,telemetry,protocol,chord,client,server,session-backends,evals}/src
+```
+
+### Round 13 — 批量 git mv (按 package 分批提交)
+
+每批单独一个 commit,便于 bisect:
+
+```bash
+# batch 1: pi-ai
+git mv crates/pi/src/bpe.rs          crates/pi-ai/src/
+git mv crates/pi/src/model.rs        crates/pi-ai/src/
+git mv crates/pi/src/models.rs       crates/pi-ai/src/
+# ... (29 个文件)
+
+# batch 2: pi-agent-core
+# batch 3: pi-coding-agent 顶层
+# batch 4: pi-coding-agent/extensions
+# batch 5: pi-coding-agent/mcp
+# batch 6: pi-coding-agent/connectors
+# batch 7: pi-tui
+# batch 8: pi-telemetry
+# batch 9: pi-protocol (含 http/)
+# batch 10: pi-chord
+# batch 11: pi-client
+# batch 12: pi-server
+# batch 13: pi-session-backends
+# batch 14: pi-evals (lsp/)
+# batch 15: 移动 main.rs → pi-coding-agent
+# batch 16: 重写 crates/pi/src/lib.rs 为门面
+```
+
+### Round 14 — `use` 语句重写 + Cargo.toml 依赖更新
+
+每个 `use crate::xxx` → `use pi_xxx::xxx`。
+`Cargo.toml` 的 `[dependencies]` 按归位表逐 package 添加。
+
+### Round 15 — 验证
+
+```bash
+cargo clean        # 磁盘不足时强制清理
+cargo check --workspace --all-targets
+cargo fmt --check
+cargo clippy --workspace -- -D warnings
+cargo test --workspace --no-run
+```
+
+### Round 16 — 提交并推送
+
+```bash
+git add -A
+git commit -m "modular: split crates/pi into 11 phase-2 packages (Round 12-16)"
+git push origin feature/crates0911
+```
+
+---
+
+## 5. 风险与约束
+
+1. **磁盘空间**:每次 `cargo check` 增量都增长,执行 Round 15 前 `cargo clean` 释放
+2. **循环依赖**:严格按 package 依赖图,任何反向引用 `pub use pi-coding-agent::*` 在 `pi-ai` 都视为违规
+3. **测试互依赖**:`extensions/tests/*.rs` 中可能存在跨包 `use`,需逐文件修复
+4. **二进制入口**:最终 `pi-coding-agent` 是唯一 binary crate,`pi-mono` 是 lib-only 门面
+5. **本计划执行期间不修改 leaf crate** —— 仅做目录迁移,内部代码改动在后续轮次
+
+---
+
+## 6. 进度对照
+
+- **Phase-1 (已完成)**:Round 1-11 抽出 51 个 leaf crate,后回滚 5 个,剩余 46 个
+- **Phase-2 骨架 (已完成)**:11 个顶层 aggregator 骨架就位(commit `3dd1ee0b`)
+- **本计划 (待执行)**:把 `crates/pi/src/` 的 224 个 `.rs` 文件按本表批量 mv 到对应 package
+- **完成度估算**:本计划执行后,模块化进度将达到 **80%+**(只剩 `crates/pi` 自身门面 + leaf 内部细化)
+- **剩余工作**:leaf 内部细化拆分(每个 Phase-2 包内的 leaf 边界调整)、`pi-mono` 整合门面、binary 重定位
+
+---
+
+> 本文档版本:v1.0(2026-09-13)
+> 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`

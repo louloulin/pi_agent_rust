@@ -1,7 +1,9 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-client`:
-//! transport-neutral client for remote pi sessions over framed bytes
-//! (Rust implementation uses JSON-RPC + HTTP today via `pi-web-remote`).
+//! Phase-2 aggregator mirroring `@earendil-works/pi-client`: client-side
+//! integrations (web_remote, web_search, xdev). After Round 17, the
+//! `pi-web-remote` leaf has been inlined directly here.
 
 #![forbid(unsafe_code)]
 
-pub use pi_web_remote::*;
+pub mod web_remote;
+pub mod web_search;
+pub mod xdev;

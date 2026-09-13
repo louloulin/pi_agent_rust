@@ -3,11 +3,21 @@ name = "pi-protocol"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/pi-protocol: transport-neutral CBOR protocol for remote pi sessions (JSON-RPC + SSE plumbing)"
+description = "Phase-2 aggregator mirroring @earendil-works/pi-protocol: JSON-RPC / SSE / ACP / SDK. After Round 17, pi-jsonrpc and pi-sse are inlined here."
 
 [lints]
 workspace = true
 
 [dependencies]
-pi-jsonrpc = { workspace = true }
-pi-sse = { workspace = true }
+# Aggregator siblings re-exported through the pi facade.
+pi-chord = { workspace = true }
+pi-coding-agent = { workspace = true }
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

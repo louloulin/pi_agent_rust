@@ -3,12 +3,20 @@ name = "pi-telemetry"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/pi-telemetry: vendor-neutral telemetry contracts, profiler, PMU, and session metrics"
+description = "Phase-2 aggregator mirroring @earendil-works/pi-telemetry: PMU telemetry, profiler, session metrics. After Round 17, the Phase-1 leaves are inlined here."
 
 [lints]
 workspace = true
 
 [dependencies]
-pi-pmu-telemetry = { workspace = true }
-pi-profiler = { workspace = true }
-pi-session-metrics = { workspace = true }
+# Aggregator siblings re-exported through the pi facade.
+pi-coding-agent = { workspace = true }
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

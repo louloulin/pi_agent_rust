@@ -3,15 +3,20 @@ name = "pi-chord"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/chord: application composition runtime (services, replicated state, RPC, plugins, hostcall lanes)"
+description = "Phase-2 aggregator mirroring @earendil-works/pi-chord: hostcall / buffer / file-lock runtime. After Round 17, the Phase-1 leaves are inlined here."
 
 [lints]
 workspace = true
 
 [dependencies]
-pi-hostcall-superinstructions = { workspace = true }
-pi-hostcall-io-uring-lane = { workspace = true }
-pi-hostcall-s3-fifo = { workspace = true }
-pi-buffer-shim = { workspace = true }
-pi-http-shim = { workspace = true }
-pi-file-lock = { workspace = true }
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+rustix = { workspace = true }
+regex = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

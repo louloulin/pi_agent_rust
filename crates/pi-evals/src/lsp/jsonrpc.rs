@@ -37,9 +37,9 @@ use serde_json::Value;
 // Re-exported framing primitives from `pi-jsonrpc`. See the module-level docs
 // above for the rationale.
 pub use pi_jsonrpc::{
-    encode_frame, find_subslice, parse_content_length, read_frame, read_frame_with_scratch,
-    CompletionWaitError, EnvPolicy, PublicTailBuffer, RpcErrorObject, ServerNotification,
-    TailBuffer, TransportError, MCP_ENV_ALLOWLIST,
+    CompletionWaitError, EnvPolicy, MCP_ENV_ALLOWLIST, PublicTailBuffer, RpcErrorObject,
+    ServerNotification, TailBuffer, TransportError, encode_frame, find_subslice,
+    parse_content_length, read_frame, read_frame_with_scratch,
 };
 
 use crate::error::{Error, Result};
@@ -58,13 +58,11 @@ const STDERR_TAIL_CAP: usize = 32 * 1024;
 type SharedWriter = Mutex<ChildStdin>;
 
 /// Pending request completions: reader thread sends exactly one result.
-type PendingMap =
-    Mutex<HashMap<u64, StdSyncSender<std::result::Result<Value, TransportError>>>>;
+type PendingMap = Mutex<HashMap<u64, StdSyncSender<std::result::Result<Value, TransportError>>>>;
 
 /// Hook for server→client requests (e.g. `workspace/applyEdit`). Returning
 /// `Some(result)` overrides the default null response.
-pub type ServerRequestHandler =
-    std::sync::Arc<dyn Fn(&str, &Value) -> Option<Value> + Send + Sync>;
+pub type ServerRequestHandler = std::sync::Arc<dyn Fn(&str, &Value) -> Option<Value> + Send + Sync>;
 
 fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex
@@ -117,7 +115,6 @@ pub async fn await_completion<T>(
         asupersync::time::sleep(now, std::time::Duration::from_millis(10)).await;
     }
 }
-
 
 /// Apply the environment policy and the caller's env entries to a command.
 fn apply_env_policy(cmd: &mut Command, policy: &EnvPolicy, env: &[(String, String)]) {

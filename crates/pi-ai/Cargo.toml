@@ -3,20 +3,25 @@ name = "pi-ai"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/pi-ai: unified LLM API, providers, model discovery, tokenization, and per-turn policy"
+description = "Phase-2 aggregator mirroring @earendil-works/pi-ai: unified LLM API, providers, model discovery, tokenization, per-turn policy. After Round 17, the Phase-1 leaves (bpe, delight, dialects, embedded-assets, failover, magic-keywords, model, provider, provider-metadata, stream-rules, token-count) are inlined here."
 
 [lints]
 workspace = true
 
 [dependencies]
-pi-model = { workspace = true }
-pi-provider = { workspace = true }
-pi-provider-metadata = { workspace = true }
-pi-token-count = { workspace = true }
-pi-bpe = { workspace = true }
-pi-failover = { workspace = true }
-pi-stream-rules = { workspace = true }
-pi-delight = { workspace = true }
-pi-magic-keywords = { workspace = true }
-pi-dialects = { workspace = true }
-pi-embedded-assets = { workspace = true }
+# Aggregator siblings re-exported through the pi facade.
+pi-chord = { workspace = true }
+pi-client = { workspace = true }
+pi-coding-agent = { workspace = true }
+pi-protocol = { workspace = true }
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+chrono = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+tiktoken-rs = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

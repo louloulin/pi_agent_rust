@@ -1,11 +1,16 @@
 //! Phase-2 aggregator mirroring `@earendil-works/pi-agent-core`: the
-//! general-purpose agent loop, transport abstraction, and state
-//! management. Downstream monorepos can depend on a single
-//! `pi-agent-core` crate to reach all the underlying pieces.
+//! agent runtime core (cx, hub, scheduler, flake-classifier, etc.). After
+//! Round 17, every Phase-1 leaf has been inlined directly here.
 
 #![forbid(unsafe_code)]
 
-pub use pi_agent_cx::*;
-pub use pi_agent_hub::*;
-pub use pi_flake_classifier::*;
-pub use pi_scheduler::*;
+pub mod agent;
+pub mod agent_cx;
+pub mod agent_hub;
+pub mod flake_classifier;
+pub mod handoff;
+pub mod memory;
+pub mod resource_governor;
+pub mod scheduler;
+pub mod skills_managed;
+pub mod subagents;

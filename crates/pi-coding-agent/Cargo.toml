@@ -3,7 +3,7 @@ name = "pi-coding-agent"
 version = "0.1.0"
 edition.workspace = true
 rust-version.workspace = true
-description = "Phase-2 aggregator mirroring @earendil-works/pi-coding-agent: the CLI binary entry, tools, session, extensions, and persistence"
+description = "Phase-2 aggregator mirroring @earendil-works/pi-coding-agent: the CLI binary entry, tools, session, extensions, and persistence. After Round 17, all Phase-1 leaves are inlined here."
 autobins = false
 
 [[bin]]
@@ -14,25 +14,46 @@ path = "src/main.rs"
 workspace = true
 
 [dependencies]
-pi-cli = { workspace = true }
-pi-workspace = { workspace = true }
-pi-version = { workspace = true }
-pi-self-update = { workspace = true }
-pi-crypto-shim = { workspace = true }
-pi-context-files = { workspace = true }
-pi-secrets = { workspace = true }
-pi-secret-screener = { workspace = true }
-pi-crash = { workspace = true }
-pi-turn-recovery = { workspace = true }
-pi-conformance = { workspace = true }
-pi-gallery = { workspace = true }
-pi-markdown-rich = { workspace = true }
-pi-status-line = { workspace = true }
-pi-overlay-system = { workspace = true }
-pi-undo = { workspace = true }
-pi-platform = { workspace = true }
-pi-stats = { workspace = true }
-pi-extension-replay = { workspace = true }
-pi-extension-scoring = { workspace = true }
-pi-swarm-progress-slo = { workspace = true }
-pi-swarm-activity-ledger = { workspace = true }
+# Aggregator siblings re-exported via the pi facade.
+pi-ai = { workspace = true }
+pi-agent-core = { workspace = true }
+pi-chord = { workspace = true }
+pi-client = { workspace = true }
+pi-protocol = { workspace = true }
+pi-server = { workspace = true }
+pi-session-backends = { workspace = true }
+pi-telemetry = { workspace = true }
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+asupersync = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+crossterm = { workspace = true, optional = true }
+dirs = { workspace = true }
+flate2 = { workspace = true }
+getrandom = { workspace = true }
+globset = { workspace = true }
+hmac = { workspace = true }
+md-5 = { workspace = true }
+pbkdf2 = { workspace = true }
+proptest = { workspace = true, optional = true }
+regex = { workspace = true }
+ring = { workspace = true }
+rquickjs = { workspace = true }
+rustix = { workspace = true }
+scrypt = { workspace = true }
+semver = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha1 = { workspace = true }
+sha2 = { workspace = true }
+signal-hook = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

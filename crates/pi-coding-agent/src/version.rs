@@ -170,7 +170,9 @@ async fn fetch_latest_release_version_from_url<F: HttpFetch>(
     client: &F,
     release_url: &str,
 ) -> Result<String> {
-    let (status, body) = client.fetch_release(release_url, RELEASE_CHECK_TIMEOUT).await?;
+    let (status, body) = client
+        .fetch_release(release_url, RELEASE_CHECK_TIMEOUT)
+        .await?;
     if status != 200 {
         return Err(Error::api(format!(
             "GitHub release lookup failed with status {status}"
@@ -292,12 +294,20 @@ mod tests {
             // Parse the response we just wrote via a fresh socket.
             use std::io::Write as _;
             use std::net::TcpStream;
-            let mut stream =
-                TcpStream::connect(self.url.trim_start_matches("http://").split('/').next().unwrap())
-                    .map_err(|err| Error::api(format!("mock connect: {err}")))?;
+            let mut stream = TcpStream::connect(
+                self.url
+                    .trim_start_matches("http://")
+                    .split('/')
+                    .next()
+                    .unwrap(),
+            )
+            .map_err(|err| Error::api(format!("mock connect: {err}")))?;
             let request = format!(
                 "GET {} HTTP/1.1\r\nHost: 127.0.0.1\r\nAccept: application/vnd.github+json\r\nConnection: close\r\n\r\n",
-                self.url.split_once('/').map(|(_, rest)| format!("/{rest}")).unwrap_or_default()
+                self.url
+                    .split_once('/')
+                    .map(|(_, rest)| format!("/{rest}"))
+                    .unwrap_or_default()
             );
             stream
                 .write_all(request.as_bytes())

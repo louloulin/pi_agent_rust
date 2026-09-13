@@ -1,20 +1,25 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-ai`: the unified LLM
-//! API surface (model + provider + tokenization + policy).
-//!
-//! This crate is a thin re-export of the existing Phase-1 leaf crates so
-//! downstream monorepos and SDK consumers can write `use pi_ai::*;` and
-//! reach every ai-related public API through a single dependency.
+//! Phase-2 aggregator mirroring `@earendil-works/pi-ai`: the AI / Provider
+//! surface (model, provider, token-count, bpe, failover, stream-rules,
+//! delight, magic-keywords, dialects, embedded-assets, etc.). After
+//! Round 17, every Phase-1 leaf that previously re-exported from this
+//! aggregator has been inlined directly here.
 
 #![forbid(unsafe_code)]
 
-pub use pi_bpe::*;
-pub use pi_delight::*;
-pub use pi_dialects::*;
-pub use pi_embedded_assets::*;
-pub use pi_failover::*;
-pub use pi_magic_keywords::*;
-pub use pi_model::*;
-pub use pi_provider::*;
-pub use pi_provider_metadata::*;
-pub use pi_stream_rules::*;
-pub use pi_token_count::*;
+pub mod bpe;
+pub mod delight;
+pub mod dialects;
+pub mod embedded_assets;
+pub mod error_hints;
+pub mod failover;
+pub mod magic_keywords;
+pub mod model;
+pub mod model_routing;
+pub mod model_selector;
+pub mod models;
+pub mod provider;
+pub mod provider_metadata;
+pub mod stream_rules;
+pub mod token_count;
+pub mod usage;
+pub mod providers;

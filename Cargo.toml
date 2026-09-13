@@ -11,65 +11,16 @@ members = [
     "crates/pi",
     "crates/pi-ai",
     "crates/pi-agent-core",
-    "crates/pi-agent-cx",
-    "crates/pi-agent-hub",
-    "crates/pi-bpe",
     "crates/pi-mono",
-    "crates/pi-buffer-shim",
     "crates/pi-chord",
-    "crates/pi-cli",
     "crates/pi-client",
     "crates/pi-coding-agent",
-    "crates/pi-context-files",
-    "crates/pi-crypto-shim",
-    "crates/pi-delight",
-    "crates/pi-dialects",
-    "crates/pi-embedded-assets",
-    "crates/pi-error",
     "crates/pi-evals",
-    "crates/pi-failover",
-    "crates/pi-file-lock",
-    "crates/pi-flake-classifier",
-    "crates/pi-hostcall-superinstructions",
-    "crates/pi-hostcall-io-uring-lane",
-    "crates/pi-hostcall-s3-fifo",
-    "crates/pi-swarm-progress-slo",
-    "crates/pi-extension-replay",
-    "crates/pi-swarm-activity-ledger",
-    "crates/pi-extension-scoring",
-    "crates/pi-scheduler",
-    "crates/pi-secrets",
-    "crates/pi-secret-screener",
-    "crates/pi-self-update",
     "crates/pi-server",
     "crates/pi-session-backends",
-    "crates/pi-conformance",
-    "crates/pi-crash",
-    "crates/pi-gallery",
-    "crates/pi-http-shim",
-    "crates/pi-jsonrpc",
-    "crates/pi-markdown-rich",
-    "crates/pi-magic-keywords",
-    "crates/pi-model",
-    "crates/pi-overlay-system",
-    "crates/pi-platform",
-    "crates/pi-profiler",
     "crates/pi-protocol",
-    "crates/pi-provider",
-    "crates/pi-provider-metadata",
-    "crates/pi-session-metrics",
-    "crates/pi-sse",
-    "crates/pi-stats",
-    "crates/pi-status-line",
-    "crates/pi-stream-rules",
     "crates/pi-telemetry",
-    "crates/pi-token-count",
-    "crates/pi-turn-recovery",
     "crates/pi-tui",
-    "crates/pi-undo",
-    "crates/pi-version",
-    "crates/pi-web-remote",
-    "crates/pi-workspace",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -94,7 +45,7 @@ readme = "README.md"
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"
 
-# Stage 2 leaf crates (workspace-internal path deps, single source of truth).
+# Phase-2 top-level packages (single source of truth) — Round 17 inlined all leaves.
 # Phase-2 top-level package crates (aggregators mirroring
 # @earendil-works/pi packages).
 pi-ai = { path = "crates/pi-ai", version = "0.1.0" }
@@ -108,57 +59,7 @@ pi-client = { path = "crates/pi-client", version = "0.1.0" }
 pi-server = { path = "crates/pi-server", version = "0.1.0" }
 pi-session-backends = { path = "crates/pi-session-backends", version = "0.1.0" }
 pi-evals = { path = "crates/pi-evals", version = "0.1.0" }
-# Phase-1 leaf crates (kept as workspace-internal path deps).
-pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
-pi-agent-hub = { path = "crates/pi-agent-hub", version = "0.1.0" }
-pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
-pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
-pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
-pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
-pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
-pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
-pi-dialects = { path = "crates/pi-dialects", version = "0.1.0" }
-pi-embedded-assets = { path = "crates/pi-embedded-assets", version = "0.1.0" }
-pi-error = { path = "crates/pi-error", version = "0.1.0" }
-pi-failover = { path = "crates/pi-failover", version = "0.1.0" }
-pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }
-pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
-pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
-pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
-pi-version = { path = "crates/pi-version", version = "0.1.0" }
-pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
-pi-workspace = { path = "crates/pi-workspace", version = "0.1.0" }
-pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
-pi-hostcall-superinstructions = { path = "crates/pi-hostcall-superinstructions", version = "0.1.0" }
-pi-hostcall-io-uring-lane = { path = "crates/pi-hostcall-io-uring-lane", version = "0.1.0" }
-pi-hostcall-s3-fifo = { path = "crates/pi-hostcall-s3-fifo", version = "0.1.0" }
-pi-swarm-progress-slo = { path = "crates/pi-swarm-progress-slo", version = "0.1.0" }
-pi-extension-replay = { path = "crates/pi-extension-replay", version = "0.1.0" }
-pi-swarm-activity-ledger = { path = "crates/pi-swarm-activity-ledger", version = "0.1.0" }
-pi-extension-scoring = { path = "crates/pi-extension-scoring", version = "0.1.0" }
-pi-scheduler = { path = "crates/pi-scheduler", version = "0.1.0" }
-pi-secrets = { path = "crates/pi-secrets", version = "0.1.0" }
-pi-secret-screener = { path = "crates/pi-secret-screener", version = "0.1.0" }
-pi-self-update = { path = "crates/pi-self-update", version = "0.1.0" }
-pi-conformance = { path = "crates/pi-conformance", version = "0.1.0" }
-pi-crash = { path = "crates/pi-crash", version = "0.1.0" }
-pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
-pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
-pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }
-pi-model = { path = "crates/pi-model", version = "0.1.0" }
-pi-magic-keywords = { path = "crates/pi-magic-keywords", version = "0.1.0" }
-pi-overlay-system = { path = "crates/pi-overlay-system", version = "0.1.0" }
-pi-platform = { path = "crates/pi-platform", version = "0.4.0" }
-pi-pmu-telemetry = { path = "crates/pi-pmu-telemetry", version = "0.1.0" }
-pi-profiler = { path = "crates/pi-profiler", version = "0.1.0" }
-pi-provider = { path = "crates/pi-provider", version = "0.1.0" }
-pi-provider-metadata = { path = "crates/pi-provider-metadata", version = "0.1.0" }
-pi-sse = { path = "crates/pi-sse", version = "0.1.0" }
-pi-stats = { path = "crates/pi-stats", version = "0.1.0" }
-pi-status-line = { path = "crates/pi-status-line", version = "0.1.0" }
-pi-stream-rules = { path = "crates/pi-stream-rules", version = "0.1.0" }
-pi-token-count = { path = "crates/pi-token-count", version = "0.1.0" }
-pi-turn-recovery = { path = "crates/pi-turn-recovery", version = "0.1.0" }
+# Phase-1 leaf crates removed (Round 17): inlined into the 11 Phase-2 packages.
 
 # Async runtime
 asupersync = { version = "0.4.4", default-features = false, features = ["tls-webpki-roots", "tls-native-roots", "test-internals"] }

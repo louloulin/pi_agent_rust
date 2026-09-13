@@ -1,8 +1,9 @@
-//! Phase-2 aggregator mirroring `@earendil-works/pi-telemetry`: vendor-neutral
-//! telemetry contracts, profiler, PMU, and session metrics.
+//! Phase-2 aggregator mirroring `@earendil-works/pi-telemetry`: PMU
+//! telemetry, profiler, session metrics. After Round 17, every Phase-1
+//! leaf has been inlined directly here.
 
 #![forbid(unsafe_code)]
 
-pub use pi_pmu_telemetry::*;
-pub use pi_profiler::*;
-pub use pi_session_metrics::*;
+pub mod pmu_telemetry;
+pub mod profiler;
+pub mod session_metrics;

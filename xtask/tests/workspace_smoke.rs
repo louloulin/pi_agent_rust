@@ -22,9 +22,16 @@ fn workspace_root_resolves_and_lists_expected_members() {
     let meta = workspace_meta();
 
     // The workspace root itself must be present and unique.
-    assert_eq!(meta.workspace_root.as_os_str().len(), meta.workspace_root.as_os_str().len(), "workspace_root must be a single path");
-    assert!(meta.workspace_root.is_absolute() || meta.workspace_root.starts_with("."),
-        "workspace_root should resolve to a real path; got {:?}", meta.workspace_root);
+    assert_eq!(
+        meta.workspace_root.as_os_str().len(),
+        meta.workspace_root.as_os_str().len(),
+        "workspace_root must be a single path"
+    );
+    assert!(
+        meta.workspace_root.is_absolute() || meta.workspace_root.starts_with("."),
+        "workspace_root should resolve to a real path; got {:?}",
+        meta.workspace_root
+    );
 
     let declared: BTreeSet<String> = meta
         .workspace_members
@@ -79,7 +86,12 @@ fn pi_mono_depends_on_pi_via_path() {
         .dependencies
         .iter()
         .find(|d| d.name == "pi")
-        .unwrap_or_else(|| panic!("`pi-mono` must depend on `pi`; got: {:?}", pi_mono.dependencies));
+        .unwrap_or_else(|| {
+            panic!(
+                "`pi-mono` must depend on `pi`; got: {:?}",
+                pi_mono.dependencies
+            )
+        });
 
     let expected_path = meta.workspace_root.join("crates/pi");
     let dep_path = pi_dep.path.as_deref();
@@ -114,6 +126,10 @@ fn xtask_is_publish_false_and_exposes_binary() {
         has_bin,
         "`xtask` package must expose a binary target named `xtask`; \
          got targets: {:?}",
-        xtask.targets.iter().map(|t| (&t.name, &t.kind)).collect::<Vec<_>>()
+        xtask
+            .targets
+            .iter()
+            .map(|t| (&t.name, &t.kind))
+            .collect::<Vec<_>>()
     );
 }

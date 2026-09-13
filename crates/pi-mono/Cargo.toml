@@ -16,10 +16,24 @@ path = "src/lib.rs"
 [dependencies]
 # Aggregator: re-export the public surface from the workspace's primary crate
 # so SDK consumers and downstream monorepos can `use pi_mono::pi as pi;` from
-# a single workspace dependency. Phase-1 keeps this thin — later stages will
-# add cross-crate re-exports for chord/tui/telemetry/ai/agent/protocol/...
-# mirroring @earendil-works/* packages.
+# a single workspace dependency.
+# Round 22: expand to mirror the upstream `@earendil-works/pi-mono` layout —
+# re-export every phase-2 top-level package plus the two Rust-only helper
+# crates (`pi-error`, `pi-provider-metadata`) so downstream consumers can
+# `use pi_mono::chord::*`, `pi_mono::coding_agent::*`, etc.
 pi = { path = "../pi" }
+pi-ai = { workspace = true }
+pi-agent-core = { workspace = true }
+pi-chord = { workspace = true }
+pi-client = { workspace = true }
+pi-coding-agent = { workspace = true }
+pi-error = { workspace = true }
+pi-evals = { workspace = true }
+pi-protocol = { workspace = true }
+pi-server = { workspace = true }
+pi-session-backends = { workspace = true }
+pi-telemetry = { workspace = true }
+pi-tui = { workspace = true }
 
 [lints]
 workspace = true

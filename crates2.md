@@ -1183,9 +1183,26 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.24(2026-09-13)
+> 本文档版本:v2.25(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 34 — `turn_recovery.rs` → `pi-chord` ✅(StopReason → RecoveryClass)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/turn_recovery.rs crates/pi-chord/src/turn_recovery.rs`(398 LOC,纯 std + `pi_ai::model::StopReason`,零 `crate::` 自依赖)
+2. 内容:`TURN_RECOVERY_SCHEMA` 常量 + `MAX_AUTO_CONTINUATIONS` + `TurnRecoveryMode` enum + `RecoveryClass` enum + `classify(stop_reason, text)` + `RecoveryAction / TurnRecoveryState` —— 把模型 `StopReason` 分类成 retry / continue / give-up 三档,支撑 agent loop 自动续接
+3. `pi-chord/Cargo.toml` 加 `pi-ai = { workspace = true }`
+4. `pi-chord/src/lib.rs` 加 `pub mod turn_recovery;` + 文档条目
+5. `pi-coding-agent/src/lib.rs` 替换 `pub mod turn_recovery;` 为 `pub use pi_chord::turn_recovery;`
+
+**验证:**
+- 磁盘满 → `cargo clean`(释放 16.1 GiB)
+- `cargo check -p pi-chord`:✅ Finished in 1m 49s(0 errors)
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 2m 46s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 2m 05s(0 errors)
+
+**LOC 迁移:** 398 LOC。pi-chord 现在持有 19 个模块。
 
 ### Round 33 — `version.rs` → `pi-chord` ✅(semver + HttpFetch trait)
 

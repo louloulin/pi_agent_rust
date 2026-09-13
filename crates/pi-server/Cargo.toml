@@ -1,0 +1,13 @@
+[package]
+name = "pi-server"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 placeholder mirroring @earendil-works/pi-server: experimental server surface (currently empty)"
+
+[lints]
+workspace = true
+
+[dependencies]
+# No leaf crates yet. The Rust port's server-side will likely be built
+# on top of pi-coding-agent + pi-chord in a later round.

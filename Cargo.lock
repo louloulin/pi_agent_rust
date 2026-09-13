@@ -5669,6 +5669,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-agent-core"
+version = "0.1.0"
+dependencies = [
+ "pi-agent-cx",
+ "pi-agent-hub",
+ "pi-flake-classifier",
+ "pi-scheduler",
+]
+
+[[package]]
 name = "pi-agent-cx"
 version = "0.1.0"
 dependencies = [
@@ -5687,6 +5697,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-ai"
+version = "0.1.0"
+dependencies = [
+ "pi-bpe",
+ "pi-delight",
+ "pi-dialects",
+ "pi-embedded-assets",
+ "pi-failover",
+ "pi-magic-keywords",
+ "pi-model",
+ "pi-provider",
+ "pi-provider-metadata",
+ "pi-stream-rules",
+ "pi-token-count",
+]
+
+[[package]]
 name = "pi-bpe"
 version = "0.1.0"
 dependencies = [
@@ -5700,11 +5727,58 @@ name = "pi-buffer-shim"
 version = "0.1.0"
 
 [[package]]
+name = "pi-chord"
+version = "0.1.0"
+dependencies = [
+ "pi-buffer-shim",
+ "pi-file-lock",
+ "pi-hostcall-io-uring-lane",
+ "pi-hostcall-s3-fifo",
+ "pi-hostcall-superinstructions",
+ "pi-http-shim",
+]
+
+[[package]]
 name = "pi-cli"
 version = "0.1.0"
 dependencies = [
  "clap",
  "proptest",
+]
+
+[[package]]
+name = "pi-client"
+version = "0.1.0"
+dependencies = [
+ "pi-web-remote",
+]
+
+[[package]]
+name = "pi-coding-agent"
+version = "0.1.0"
+dependencies = [
+ "pi-cli",
+ "pi-conformance",
+ "pi-context-files",
+ "pi-crash",
+ "pi-crypto-shim",
+ "pi-extension-replay",
+ "pi-extension-scoring",
+ "pi-gallery",
+ "pi-markdown-rich",
+ "pi-overlay-system",
+ "pi-platform",
+ "pi-secret-screener",
+ "pi-secrets",
+ "pi-self-update",
+ "pi-stats",
+ "pi-status-line",
+ "pi-swarm-activity-ledger",
+ "pi-swarm-progress-slo",
+ "pi-turn-recovery",
+ "pi-undo",
+ "pi-version",
+ "pi-workspace",
 ]
 
 [[package]]
@@ -5798,6 +5872,10 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.20",
 ]
+
+[[package]]
+name = "pi-evals"
+version = "0.1.0"
 
 [[package]]
 name = "pi-extension-replay"
@@ -5956,6 +6034,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-protocol"
+version = "0.1.0"
+dependencies = [
+ "pi-jsonrpc",
+ "pi-sse",
+]
+
+[[package]]
 name = "pi-provider"
 version = "0.1.0"
 dependencies = [
@@ -6014,6 +6100,14 @@ dependencies = [
  "sha2 0.11.0",
  "tracing",
 ]
+
+[[package]]
+name = "pi-server"
+version = "0.1.0"
+
+[[package]]
+name = "pi-session-backends"
+version = "0.1.0"
 
 [[package]]
 name = "pi-session-metrics"
@@ -6083,11 +6177,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-telemetry"
+version = "0.1.0"
+dependencies = [
+ "pi-pmu-telemetry",
+ "pi-profiler",
+ "pi-session-metrics",
+]
+
+[[package]]
 name = "pi-token-count"
 version = "0.1.0"
 dependencies = [
  "tiktoken-rs",
 ]
+
+[[package]]
+name = "pi-tui"
+version = "0.1.0"
 
 [[package]]
 name = "pi-turn-recovery"

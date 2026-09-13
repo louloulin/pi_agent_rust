@@ -1,0 +1,15 @@
+[package]
+name = "pi-evals"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 placeholder mirroring @earendil-works/pi-evals: evaluation harness (currently empty; the Rust port's conformance suite lives in crates/pi-conformance)"
+
+[lints]
+workspace = true
+
+[dependencies]
+# The Rust port's conformance/eval test suite currently lives in
+# `crates/pi-conformance` and a few integration tests under
+# `crates/pi/tests/`. Future rounds may consolidate those behind
+# `pi-evals` to match the upstream structure.

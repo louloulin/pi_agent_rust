@@ -1,0 +1,13 @@
+[package]
+name = "pi-protocol"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-protocol: transport-neutral CBOR protocol for remote pi sessions (JSON-RPC + SSE plumbing)"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-jsonrpc = { workspace = true }
+pi-sse = { workspace = true }

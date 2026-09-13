@@ -1,22 +1,32 @@
 [workspace]
 resolver = "2"
-# Phase-1 modularization of pi.rs. The legacy single-crate tree was relocated
-# to crates/pi/ unchanged; crates/pi-mono is the workspace aggregator;
-# xtask hosts workspace plumbing (cargo xtask ci).
+# Phase-2 modularization of pi.rs. The legacy single-crate tree was
+# relocated to crates/pi/ unchanged; crates/pi-mono is the workspace
+# aggregator; the 11 phase-2 top-level package crates (pi-ai,
+# pi-agent-core, pi-coding-agent, pi-tui, pi-telemetry, pi-protocol,
+# pi-chord, pi-client, pi-server, pi-session-backends, pi-evals)
+# mirror the @earendil-works/pi packages structure. xtask hosts
+# workspace plumbing (cargo xtask ci).
 members = [
     "crates/pi",
+    "crates/pi-ai",
+    "crates/pi-agent-core",
     "crates/pi-agent-cx",
     "crates/pi-agent-hub",
     "crates/pi-bpe",
     "crates/pi-mono",
     "crates/pi-buffer-shim",
+    "crates/pi-chord",
     "crates/pi-cli",
+    "crates/pi-client",
+    "crates/pi-coding-agent",
     "crates/pi-context-files",
     "crates/pi-crypto-shim",
     "crates/pi-delight",
     "crates/pi-dialects",
     "crates/pi-embedded-assets",
     "crates/pi-error",
+    "crates/pi-evals",
     "crates/pi-failover",
     "crates/pi-file-lock",
     "crates/pi-flake-classifier",
@@ -31,6 +41,8 @@ members = [
     "crates/pi-secrets",
     "crates/pi-secret-screener",
     "crates/pi-self-update",
+    "crates/pi-server",
+    "crates/pi-session-backends",
     "crates/pi-conformance",
     "crates/pi-crash",
     "crates/pi-gallery",
@@ -42,6 +54,7 @@ members = [
     "crates/pi-overlay-system",
     "crates/pi-platform",
     "crates/pi-profiler",
+    "crates/pi-protocol",
     "crates/pi-provider",
     "crates/pi-provider-metadata",
     "crates/pi-session-metrics",
@@ -49,8 +62,10 @@ members = [
     "crates/pi-stats",
     "crates/pi-status-line",
     "crates/pi-stream-rules",
+    "crates/pi-telemetry",
     "crates/pi-token-count",
     "crates/pi-turn-recovery",
+    "crates/pi-tui",
     "crates/pi-undo",
     "crates/pi-version",
     "crates/pi-web-remote",
@@ -80,6 +95,20 @@ clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
+# Phase-2 top-level package crates (aggregators mirroring
+# @earendil-works/pi packages).
+pi-ai = { path = "crates/pi-ai", version = "0.1.0" }
+pi-agent-core = { path = "crates/pi-agent-core", version = "0.1.0" }
+pi-coding-agent = { path = "crates/pi-coding-agent", version = "0.1.0" }
+pi-tui = { path = "crates/pi-tui", version = "0.1.0" }
+pi-telemetry = { path = "crates/pi-telemetry", version = "0.1.0" }
+pi-protocol = { path = "crates/pi-protocol", version = "0.1.0" }
+pi-chord = { path = "crates/pi-chord", version = "0.1.0" }
+pi-client = { path = "crates/pi-client", version = "0.1.0" }
+pi-server = { path = "crates/pi-server", version = "0.1.0" }
+pi-session-backends = { path = "crates/pi-session-backends", version = "0.1.0" }
+pi-evals = { path = "crates/pi-evals", version = "0.1.0" }
+# Phase-1 leaf crates (kept as workspace-internal path deps).
 pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
 pi-agent-hub = { path = "crates/pi-agent-hub", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }

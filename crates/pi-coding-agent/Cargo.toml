@@ -1,0 +1,33 @@
+[package]
+name = "pi-coding-agent"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-coding-agent: the CLI binary entry, tools, session, extensions, and persistence"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-cli = { workspace = true }
+pi-workspace = { workspace = true }
+pi-version = { workspace = true }
+pi-self-update = { workspace = true }
+pi-crypto-shim = { workspace = true }
+pi-context-files = { workspace = true }
+pi-secrets = { workspace = true }
+pi-secret-screener = { workspace = true }
+pi-crash = { workspace = true }
+pi-turn-recovery = { workspace = true }
+pi-conformance = { workspace = true }
+pi-gallery = { workspace = true }
+pi-markdown-rich = { workspace = true }
+pi-status-line = { workspace = true }
+pi-overlay-system = { workspace = true }
+pi-undo = { workspace = true }
+pi-platform = { workspace = true }
+pi-stats = { workspace = true }
+pi-extension-replay = { workspace = true }
+pi-extension-scoring = { workspace = true }
+pi-swarm-progress-slo = { workspace = true }
+pi-swarm-activity-ledger = { workspace = true }

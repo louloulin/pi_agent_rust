@@ -1,0 +1,15 @@
+[package]
+name = "pi-session-backends"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 placeholder mirroring @earendil-works/pi-session-backends: session persistence backends (SQLite, JSONL) — currently still in crates/pi/src"
+
+[lints]
+workspace = true
+
+[dependencies]
+# The session backends (SQLite sidecar, JSONL tree, picker, store-v2)
+# currently live inlined in crates/pi/src/{session,session_sqlite,
+# session_store_v2,session_picker,session_index}.rs. A future Phase-2
+# round will extract a `pi-session` leaf and re-export it here.

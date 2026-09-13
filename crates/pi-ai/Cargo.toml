@@ -1,0 +1,22 @@
+[package]
+name = "pi-ai"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-ai: unified LLM API, providers, model discovery, tokenization, and per-turn policy"
+
+[lints]
+workspace = true
+
+[dependencies]
+pi-model = { workspace = true }
+pi-provider = { workspace = true }
+pi-provider-metadata = { workspace = true }
+pi-token-count = { workspace = true }
+pi-bpe = { workspace = true }
+pi-failover = { workspace = true }
+pi-stream-rules = { workspace = true }
+pi-delight = { workspace = true }
+pi-magic-keywords = { workspace = true }
+pi-dialects = { workspace = true }
+pi-embedded-assets = { workspace = true }

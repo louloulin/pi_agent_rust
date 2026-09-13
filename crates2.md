@@ -1187,7 +1187,18 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 38 — `undo.rs` → `pi-chord` ✅(mutation history)
+### Round 39 — `commit_split.rs` → `pi-chord` ✅(atomic commit planner)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/commit_split.rs crates/pi-chord/src/commit_split.rs`（720 LOC）
+2. 将唯一的 memory 反向依赖收敛为本地 secrets seam，保持提交消息脱敏行为；`pi-chord` 不依赖 `pi-coding-agent`
+3. 通过 `pi-coding-agent` re-export 保持原有 `crate::commit_split::*` 与公开路径兼容
+
+**验证:**
+- `cargo check -p pi-chord`
+- `cargo test -p pi-chord commit_split --lib`
+- `git diff --check`
+
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/undo.rs crates/pi-chord/src/undo.rs`（714 LOC，纯 std + serde + sha2，无 `crate::` 反向依赖）

@@ -53,10 +53,13 @@
 //!   session-scoped placeholder vault (Round 37)
 //! - `undo.rs` — bounded content-addressed file mutation history with
 //!   undo/redo and external-change protection (Round 38)
+//! - `commit_split.rs` — dependency-ordered atomic git commit planning and
+//!   execution with secret-safe messages (Round 39)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
+pub mod commit_split;
 pub mod crash;
 pub mod extension_inclusion;
 pub mod extension_license;

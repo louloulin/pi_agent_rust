@@ -18,6 +18,9 @@ pub mod context_files;
 // Round 32: `crash` re-housed in `pi-chord` (pure std + serde, zero
 // `crate::` self-deps — used to be inline under `pi-coding-agent`).
 pub use pi_chord::crash;
+// Round 39: `commit_split` re-housed in `pi-chord`; retain the historical
+// module path for CLI and SDK callers.
+pub use pi_chord::commit_split;
 pub mod crypto_shim;
 pub mod extension_replay;
 pub mod extension_scoring;

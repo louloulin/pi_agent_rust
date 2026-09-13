@@ -11,7 +11,11 @@ use std::process::Command;
 use serde::{Deserialize, Serialize};
 
 use pi_error::{Error, Result};
-use crate::memory::screen_secrets;
+
+fn screen_secrets(content: &str) -> String {
+    let mut vault = crate::secrets::SecretVault::default();
+    crate::secrets::obfuscate(content, &mut vault, &[]).0
+}
 
 /// File category used for commit ordering priority and scoring.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]

@@ -5684,6 +5684,7 @@ dependencies = [
  "anyhow",
  "filetime",
  "rustix",
+ "serde",
  "serde_json",
  "tempfile",
 ]

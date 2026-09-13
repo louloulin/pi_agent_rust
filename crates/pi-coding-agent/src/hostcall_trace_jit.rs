@@ -22,7 +22,7 @@
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-use crate::hostcall_superinstructions::HostcallSuperinstructionPlan;
+use pi_chord::hostcall_superinstructions::HostcallSuperinstructionPlan;
 
 // ── Configuration constants ──────────────────────────────────────────
 
@@ -577,7 +577,7 @@ fn usize_from_env(var: &str, default: usize) -> usize {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::hostcall_superinstructions::{
+    use pi_chord::hostcall_superinstructions::{
         HOSTCALL_SUPERINSTRUCTION_PLAN_VERSION, HOSTCALL_SUPERINSTRUCTION_SCHEMA_VERSION,
         HostcallSuperinstructionPlan,
     };

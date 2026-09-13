@@ -19,6 +19,8 @@ anyhow = { workspace = true }
 # file_lock.rs (Round 27.1)
 filetime = { workspace = true }
 rustix = { workspace = true }
+# hostcall_superinstructions.rs (Round 27.3) uses serde derive
+serde = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

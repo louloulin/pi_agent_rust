@@ -790,8 +790,25 @@ Round 30 后(收尾)       : ~64%
 | `hostcall_egraph.rs` | 2,450 | 依赖 hostcall_rewrite (已迁) |
 | `extensions_api.rs` | ~25,000 | 中心枢纽,需最后迁 |
 
+### Round 27.3 — `hostcall_superinstructions.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_superinstructions.rs crates/pi-chord/src/hostcall_superinstructions.rs`(859 LOC,**只依赖 std + serde**)
+2. `pi-chord/Cargo.toml` 新增 `serde` 生产依赖
+3. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_superinstructions;`
+4. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_superinstructions;`
+5. Bulk rename `crate::hostcall_superinstructions::*` → `pi_chord::hostcall_superinstructions::*`:
+   - `pi-coding-agent/src/extensions_api.rs`(1 处)
+   - `pi-coding-agent/src/hostcall_trace_jit.rs`(2 处)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 859 LOC
+
 ---
 
-> 本文档版本:v2.4(2026-09-13)
+> 本文档版本:v2.5(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

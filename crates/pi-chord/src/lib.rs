@@ -11,9 +11,12 @@
 //!   settings/auth/session-index files (Round 27.1)
 //! - `hostcall_rewrite.rs` — Constrained hostcall rewrite planner for hot-path
 //!   marshalling (Round 27.2)
+//! - `hostcall_superinstructions.rs` — Trace-driven superinstruction compiler
+//!   and execution runtime (Round 27.3)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
 pub mod file_lock;
 pub mod hostcall_rewrite;
+pub mod hostcall_superinstructions;

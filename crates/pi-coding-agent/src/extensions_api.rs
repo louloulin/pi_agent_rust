@@ -30,7 +30,7 @@ use crate::hostcall_amac::AmacBatchExecutorConfig;
 use pi_chord::hostcall_rewrite::{
     HostcallRewriteEngine, HostcallRewritePlan, HostcallRewritePlanKind,
 };
-use crate::hostcall_superinstructions::{
+use pi_chord::hostcall_superinstructions::{
     HostcallSuperinstructionCompiler, HostcallSuperinstructionPlan, execute_with_superinstruction,
 };
 use crate::hostcall_trace_jit::{GuardContext, TraceJitCompiler};

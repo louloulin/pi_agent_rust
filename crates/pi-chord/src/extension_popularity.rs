@@ -5,11 +5,52 @@
 //! - Normalize missing/unavailable metrics to `null` (never `0`).
 //! - Persist evidence onto the canonical candidate pool JSON so scoring can be auditable.
 
+use futures::future::BoxFuture;
 use pi_error::{Error, Result};
-use crate::http::client::Client;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::time::Duration;
+
+/// Trait seam (Round 29.2) so `extension_popularity` can fetch npm /
+/// GitHub metrics without depending on the concrete
+/// `pi-coding-agent::http::client::Client`. `Client` implements this
+/// trait in `pi-coding-agent` (see `http/client.rs`); the binary passes
+/// the concrete client into the fetch helpers.
+///
+/// All input lifetimes are bound to `'a` so the returned future stays
+/// tied to `&self` — callers do not need to keep the client or the
+/// request inputs alive separately, and the trait stays
+/// dyn-compatible (object-safe) for `&dyn NpmHttpGet` dispatch.
+pub trait NpmHttpGet: Send + Sync {
+    /// Issue a GET against `url` with a per-request timeout, returning
+    /// the response body as text. Implementations map non-2xx HTTP
+    /// statuses and transport errors into `Err`.
+    fn fetch_text<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: Duration,
+    ) -> BoxFuture<'a, Result<String>>;
+
+    /// Like [`fetch_text`](Self::fetch_text) but additionally returns
+    /// the HTTP status code. Used by callers that need to distinguish
+    /// a benign missing-resource (e.g. `404 Not Found`) from a real
+    /// failure; the underlying transport error still maps to `Err`.
+    fn fetch_text_with_status<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: Duration,
+    ) -> BoxFuture<'a, Result<(u16, String)>>;
+
+    /// Like [`fetch_text_with_status`](Self::fetch_text_with_status)
+    /// but with caller-supplied request headers. Used for authenticated
+    /// GitHub API requests (Bearer token, Accept header, API version).
+    fn fetch_text_with_headers<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: Duration,
+        headers: &'a [(&'a str, String)],
+    ) -> BoxFuture<'a, Result<(u16, String)>>;
+}
 
 const POPULARITY_REQUEST_TIMEOUT: Duration = Duration::from_secs(20);
 
@@ -268,22 +309,19 @@ pub fn parse_github_repo_response(text: &str) -> Result<GitHubRepoMetrics> {
 }
 
 pub async fn fetch_github_repo_metrics_optional(
-    client: &Client,
+    client: &dyn NpmHttpGet,
     token: &str,
     repo: &GitHubRepoRef,
 ) -> Result<Option<GitHubRepoMetrics>> {
     let url = format!("https://api.github.com/repos/{}/{}", repo.owner, repo.repo);
-    let response = client
-        .get(&url)
-        .timeout(POPULARITY_REQUEST_TIMEOUT)
-        .header("Accept", "application/vnd.github+json")
-        .header("X-GitHub-Api-Version", "2022-11-28")
-        .header("Authorization", format!("Bearer {token}"))
-        .send()
+    let headers: [(&str, String); 3] = [
+        ("Accept", "application/vnd.github+json".to_string()),
+        ("X-GitHub-Api-Version", "2022-11-28".to_string()),
+        ("Authorization", format!("Bearer {token}")),
+    ];
+    let (status, text) = client
+        .fetch_text_with_headers(&url, POPULARITY_REQUEST_TIMEOUT, &headers)
         .await?;
-
-    let status = response.status();
-    let text = response.text().await?;
 
     match status {
         200 => Ok(Some(parse_github_repo_response(&text)?)),
@@ -311,16 +349,15 @@ pub fn parse_npm_downloads_response(text: &str) -> Result<Option<u64>> {
     Ok(parsed.downloads)
 }
 
-pub async fn fetch_npm_downloads(client: &Client, package: &str) -> Result<NpmDownloads> {
-    async fn fetch_range(client: &Client, package: &str, range: &str) -> Result<Option<u64>> {
+pub async fn fetch_npm_downloads(client: &dyn NpmHttpGet, package: &str) -> Result<NpmDownloads> {
+    async fn fetch_range(
+        client: &dyn NpmHttpGet,
+        package: &str,
+        range: &str,
+    ) -> Result<Option<u64>> {
         let encoded = url::form_urlencoded::byte_serialize(package.as_bytes()).collect::<String>();
         let url = format!("https://api.npmjs.org/downloads/point/{range}/{encoded}");
-        let response = client
-            .get(&url)
-            .timeout(POPULARITY_REQUEST_TIMEOUT)
-            .send()
-            .await?;
-        let text = response.text().await?;
+        let text = client.fetch_text(&url, POPULARITY_REQUEST_TIMEOUT).await?;
         parse_npm_downloads_response(&text)
     }
 
@@ -363,18 +400,14 @@ pub fn parse_npm_registry_response(text: &str) -> Result<NpmRegistryMeta> {
 }
 
 pub async fn fetch_npm_registry_meta(
-    client: &Client,
+    client: &dyn NpmHttpGet,
     package: &str,
 ) -> Result<Option<NpmRegistryMeta>> {
     let encoded = url::form_urlencoded::byte_serialize(package.as_bytes()).collect::<String>();
     let url = format!("https://registry.npmjs.org/{encoded}");
-    let response = client
-        .get(&url)
-        .timeout(POPULARITY_REQUEST_TIMEOUT)
-        .send()
+    let (status, text) = client
+        .fetch_text_with_status(&url, POPULARITY_REQUEST_TIMEOUT)
         .await?;
-    let status = response.status();
-    let text = response.text().await?;
 
     match status {
         200 => Ok(Some(parse_npm_registry_response(&text)?)),
@@ -406,7 +439,7 @@ fn parse_owner_repo_from_path(path: &str) -> Option<GitHubRepoRef> {
 
 /// Fetch all referenced GitHub repos (deduped) and return a `full_name -> metrics` map.
 pub async fn snapshot_github_repos(
-    client: &Client,
+    client: &dyn NpmHttpGet,
     token: &str,
     repos: &[GitHubRepoRef],
 ) -> Result<HashMap<String, GitHubRepoMetrics>> {

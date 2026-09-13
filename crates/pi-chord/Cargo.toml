@@ -28,6 +28,12 @@ serde_json = { workspace = true }
 tracing = { workspace = true }
 # extension_inclusion.rs (Round 29.1) uses sha2 for content addressing
 sha2 = { workspace = true }
+# extension_popularity.rs (Round 29.2) uses url for npm registry queries
+url = { workspace = true }
+# extension_popularity.rs (Round 29.2) — Error/Result re-exports
+pi-error = { workspace = true }
+# extension_popularity.rs (Round 29.2) — BoxFuture for the NpmHttpGet trait seam
+futures = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

@@ -351,6 +351,67 @@ impl Default for Client {
     }
 }
 
+/// Round 29.2 trait seam: `extension_popularity` lives in `pi-chord`
+/// (upstream) and must not depend on the concrete `Client` (downstream)
+/// or the cycle re-opens. We implement `NpmHttpGet` here so the binary
+/// can pass `&client` straight into the fetch helpers.
+///
+/// The per-request timeout honors whatever the caller passed in —
+/// `RequestBuilder::timeout` resolves against the same env/setting
+/// hierarchy that the rest of the HTTP client uses, so test mocks and
+/// production traffic share a single timeout path.
+impl pi_chord::extension_popularity::NpmHttpGet for Client {
+    fn fetch_text<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: std::time::Duration,
+    ) -> futures::future::BoxFuture<'a, pi_error::Result<String>> {
+        Box::pin(async move {
+            let response = self.get(url).timeout(timeout).send().await?;
+            let status = response.status();
+            let text = response.text().await?;
+            if (200..300).contains(&status) {
+                Ok(text)
+            } else {
+                Err(pi_error::Error::api(format!(
+                    "HTTP {status} fetching {url}: {text}"
+                )))
+            }
+        })
+    }
+
+    fn fetch_text_with_status<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: std::time::Duration,
+    ) -> futures::future::BoxFuture<'a, pi_error::Result<(u16, String)>> {
+        Box::pin(async move {
+            let response = self.get(url).timeout(timeout).send().await?;
+            let status = response.status();
+            let text = response.text().await?;
+            Ok((status, text))
+        })
+    }
+
+    fn fetch_text_with_headers<'a>(
+        &'a self,
+        url: &'a str,
+        timeout: std::time::Duration,
+        headers: &'a [(&'a str, String)],
+    ) -> futures::future::BoxFuture<'a, pi_error::Result<(u16, String)>> {
+        Box::pin(async move {
+            let mut builder = self.get(url).timeout(timeout);
+            for (k, v) in headers {
+                builder = builder.header(*k, v.as_str());
+            }
+            let response = builder.send().await?;
+            let status = response.status();
+            let text = response.text().await?;
+            Ok((status, text))
+        })
+    }
+}
+
 #[derive(Debug, Clone, Copy)]
 enum Method {
     Delete,

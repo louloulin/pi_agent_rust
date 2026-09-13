@@ -62,10 +62,13 @@ pub mod extension_index;
 // legacy example/test surface).
 pub use pi_chord::extension_inclusion;
 pub use pi_chord::extension_license;
-pub mod extension_popularity;
+// Round 29.2: `extension_popularity` + `extension_validation` re-housed
+// in `pi-chord` (the popularity module now uses a `NpmHttpGet` trait seam
+// so it does not depend on the concrete `Client` from this crate).
+pub use pi_chord::extension_popularity;
+pub use pi_chord::extension_validation;
 pub mod extension_preflight;
 pub mod extension_tools;
-pub mod extension_validation;
 pub mod extensions_api;
 pub mod extensions_js;
 pub mod providers;

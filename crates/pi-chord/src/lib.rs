@@ -28,12 +28,18 @@
 //! - `extension_inclusion.rs` — Final inclusion list generation: merges
 //!   scoring tiers, license verdicts, validation evidence into a pinned
 //!   inclusion list (Round 29.1)
+//! - `extension_popularity.rs` — Popularity signal snapshotting for
+//!   extension candidates; fetches GitHub + npm metrics (Round 29.2)
+//! - `extension_validation.rs` — Validation evidence + dry-run probes
+//!   for extension candidates (Round 29.2)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
 pub mod extension_inclusion;
 pub mod extension_license;
+pub mod extension_popularity;
+pub mod extension_validation;
 pub mod file_lock;
 pub mod hostcall_egraph;
 pub mod hostcall_io_uring_lane;

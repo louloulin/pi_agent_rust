@@ -5684,12 +5684,15 @@ dependencies = [
  "anyhow",
  "crossbeam-queue",
  "filetime",
+ "futures",
+ "pi-error",
  "rustix",
  "serde",
  "serde_json",
  "sha2 0.11.0",
  "tempfile",
  "tracing",
+ "url",
 ]
 
 [[package]]

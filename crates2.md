@@ -1044,6 +1044,37 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.15(2026-09-13)
+### Round 29.2 — `extension_popularity + extension_validation` → `pi-chord` ✅ (trait seam for `Client`)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/extension_popularity.rs crates/pi-chord/src/extension_popularity.rs`(1,076 LOC)
+2. `git mv crates/pi-coding-agent/src/extension_validation.rs crates/pi-chord/src/extension_validation.rs`(1,399 LOC)
+3. `extension_popularity.rs` 原本 5 处 `client: &Client` 参数(`Client` 来自 `pi-coding-agent::http::client`),直接搬动会让 `pi-chord` 反向依赖 `pi-coding-agent`,重开 cycle。
+4. **解决方案 — 在 `pi-chord` 定义 `pub trait NpmHttpGet: Send + Sync`**,三方法签名(dyn 兼容 + `&self`-bound BoxFuture):
+   - `fetch_text(&self, url, timeout) -> BoxFuture<'_, Result<String>>`
+   - `fetch_text_with_status(&self, url, timeout) -> BoxFuture<'_, Result<(u16, String)>>`
+   - `fetch_text_with_headers(&self, url, timeout, headers: &[(&str, String)]) -> BoxFuture<'_, Result<(u16, String)>>`
+5. `pi-coding-agent/src/http/client.rs` 加 `impl NpmHttpGet for Client`,桥接 `self.get(url).timeout(t).send().await?.text().await?`;三方法分别映射到无 header / 无 status / 带 GitHub auth 头。
+6. `pi-chord/Cargo.toml` 加 `url = { workspace = true }`(`url::form_urlencoded`)、`pi-error = { workspace = true }`、`futures = { workspace = true }`(`BoxFuture`)。
+7. `extension_popularity.rs` 内部 fetch 助手(`fetch_npm_downloads`、`fetch_github_repo_metrics_optional`、`fetch_npm_registry_meta`、`snapshot_github_repos`)全部改为接收 `client: &dyn NpmHttpGet`,GitHub auth 路径用 `fetch_text_with_headers` 传递 Bearer + Accept + API-Version。
+8. `pi-chord/src/lib.rs` 加 `pub mod extension_popularity; pub mod extension_validation;`;`pi-coding-agent/src/lib.rs` 改为 `pub use pi_chord::extension_popularity; pub use pi_chord::extension_validation;`(原 `pub mod` 删掉)。
+9. `extension_validation.rs` 内部 `crate::extension_popularity::*` 引用无需改:在 `pi-chord` 内 sibling 模块路径依然成立。
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished(4 warnings,全部为既有 pi-error/serde 衍生 warning)
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,baseline 持平)
+- `cargo check --workspace --exclude pi --exclude pi-mono`:✅ Finished in 2m 16s(0 errors)
+- `cargo check -p pi`(binary):✅ Finished in 3m 18s(0 errors)
+- `cargo clean` 跑了一次(磁盘从 100% 满 → 68%)
+
+**LOC 迁移:** 2,475 LOC(净代码 + trait seam + impl bridge)
+
+**trait seam 设计要点:** 关键坑是 `async fn` + `impl Future` 不会被识别为 dyn 兼容,必须改 `BoxFuture<'a, ...>` + 把所有输入引用绑到 `'a`(`url: &'a str`、`headers: &'a [...]`),否则 Rust 报 `the trait NpmHttpGet is not dyn compatible`。`Send + Sync` bound 让 trait 对象可以跨 await 边界传递,符合 `Client` 实际使用场景(被 `BubbleteaModel`、`agent_hub` 等多任务复用)。这是 Round 27-29 系列第 4 个 trait seam 案例(`AutocompleteResourceSource`、`WorkspaceRootProvider`、本 trait),trait seam 已稳定为 cycle 解耦的标准手段。
+
+**Round 29 累计(本轮+Round 29.1):** 4,537 LOC 已迁回 `pi-chord`,接近上游 `pi-chord` 总体(9,375 LOC,差 34 个 .ts)的 50%。
+
+---
+
+> 本文档版本:v2.16(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

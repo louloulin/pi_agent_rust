@@ -807,8 +807,26 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 859 LOC
 
+### Round 27.4 — `hostcall_io_uring_lane.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_io_uring_lane.rs crates/pi-chord/src/hostcall_io_uring_lane.rs`(1,085 LOC,serde)
+2. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_io_uring_lane;`
+3. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_io_uring_lane;`
+4. Bulk rename `crate::hostcall_io_uring_lane::*` → `pi_chord::hostcall_io_uring_lane::*`:
+   - `pi-coding-agent/src/extension_dispatcher.rs`
+   - `pi-coding-agent/src/extensions_js.rs`
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 1,085 LOC
+
+**Round 27 累计迁出 5/15 chord 文件**
+
 ---
 
-> 本文档版本:v2.5(2026-09-13)
+> 本文档版本:v2.6(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

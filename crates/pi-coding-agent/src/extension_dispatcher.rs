@@ -32,7 +32,7 @@ use crate::extensions::{
 };
 use crate::extensions_js::{HostcallKind, HostcallRequest, PiJsRuntime, js_to_json, json_to_js};
 use crate::hostcall_amac::{AmacBatchExecutor, AmacBatchExecutorConfig};
-use crate::hostcall_io_uring_lane::{
+use pi_chord::hostcall_io_uring_lane::{
     HostcallCapabilityClass, HostcallDispatchLane, HostcallIoHint, IoUringFallbackReason,
     IoUringLaneDecisionInput, IoUringLanePolicyConfig, decide_io_uring_lane,
     io_uring_executor_available,

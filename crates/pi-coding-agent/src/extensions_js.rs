@@ -24,7 +24,7 @@
 //! ```
 
 use pi_error::{Error, Result};
-use crate::hostcall_io_uring_lane::{
+use pi_chord::hostcall_io_uring_lane::{
     HostcallCapabilityClass, HostcallIoHint, IoUringLaneDecisionInput,
 };
 use crate::hostcall_queue::{

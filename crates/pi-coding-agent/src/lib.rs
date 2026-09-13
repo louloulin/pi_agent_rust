@@ -95,7 +95,6 @@ pub mod compaction;
 pub mod compaction_worker;
 pub mod hostcall_amac;
 pub mod hostcall_egraph;
-pub mod hostcall_io_uring_lane;
 pub mod hostcall_queue;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_trace_jit;

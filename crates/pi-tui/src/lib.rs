@@ -14,11 +14,15 @@
 //!   the bubbletea and ftui editor stacks (Round 28.4)
 //! - `text_utils.rs` — display-width truncation helpers for the message
 //!   renderer (Round 28.5)
+//! - `overlay_system.rs` — unified overlay stack + set-piece surfaces
+//!   (Esc-stack, toast notifications, welcome / help / picker modals)
+//!   (Round 30.2)
 
 #![forbid(unsafe_code)]
 
 pub mod autocomplete;
 pub mod file_refs;
+pub mod overlay_system;
 pub mod terminal_images;
 pub mod text_utils;
 pub mod tui;

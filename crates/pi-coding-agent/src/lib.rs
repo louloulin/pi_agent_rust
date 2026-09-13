@@ -21,7 +21,10 @@ pub mod extension_replay;
 pub mod extension_scoring;
 pub mod gallery;
 pub mod markdown_rich;
-pub mod overlay_system;
+// Round 30.2: `overlay_system` re-housed in `pi-tui`. Re-export it here
+// so binary + interactive/* callers can keep using
+// `crate::overlay_system::*`.
+pub use pi_tui::overlay_system;
 pub mod platform;
 pub mod secrets;
 pub mod self_update;

@@ -5887,6 +5887,7 @@ dependencies = [
  "ignore",
  "pi-ai",
  "rich_rust",
+ "serde",
  "unicode-width",
  "url",
 ]

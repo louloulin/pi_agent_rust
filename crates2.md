@@ -1105,6 +1105,40 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.17(2026-09-13)
+### Round 30.2 — `overlay_system.rs` → `pi-tui` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/overlay_system.rs crates/pi-tui/src/overlay_system.rs`(235 LOC)
+2. 文件仅依赖 `serde + std::collections::VecDeque`,**零 `crate::` 引用**,可零成本平移。
+3. `pi-tui/Cargo.toml` 加 `serde = { workspace = true }`(已有 `anyhow / base64 / pi-ai / dirs / rich_rust / ignore / url / unicode-width`)。
+4. `pi-tui/src/lib.rs` 加 `pub mod overlay_system;` + 文档条目。
+5. `pi-coding-agent/src/lib.rs` 替换 `pub mod overlay_system;` 为 `pub use pi_tui::overlay_system;`(re-export,保留 `pi_coding_agent::overlay_system::*` 路径)。
+6. `interactive/mod.rs:2242` 与 `interactive/view.rs:341` 两处 `crate::overlay_system::WelcomeScreen::default()` 调用无需修改(经 re-export 链解析)。
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished in 1m 23s(1 dead_code warning,`OverlayKind` 枚举未在 pi-tui 内部使用但保持 pub,不影响 binary)
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 49.19s(0 errors)
+
+**LOC 迁移:** 235 LOC
+
+**Round 30 累计(本轮 + Round 30.1):** 671 LOC,继续向 pi-tui 收尾。
+
+### Round 30 后续候选(按文件大小排序)
+| 文件 | LOC | 候选归属 | 风险 |
+|------|-----|---------|------|
+| `gallery.rs` | 134 | `pi-tui`(slideshow helper) | 零依赖 |
+| `completion.rs` | 188 | `pi-tui`(shell completion) | 零依赖 |
+| `btw.rs` | 272 | `pi-ai` 或 `pi-tui` | pi_ai dep |
+| `current_time.rs` | 276 | `pi-tui`(tool impl 较杂) | 有 `crate::tools::*` |
+| `skills_managed.rs` | 346 | `pi-chord`(skill mgmt) | 有 pi_error,无 crate |
+| `theme.rs` | 471 | `pi-tui`(theme) | 有 `crate::config::Config` |
+| `usage.rs` | 602 | `pi-ai` 或 `pi-coding-agent` | 有 `crate::auth + http::client` |
+| `conformance.rs` | 471 | `pi-evals` | 需评估 |
+| `agent_cx.rs` | 246 | `pi-agent-core` | 158 callers,需 bulk rename |
+
+---
+
+> 本文档版本:v2.18(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

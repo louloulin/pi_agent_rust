@@ -42,3 +42,6 @@ url = { workspace = true }
 # text_utils.rs (Round 28.5): display-width truncation helpers used by the
 # message-rendering stack.
 unicode-width = { workspace = true }
+# overlay_system.rs (Round 30.2): unified overlay stack + set-piece
+# surfaces (Esc-stack, toast notifications, welcome / help / picker modals).
+serde = { workspace = true }

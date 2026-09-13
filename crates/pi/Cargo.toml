@@ -36,11 +36,6 @@ name = "pi"
 path = "src/lib.rs"
 
 [[bin]]
-name = "pi"
-path = "src/main.rs"
-required-features = ["tui"]
-
-[[bin]]
 name = "pi_legacy_capture"
 path = "src/bin/pi_legacy_capture.rs"
 required-features = ["internal-legacy-capture"]
@@ -89,6 +84,20 @@ harness = false
 [dependencies]
 clap = { workspace = true }
 clap_complete = { workspace = true }
+# Phase-2 top-level packages (11 aggregators). The lib.rs facade re-exports
+# these; the binary entry will move to pi-coding-agent in a later round.
+pi-ai = { workspace = true }
+pi-agent-core = { workspace = true }
+pi-coding-agent = { workspace = true }
+pi-tui = { workspace = true }
+pi-telemetry = { workspace = true }
+pi-protocol = { workspace = true }
+pi-chord = { workspace = true }
+pi-client = { workspace = true }
+pi-server = { workspace = true }
+pi-session-backends = { workspace = true }
+pi-evals = { workspace = true }
+# Phase-1 leaf crates (kept until per-leaf internals are flattened).
 pi-agent-cx = { workspace = true }
 pi-agent-hub = { workspace = true }
 pi-bpe = { workspace = true }

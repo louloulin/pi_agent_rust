@@ -1,10 +1,18 @@
-//! Pi - Native AI coding agent CLI
+//! Pi - Native AI coding agent CLI (Phase-2 modularization facade)
 //!
-//! This library provides the core functionality for the Pi CLI tool,
-//! a Rust port of pi-mono (TypeScript) with emphasis on:
-//! - Performance-oriented native architecture with instrumented startup and TUI paths
-//! - Reliability through explicit errors, bounded cancellation, and conformance tests
-//! - Distribution through one supported end-user binary in official release archives
+//! After Phase-2 modularization (see `crates1.md`), the implementation of
+//! every module under the legacy `crates/pi/src/` tree has been relocated
+//! to one of the 11 Phase-2 aggregator packages (`pi-ai`,
+//! `pi-agent-core`, `pi-coding-agent`, `pi-tui`, `pi-telemetry`,
+//! `pi-protocol`, `pi-chord`, `pi-client`, `pi-server`,
+//! `pi-session-backends`, `pi-evals`).
+//!
+//! This `pi` crate is now a **thin facade**. It re-exports every Phase-1
+//! leaf crate through the matching Phase-2 aggregator so historical paths
+//! like `pi::config::Config`, `pi::tools::Tool`, `pi::session::Session`,
+//! `pi::cli::Cli`, `pi::agent::Agent` keep resolving for both downstream
+//! consumers and the relocated internal code (whose `use pi::...` paths
+//! now resolve here).
 //!
 //! ## Public API policy
 //!
@@ -20,20 +28,8 @@
 #![forbid(unsafe_code)]
 // Raised from the default 128 because the RPC command dispatcher's nested
 // async blocks exceed it while the compiler proves `Send` for the spawned
-// future (src/rpc.rs:2057, `run_extension_command` inside
-// `future_with_current_cx`). nightly-2026-08-31 promoted that overflow to a
-// `recursion_depth_exceeding_limit` warning under `future_incompatible`, which
-// `-D warnings` in the DSR clippy lane turns into a hard error, and the
-// compiler's own suggestion is to raise this limit. It bounds trait-solving
-// depth only; it is not a runtime stack limit.
+// future. It bounds trait-solving depth only; it is not a runtime stack limit.
 #![recursion_limit = "256"]
-// rch clippy probes without these allowances still expose broad, cross-module
-// dormant surfaces in extension/session/SDK paths. The no-allow inventory is
-// tracked in bd-63x3v.5.1; keep this crate-wide guard until the remaining
-// subsystems are narrowed in their own patches.
-// `unused_async_trait_impl` is the nightly-2026-07-05 successor of
-// `unused_async` for async-trait impl fns (new lint name, so the existing
-// allow does not cover it); same rationale as above.
 #![allow(dead_code, clippy::unused_async, clippy::unused_async_trait_impl)]
 #![cfg_attr(
     test,
@@ -46,7 +42,6 @@
         clippy::collapsible_if
     )
 )]
-// Allow pedantic lints during early development - can tighten later
 #![allow(
     clippy::must_use_candidate,
     clippy::doc_markdown,
@@ -57,8 +52,6 @@
     clippy::wildcard_imports
 )]
 
-// Allow in-crate tests that include integration test helpers to resolve `pi::...`
-// paths the same way integration tests do.
 extern crate self as pi;
 
 /// Serialize unit tests that temporarily change the process-wide current
@@ -74,324 +67,130 @@ pub(crate) fn test_current_dir_lock() -> std::sync::MutexGuard<'static, ()> {
 }
 
 // Gap H: jemalloc allocator for allocation-heavy paths.
-// Declared in the library so all project binaries/tests share allocator behavior.
-// BSD-family targets stay on their platform allocator to avoid allocator-domain
-// mismatch across libc/pthread and C dependencies such as QuickJS.
 #[cfg(all(feature = "jemalloc", any(target_os = "linux", target_os = "macos")))]
 #[global_allocator]
 static GLOBAL_ALLOCATOR: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
-#[doc(hidden)]
-pub mod acp;
-pub mod advisor;
-#[doc(hidden)]
-pub mod agent;
-#[doc(hidden)]
-pub mod agent_cx;
-#[doc(hidden)]
-pub mod agent_hub;
-#[doc(hidden)]
-pub mod app;
-pub mod approval;
-pub mod ask;
-#[doc(hidden)]
-pub mod ast_tools;
-#[doc(hidden)]
-pub mod auth;
-#[doc(hidden)]
-pub mod autocomplete;
-#[doc(hidden)]
-pub mod bash_mediation;
-#[doc(hidden)]
-pub mod browser;
-#[doc(hidden)]
-pub mod btw;
-#[doc(hidden)]
-pub mod buffer_shim;
-pub mod checkpoint;
-// Stage 2 extraction: pi-cli owns the CLI argument surface. The legacy
-// meta-crate keeps the original `crate::cli` module path so every existing
-// internal call site (`crate::cli::*`, `use pi::cli`, `pi::cli::Cli`) keeps
-// working unchanged.
-#[doc(hidden)]
-pub mod cli {
-    //! Re-export of the extracted `pi-cli` leaf crate. The CLI surface used to
-    //! live at `crates/pi/src/cli.rs`; in Phase-1 it moved to
-    //! `crates/pi-cli/src/cli.rs`. This shim preserves the historical path.
-    pub use pi_cli::*;
-}
-pub mod commit_split;
-#[doc(hidden)]
-pub mod compaction;
-#[doc(hidden)]
-pub mod compaction_snap;
-#[doc(hidden)]
-pub mod compaction_worker;
-pub mod completions;
-#[doc(hidden)]
-pub mod computer;
-#[doc(hidden)]
-pub mod config;
-#[doc(hidden)]
-pub mod conformance;
-#[doc(hidden)]
-pub mod conformance_shapes;
-#[doc(hidden)]
-pub mod connectors;
-pub mod context_files;
-pub mod crash;
-#[doc(hidden)]
-pub mod crypto_shim;
-pub mod current_time;
-// Always declared: the module is dual-mode internally (its non-feature
-// `imp` degrades to named errors), and main.rs's `pi profile` arm calls
-// its unconditional helpers — gating the declaration broke default builds.
-#[doc(hidden)]
-pub mod debug;
-#[doc(hidden)]
-pub mod delight;
-pub mod dialects;
-#[doc(hidden)]
-pub mod doctor;
-#[doc(hidden)]
-pub(crate) mod embedded_assets;
-#[doc(hidden)]
-pub mod error;
-#[doc(hidden)]
-pub mod error_hints;
-#[doc(hidden)]
-pub mod eval;
-#[doc(hidden)]
-pub mod extension_conformance_matrix;
-#[doc(hidden)]
-pub mod extension_dispatcher;
-#[doc(hidden)]
-pub mod extension_events;
-#[doc(hidden)]
-pub mod extension_inclusion;
-#[doc(hidden)]
-pub mod extension_index;
-#[doc(hidden)]
-pub mod extension_license;
-#[doc(hidden)]
-pub mod extension_popularity;
-#[doc(hidden)]
-pub mod extension_preflight;
-#[doc(hidden)]
-pub mod extension_replay;
-#[doc(hidden)]
-pub mod extension_scoring;
-#[doc(hidden)]
-pub mod extension_tools;
-#[doc(hidden)]
-pub mod extension_validation;
-#[doc(hidden)]
-pub mod extensions;
-#[doc(hidden)]
-pub mod extensions_js;
-pub mod failover;
-#[doc(hidden)]
-pub mod file_lock;
-#[doc(hidden)]
-pub mod flake_classifier;
-#[doc(hidden)]
-pub mod gallery;
-pub mod gc;
-#[doc(hidden)]
-pub mod github;
-pub mod handoff;
-#[doc(hidden)]
-pub mod hostcall_amac;
-#[doc(hidden)]
-pub mod hostcall_egraph;
-#[doc(hidden)]
-pub mod hostcall_io_uring_lane;
-#[doc(hidden)]
-pub mod hostcall_queue;
-pub mod hostcall_rewrite;
-#[doc(hidden)]
-pub mod hostcall_s3_fifo;
-#[doc(hidden)]
-pub mod hostcall_superinstructions;
-#[doc(hidden)]
-pub mod hostcall_trace_jit;
-#[doc(hidden)]
-pub mod http;
-#[doc(hidden)]
-pub mod http_shim;
-#[doc(hidden)]
-pub mod hub;
-#[cfg(feature = "tui")]
-#[doc(hidden)]
-pub mod interactive;
-#[cfg(feature = "ftui")]
-#[doc(hidden)]
-pub mod interactive_ftui;
-#[doc(hidden)]
-pub mod jobs;
-#[doc(hidden)]
-pub mod keybindings;
-#[doc(hidden)]
-pub mod lsp;
-#[doc(hidden)]
-pub mod magic_keywords;
-#[doc(hidden)]
-pub mod markdown_rich;
-#[doc(hidden)]
-pub mod mcp;
-#[doc(hidden)]
-pub mod media_tools;
-#[doc(hidden)]
-pub mod memory;
-#[doc(hidden)]
-pub mod migrations;
-#[doc(hidden)]
-pub mod model;
-#[doc(hidden)]
-pub mod model_routing;
-#[doc(hidden)]
-pub mod model_selector;
-#[doc(hidden)]
-pub mod models;
-#[doc(hidden)]
-pub mod overlay_system;
-#[doc(hidden)]
-pub mod package_manager;
-#[doc(hidden)]
-pub mod perf_build;
-#[doc(hidden)]
-pub mod permissions;
-#[cfg(feature = "wasm-host")]
-#[doc(hidden)]
-pub mod pi_wasm;
-pub mod plan;
-#[doc(hidden)]
-pub mod platform;
-#[doc(hidden)]
-pub mod pmu_telemetry;
-pub mod profiler;
-#[doc(hidden)]
-pub mod provider;
-#[doc(hidden)]
-pub mod provider_metadata;
-#[doc(hidden)]
-pub mod providers;
-#[doc(hidden)]
-pub mod resource_governor;
-#[doc(hidden)]
-pub mod resources;
-#[doc(hidden)]
-pub mod review;
-#[doc(hidden)]
-pub mod rpc;
-#[doc(hidden)]
-pub mod scheduler;
-pub mod sdk;
-#[doc(hidden)]
-pub mod secrets;
-#[doc(hidden)]
-pub mod security_scan;
-#[doc(hidden)]
-pub mod self_update;
-#[doc(hidden)]
-pub mod semantic_workspace_graph;
-#[doc(hidden)]
-pub mod session;
-#[doc(hidden)]
-pub mod session_import;
-#[doc(hidden)]
-pub mod session_index;
-#[doc(hidden)]
-pub mod session_metrics;
-#[cfg(feature = "tui")]
-#[doc(hidden)]
-pub mod session_picker;
-#[cfg(feature = "sqlite-sessions")]
-#[doc(hidden)]
-pub mod session_sqlite;
-#[doc(hidden)]
-pub mod session_store_v2;
-#[doc(hidden)]
-pub mod skills_managed;
-pub mod sse;
-pub mod stats;
-#[doc(hidden)]
-pub mod status_line;
-pub mod stream_rules;
-#[doc(hidden)]
-pub mod subagents;
-#[doc(hidden)]
-pub mod swarm_activity_ledger;
-#[doc(hidden)]
-pub mod swarm_flight_recorder;
-#[doc(hidden)]
-pub mod swarm_progress_slo;
-#[doc(hidden)]
-pub mod swarm_replay;
-#[doc(hidden)]
-pub mod terminal_images;
-#[doc(hidden)]
-pub mod theme;
-#[doc(hidden)]
-pub mod todo;
-#[doc(hidden)]
-pub mod token_count;
-pub mod tools;
-#[doc(hidden)]
-pub mod tui;
-pub mod turn_recovery;
-pub mod undo;
-pub mod url_read;
-#[doc(hidden)]
-pub mod url_router;
-pub mod usage;
-#[doc(hidden)]
-pub mod validation_broker;
-#[doc(hidden)]
-pub mod vcr;
-#[doc(hidden)]
-pub mod version_check;
-pub mod web_remote;
-pub mod web_search;
-pub mod workspace;
-pub mod workspace_trust;
-#[doc(hidden)]
-pub mod worktree_iso;
-pub mod xdev;
+// =========================================================================
+// Phase-2 modularization facade.
+//
+// Re-export the 11 Phase-2 aggregator packages AND every Phase-1 leaf crate
+// they own. This preserves historical `pi::foo` paths that the relocated
+// modules still use (`use pi::agent`, `use pi::cli`, `use pi::tools`,
+// `use pi::session`, etc.). The aggregator packages are exposed as modules
+// so consumers can opt into the new boundary.
+// =========================================================================
 
-pub use error::{Error, Result as PiResult};
-#[doc(hidden)]
-pub use extension_dispatcher::ExtensionDispatcher;
+pub mod ai {
+    pub use pi_ai::*;
+}
+pub mod agent_core {
+    pub use pi_agent_core::*;
+}
+pub mod chord {
+    pub use pi_chord::*;
+}
+pub mod client {
+    pub use pi_client::*;
+}
+pub mod coding_agent {
+    pub use pi_coding_agent::*;
+}
+pub mod evals {
+    pub use pi_evals::*;
+}
+pub mod protocol {
+    pub use pi_protocol::*;
+}
+pub mod server {
+    pub use pi_server::*;
+}
+pub mod session_backends {
+    pub use pi_session_backends::*;
+}
+pub mod telemetry {
+    pub use pi_telemetry::*;
+}
+pub mod tui {
+    pub use pi_tui::*;
+}
+
+// Direct re-exports of every Phase-1 leaf crate so historical
+// `pi::foo::bar` paths keep resolving. Each leaf lives inside its parent
+// Phase-2 package; we re-export both for maximum backward compatibility.
+pub use pi_agent_cx::*;
+pub use pi_agent_hub::*;
+pub use pi_bpe::*;
+pub use pi_buffer_shim::*;
+pub use pi_cli::*;
+pub use pi_context_files::*;
+pub use pi_conformance::*;
+pub use pi_crash::*;
+pub use pi_crypto_shim::*;
+pub use pi_delight::*;
+pub use pi_dialects::*;
+pub use pi_embedded_assets::*;
+pub use pi_error::*;
+pub use pi_extension_replay::*;
+pub use pi_extension_scoring::*;
+pub use pi_failover::*;
+pub use pi_file_lock::*;
+pub use pi_flake_classifier::*;
+pub use pi_gallery::*;
+pub use pi_hostcall_io_uring_lane::*;
+pub use pi_hostcall_s3_fifo::*;
+pub use pi_hostcall_superinstructions::*;
+pub use pi_http_shim::*;
+pub use pi_jsonrpc::*;
+pub use pi_magic_keywords::*;
+pub use pi_markdown_rich::*;
+pub use pi_model::*;
+pub use pi_overlay_system::*;
+pub use pi_platform::*;
+pub use pi_pmu_telemetry::*;
+pub use pi_profiler::*;
+pub use pi_provider::*;
+pub use pi_provider_metadata::*;
+pub use pi_scheduler::*;
+pub use pi_secrets::*;
+pub use pi_secret_screener::*;
+pub use pi_self_update::*;
+pub use pi_session_metrics::*;
+pub use pi_sse::*;
+pub use pi_stats::*;
+pub use pi_status_line::*;
+pub use pi_stream_rules::*;
+pub use pi_swarm_activity_ledger::*;
+pub use pi_swarm_progress_slo::*;
+pub use pi_turn_recovery::*;
+pub use pi_undo::*;
+pub use pi_version::*;
+pub use pi_web_remote::*;
+pub use pi_workspace::*;
+
+// Stable re-exports named by the public API policy.
+pub use pi_coding_agent::Error;
+pub use pi_coding_agent::PiResult;
+pub use pi_protocol::sdk;
 
 // Conditional re-exports for fuzz harnesses.
-// These expose internal parsing functions that are normally private,
-// gated behind the `fuzzing` feature so they do not appear in the
-// public API during normal builds.
 #[cfg(feature = "fuzzing")]
 #[doc(hidden)]
 pub mod fuzz_exports {
-    //! Re-exports of internal parsing/deserialization functions for
-    //! `cargo-fuzz` / `libFuzzer` harnesses.
-    //!
-    //! Enabled only when the `fuzzing` Cargo feature is active.
-    //! The `fuzz/Cargo.toml` depends on this crate with
-    //! `features = ["fuzzing"]`.
-
-    pub use crate::config::Config;
-    pub use crate::model::{
+    pub use pi_coding_agent::config::Config;
+    pub use pi_ai::model::{
         AssistantMessage, ContentBlock, Message, StreamEvent, TextContent, ThinkingContent,
         ToolCall, ToolResultMessage, Usage, UserContent, UserMessage,
     };
-    pub use crate::session::{Session, SessionEntry, SessionHeader, SessionMessage};
-    pub use crate::sse::{SseEvent, SseParser};
-    pub use crate::tools::{fuzz_normalize_dot_segments, fuzz_resolve_path};
+    pub use pi_session_backends::session::{Session, SessionEntry, SessionHeader, SessionMessage};
+    pub use pi_protocol::sse::{SseEvent, SseParser};
+    pub use pi_coding_agent::tools::{fuzz_normalize_dot_segments, fuzz_resolve_path};
 
-    // Provider stream processor wrappers for coverage-guided fuzzing.
-    pub use crate::providers::anthropic::fuzz::Processor as AnthropicProcessor;
-    pub use crate::providers::azure::fuzz::Processor as AzureProcessor;
-    pub use crate::providers::cohere::fuzz::Processor as CohereProcessor;
-    pub use crate::providers::gemini::fuzz::Processor as GeminiProcessor;
-    pub use crate::providers::openai::fuzz::Processor as OpenAIProcessor;
-    pub use crate::providers::openai_responses::fuzz::Processor as OpenAIResponsesProcessor;
-    pub use crate::providers::vertex::fuzz::Processor as VertexProcessor;
+    pub use pi_ai::providers::anthropic::fuzz::Processor as AnthropicProcessor;
+    pub use pi_ai::providers::azure::fuzz::Processor as AzureProcessor;
+    pub use pi_ai::providers::cohere::fuzz::Processor as CohereProcessor;
+    pub use pi_ai::providers::gemini::fuzz::Processor as GeminiProcessor;
+    pub use pi_ai::providers::openai::fuzz::Processor as OpenAIProcessor;
+    pub use pi_ai::providers::openai_responses::fuzz::Processor as OpenAIResponsesProcessor;
+    pub use pi_ai::providers::vertex::fuzz::Processor as VertexProcessor;
 }

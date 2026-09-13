@@ -539,5 +539,94 @@ git push origin feature/crates0911
 | `@earendil-works/pi-tui` | `pi-tui` | ✅ 名称 + 职责一致 |
 | (额外辅助) | `pi-error` / `pi-provider-metadata` | ➕ Rust 拆分出来的工具 crate,TypeScript 没有独立对应 |
 
-> 本文档版本:v1.1(2026-09-13)
+## 10. 完成度百分比(2026-09-13)
+
+| 模块化目标 | 状态 | 占比 |
+|------------|------|------|
+| 224 文件批量迁移到 11 个 Phase-2 包 | ✅ 完成(Round 13) | 35% |
+| 50 个 leaf crate inline 收编 | ✅ 完成(Round 17) | 25% |
+| `pi` 门面 + binary `pi` 编译链路打通 | ✅ 完成(Round 18-20) | 15% |
+| `pi-mono` 完整 aggregator surface | ✅ 完成(Round 22) | 10% |
+| **结构镜像小计** | | **85%** |
+| 剩余:`cargo test --workspace` 全绿 | ⏳ 未执行 | — |
+| 剩余:`cargo clippy --workspace -- -D warnings` 全绿 | ⏳ 未执行(195 warnings 待收敛) | — |
+| 剩余:7 个空 marker crate 拆回真实代码归属 | ⏳ 未开始(Round 24+) | — |
+| **结构镜像估算** | | **85%+**(剩余主要是 lint / test / 代码归属) |
+
+## 11. Round 23 — 与上游 `earendil-works/pi` 的真实差距分析
+
+**说明**:本节不是结构对齐度对比,而是**真实的、基于 git clone 的上游代码分析**。Round 23 已 `git clone https://github.com/earendil-works/pi.git` 并逐 crate 比对。
+
+### 11.1 上游 vs 本仓库 LOC 对照(2026-09-13)
+
+| 上游 `@earendil-works/*` 包 | 上游 .ts 文件数 | 上游 LOC | Rust crate | Rust .rs 文件数 | Rust LOC |
+|------|--------|--------|------|--------|--------|
+| `pi-agent-core` | 180 | 50,136 | `pi-agent-core` | 3 | 5,283 |
+| `pi-ai` | 340 | 65,515 | `pi-ai` | 16 | 14,707 |
+| `pi-chord` | 34 | 9,375 | `pi-chord` | 1 | 12 |
+| `pi-client` | 13 | 1,951 | `pi-client` | 1 | 13 |
+| `pi-coding-agent` | 646 | 143,033 | `pi-coding-agent` | 212 | **531,436** |
+| `pi-evals` | 17 | 2,474 | `pi-evals` | 1 | 12 |
+| `pi-protocol` | 12 | 1,447 | `pi-protocol` | 1 | 12 |
+| `pi-server` | 23 | 3,051 | `pi-server` | 1 | 13 |
+| `pi-session-backends` | 27 | 4,126 | `pi-session-backends` | 1 | 13 |
+| `pi-telemetry` | 8 | 1,178 | `pi-telemetry` | 4 | 1,882 |
+| `pi-tui` | 87 | 36,724 | `pi-tui` | 1 | 12 |
+| **合计** | **1,387** | **319,024** | | **242** | **553,395** |
+
+### 11.2 根本问题:Round 18 循环破除导致 7 个 crate 退化为空 marker
+
+`pi-coding-agent` 现在承载了**多个本应属于其他 phase-2 包**的代码:`tui / interactive / interactive_ftui / terminal_images / autocomplete`(本应在 `pi-tui`)、`extensions_api / extensions / connectors`(本应在 `pi-chord`)、`rpc / acp / jsonrpc / http / sdk`(本应在 `pi-protocol`)、`session / session_sqlite / session_store_v2 / session_picker / session_import / session_index / session_test`(本应在 `pi-session-backends`)、`web_remote`(本应在 `pi-client`)、`package_manager / plan / jobs / github / review / debug / eval / xdev`(本应在 `pi-server` + `pi-evals`)。这是为了让 pi-coding-agent 编译过的权宜方案,**不是真正的模块化对齐**。
+
+**真实模块化完成度**:
+- **结构镜像**(11 个 crate 与上游同名):✅ 完成
+- **代码归属镜像**(每个 crate 的代码归属与上游一致):❌ 未完成
+  - 完全对齐:`pi-ai`(14.7K vs 65.5K,差 50K = pi-coding-agent/providers 13 个文件 + pi-coding-agent/embedded_assets 等)、`pi-telemetry`(1.9K vs 1.2K,差 -0.7K,Rust 多了一些)
+  - 完全错位:`pi-chord / pi-client / pi-evals / pi-protocol / pi-server / pi-session-backends / pi-tui`(7 个 crate 是 12 LOC 空 marker)
+
+### 11.3 真实的"复刻度"数字(代码归属而非结构镜像)
+
+| 维度 | 上游 | 我们 | 完成度 |
+|------|------|------|--------|
+| **包结构镜像**(11 个同名 crate) | 11/11 | 11/11 | ✅ 100% |
+| **代码归属** | 1,387 .ts @ 319K LOC | 242 .rs @ 553K LOC(归属错位) | ⚠️ 约 **30%**(7 个 crate 是空 marker) |
+| **provider 覆盖**(`pi-ai/src/providers`) | 87 个 provider | 13 个 provider(`pi-coding-agent/providers/`) | ⚠️ 15% |
+| **API 层**(`pi-ai/src/api/`) | 32 文件 | 0(全部内联在 provider 文件) | ❌ 0% |
+| **Auth 抽象**(`pi-ai/src/auth/`) | 6+ 文件 | 0(`pi-coding-agent/auth.rs`) | ❌ 0% |
+| **TUI 组件**(`pi-tui/src/components/`) | ~40 文件 | 0(`pi-coding-agent/interactive_ftui`) | ❌ 0% |
+| **Chord 服务**(`pi-chord/src/{hostcall,buffer,file-lock}`) | 9,375 LOC | 0(`pi-coding-agent/hostcall_*,buffer_shim,file_lock`) | ❌ 0% |
+| **协议层**(`pi-protocol/src/{jsonrpc,sse,framing}`) | 1,447 LOC | 0(`pi-coding-agent/rpc,jsonrpc,http`) | ❌ 0% |
+| **session 后端**(`pi-session-backends/src/{sqlite,jsonl}`) | 4,126 LOC | 0(`pi-coding-agent/session_sqlite,session_store_v2`) | ❌ 0% |
+
+**总体真实复刻度(代码归属而非结构镜像):~30%**(7 个 crate 空 marker + 多个子域零拆解)
+
+### 11.4 真实复刻的可行路径(按 ROI 排序)
+
+| 路径 | 价值 | 工作量 | 风险 |
+|------|------|--------|------|
+| **(A) 解 `pi-coding-agent ↔ pi-X` 循环,反向把模块拆回各自 phase-2 包** | 真实完成度从 30% → 70%+ | 大(需重新设计 7 个模块的依赖图,可能要 lazy_static / trait 抽象) | 高(可能引入新的循环) |
+| **(B) 在不动结构的前提下,把 `pi-coding-agent/providers/` 13 个文件按 upstream `pi-ai/providers/` 87 个文件全量补齐** | provider 覆盖从 15% → 100% | 中(只需新增 provider 实现) | 低(纯加法) |
+| **(C) 把 `pi-coding-agent/extensions_api.rs` 拆出到 `pi-chord`,破除 `pi-coding-agent ↔ pi-chord` 循环** | `pi-chord` 从 12 LOC → ~25K LOC | 中 | 中(extensions 强依赖 runtime types) |
+| **(D) 把 `pi-coding-agent/{tui,interactive,autocomplete,terminal_images}` 拆出到 `pi-tui`,破除 `pi-coding-agent ↔ pi-tui` 循环** | `pi-tui` 从 12 LOC → ~36K LOC | 中 | 中(TUI 强依赖 agent event 流) |
+| **(E) 把 `pi-coding-agent/{rpc,acp,jsonrpc,http,sdk}` 拆出到 `pi-protocol`,破除 `pi-coding-agent ↔ pi-protocol` 循环** | `pi-protocol` 从 12 LOC → ~1.4K LOC | 小 | 低 |
+| **(F) 把 `pi-coding-agent/{session,session_*,...}` 拆出到 `pi-session-backends`,破除循环** | `pi-session-backends` 从 12 LOC → ~4K LOC | 中 | 中 |
+| **(G) 把 `pi-coding-agent/{web_remote,client,connectors}` 拆出到 `pi-client`** | `pi-client` 从 12 LOC → ~2K LOC | 小 | 低 |
+
+### 11.5 推荐执行顺序(增量提升真实复刻度)
+
+1. **Round 24**:执行 **(E)** —— 拆 `pi-protocol`(最简单、风险最低)→ 真实复刻度 +0.5%
+2. **Round 25**:执行 **(G)** —— 拆 `pi-client` → 真实复刻度 +0.5%
+3. **Round 26**:执行 **(F)** —— 拆 `pi-session-backends` → 真实复刻度 +1%
+4. **Round 27**:执行 **(C)** —— 拆 `pi-chord`(需要重构 extensions 与 chord 的耦合)→ 真实复刻度 +7%
+5. **Round 28**:执行 **(D)** —— 拆 `pi-tui`(需要把 agent event 流抽象成 trait)→ 真实复刻度 +10%
+6. **Round 29**:执行 **(B)** —— provider 全量补齐 → 真实复刻度 +10%
+7. **Round 30**:执行 **(A)** 剩余部分(agent, evals, server) → 真实复刻度 +5%
+
+**预计 Round 30 结束时真实复刻度:约 35-40%**(因为 Rust 的代码量本身比 TS 多,且很多子模块在 TS 是 lazy 分包,Rust 是单文件)
+
+### 11.6 关于 Round 18 的复盘
+
+Round 18 把 agent / chord / tui / protocol / evals / server / session-backends 全吸收到 pi-coding-agent 是**当时的合理决策**:不打破这些循环,Round 17 inline 后的 cargo check 通不过。但代价是 7 个 phase-2 crate 退化为空 marker —— **结构镜像完成了,代码归属错位**。要走到真正的模块化复刻,需要重新引入 lazy / trait 抽象让 pi-coding-agent 与每个 phase-2 包解耦,这部分工作从 Round 24 开始。
+
+> 本文档版本:v1.2(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`

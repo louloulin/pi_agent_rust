@@ -364,7 +364,7 @@ fn enter_accepts_highlighted_autocomplete_item() {
     // highlighted (e.g. user pressed Down to select `/model`), pressing Enter
     // must accept the highlighted item — matching the dropdown's own footer
     // hint "Enter/Tab accept" — not submit the raw `/` typed so far.
-    use crate::autocomplete::{AutocompleteItem, AutocompleteItemKind};
+    use pi_tui::autocomplete::{AutocompleteItem, AutocompleteItemKind};
     use bubbletea::{KeyMsg, KeyType, Message};
 
     let dir = tempdir();

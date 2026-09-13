@@ -20,7 +20,7 @@
 //!   spinner ticks, theme-derived [`FtuiPalette`], the shared keybinding
 //!   catalog via `KeyBinding::from_ftui_key`, inline ask cards, a modal
 //!   picker overlay (`/theme`), the slash-command completion popup above the
-//!   editor (issue #208; shares [`crate::autocomplete`] with the charmed
+//!   editor (issue #208; shares [`pi_tui::autocomplete`] with the charmed
 //!   stack), and input routing for `/model`, `/help`, and
 //!   display-only `!`/`!!` bash. All agent/tool-originated text passes
 //!   through `ftui::render::sanitize` before it can reach a frame.
@@ -31,7 +31,7 @@
 //!
 //! Fully ported surfaces:
 //! - Interactive tree/fork selector overlays and toast queue ([`crate::overlay_system`])
-//! - Command-palette autocomplete and composer ([`crate::autocomplete`])
+//! - Command-palette autocomplete and composer ([`pi_tui::autocomplete`])
 //! - Rich Powerline status line with responsive dropping ([`crate::status_line`])
 //! - Rich markdown with LaTeX symbols, mermaid diagrams, and hex swatches ([`crate::markdown_rich`])
 //! - Delight animations, sparklines, and terminal titles ([`crate::delight`])
@@ -55,7 +55,7 @@ use ftui::widgets::textarea::TextArea;
 use ftui::{Cmd, Event, Frame, KeyCode, Model, Modifiers, MouseEventKind};
 
 use crate::ask::{AskAnswer, AskResponse, AskUiRequest, QuestionReply};
-use crate::autocomplete::{AutocompleteCatalog, AutocompleteItem, AutocompleteItemKind};
+use pi_tui::autocomplete::{AutocompleteCatalog, AutocompleteItem, AutocompleteItemKind};
 use crate::extensions::{ExtensionUiRequest, ExtensionUiResponse};
 use crate::interactive::{AutocompleteState, PiMsg, extension_commands_for_catalog};
 use crate::interactive::{format_extension_ui_prompt, parse_extension_ui_response};
@@ -1163,7 +1163,7 @@ pub struct PiFtuiModel {
     /// The input editor (ftui-widgets TextArea replaces bubbles TextArea).
     input: TextArea,
     /// Slash-command completion popup (issue #208). Shares the dropdown
-    /// state machine and the [`crate::autocomplete`] provider with the
+    /// state machine and the [`pi_tui::autocomplete`] provider with the
     /// charmed stack, so both surfaces complete from the same command list.
     autocomplete: AutocompleteState,
     /// Where submitted user input goes. The launch path hands the sending
@@ -7139,7 +7139,7 @@ mod tests {
             "unknown command before the catalog arrives"
         );
         let catalog = AutocompleteCatalog {
-            extension_commands: vec![crate::autocomplete::NamedEntry {
+            extension_commands: vec![pi_tui::autocomplete::NamedEntry {
                 name: String::from("deploy"),
                 description: Some(String::from("Ship the current branch")),
             }],

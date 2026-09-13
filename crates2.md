@@ -954,8 +954,35 @@ Round 30 后(收尾)       : ~64%
 
 **cycle 阻断说明:** 通过 `tui_log_init_dir` 钩子而非 `pi-tui → pi-coding-agent` 边,保留了 `PI_CODING_AGENT_DIR` 环境变量语义,同时不引入新 cycle。这是 Round 28 系列里第二个完美迁出的 TUI 大文件(`terminal_images.rs` 是第一个)。
 
+### Round 28.3 — `autocomplete.rs` → `pi-tui` ✅ (trait seam)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/autocomplete.rs crates/pi-tui/src/autocomplete.rs`(2,789 LOC)
+2. **2 个内部 cycle 引用**:`autocomplete.rs` 引用 `crate::workspace::WorkspaceHandle` 与 `crate::models::model_autocomplete_candidates()`,直接搬会形成 `pi-tui → pi-coding-agent` cycle。
+3. **解决方案 — 引入 2 个 trait seam**:
+   - `pub trait AutocompleteResourceSource`(in pi-tui):返回 prompts / skills / models 的 `(String, Option<String>)` 列表
+   - `pub trait WorkspaceRootProvider: Debug + Send`(in pi-tui):返回 canonical 根路径列表
+4. `AutocompleteCatalog` 新增 `models: Vec<NamedEntry>` 字段
+5. `AutocompleteProvider.workspace` 字段从 `Option<WorkspaceHandle>` 改为 `Option<Box<dyn WorkspaceRootProvider>>`
+6. `pi-coding-agent/src/resources.rs` 新增 `impl AutocompleteResourceSource for ResourceLoader`(4 个方法:prompts / skills / models / enable_skill_commands)
+7. `pi-coding-agent/src/workspace.rs` 新增 `impl WorkspaceRootProvider for WorkspaceHandle`(roots_or 委托给 `snapshot_or(cwd).all()`)
+8. `pi-tui/Cargo.toml` 新增 `ignore` 依赖
+9. `pi-tui/src/lib.rs` 新增 `pub mod autocomplete;`
+10. `pi-coding-agent/src/lib.rs` 移除 `pub mod autocomplete;`
+11. Bulk rename 6 处调用方:main.rs、interactive/{agent,ftui,state,tests,mod}.rs
+12. `interactive/state.rs:152` 与 `interactive/mod.rs:2742` 调用 `set_workspace` 路径:`AutocompleteState::set_workspace` 内部用 `Box::new(workspace) as Box<dyn WorkspaceRootProvider>` 做强制转换
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,与 Round 28.2 持平)
+- `cargo check --bin pi -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 2,789 LOC
+
+**trait seam 设计:** 这是 Round 28 系列首次需要 trait seam 桥接的类型;之前的 `terminal_images.rs` 与 `tui.rs` 都只用了基础类型(std / base64 / rich_rust / dirs)。trait seam 让 pi-tui 不需要知道 `ResourceLoader`、`WorkspaceHandle` 这些 pi-coding-agent 内部类型,且为 Round 31+ 的更深层解耦提供了可复用模式。
+
 ---
 
-> 本文档版本:v2.11(2026-09-13)
+> 本文档版本:v2.12(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

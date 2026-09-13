@@ -695,6 +695,37 @@ impl ResourceLoader {
     }
 }
 
+// Round 28.3: trait seam so `pi-tui::autocomplete` can read prompt / skill
+// entries without taking a `pi-tui -> pi-coding-agent` back-edge. The trait
+// returns `(String, Option<String>)` pairs so `pi-tui` does not have to know
+// the concrete `PromptTemplate` / `Skill` types.
+impl pi_tui::autocomplete::AutocompleteResourceSource for ResourceLoader {
+    fn autocomplete_prompts(&self) -> Vec<(String, Option<String>)> {
+        self.prompts
+            .iter()
+            .map(|t| (t.name.clone(), Some(t.description.clone())))
+            .collect()
+    }
+
+    fn autocomplete_skills(&self) -> Vec<(String, Option<String>)> {
+        self.skills
+            .iter()
+            .map(|s| (s.name.clone(), Some(s.description.clone())))
+            .collect()
+    }
+
+    fn autocomplete_models(&self) -> Vec<(String, Option<String>)> {
+        crate::models::model_autocomplete_candidates()
+            .iter()
+            .map(|c| (c.slug.clone(), c.description.clone()))
+            .collect()
+    }
+
+    fn autocomplete_enable_skill_commands(&self) -> bool {
+        self.enable_skill_commands
+    }
+}
+
 // ============================================================================
 // Package resources
 // ============================================================================

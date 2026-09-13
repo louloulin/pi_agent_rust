@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use bubbles::list::{DefaultDelegate, Item as ListItem, List};
 
 use crate::agent::{QueueMode, QueuedAgentMessage};
-use crate::autocomplete::{
+use pi_tui::autocomplete::{
     AutocompleteCatalog, AutocompleteItem, AutocompleteProvider, AutocompleteResponse,
 };
 use crate::extensions::ExtensionUiRequest;
@@ -151,7 +151,8 @@ impl AutocompleteState {
     /// Attach the session workspace root handle (bd-cv653.3.12): @-file
     /// suggestions then span every additional root.
     pub(super) fn set_workspace(&mut self, workspace: crate::workspace::WorkspaceHandle) {
-        self.provider.set_workspace(workspace);
+        self.provider
+            .set_workspace(Box::new(workspace) as Box<dyn pi_tui::autocomplete::WorkspaceRootProvider>);
         self.close();
     }
 
@@ -1191,7 +1192,7 @@ mod tests {
 
     fn model_item(id: &str) -> AutocompleteItem {
         AutocompleteItem {
-            kind: crate::autocomplete::AutocompleteItemKind::Model,
+            kind: pi_tui::autocomplete::AutocompleteItemKind::Model,
             label: id.to_string(),
             insert: id.to_string(),
             description: None,

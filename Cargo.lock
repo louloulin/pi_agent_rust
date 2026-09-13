@@ -5878,6 +5878,7 @@ dependencies = [
  "anyhow",
  "base64 0.23.1",
  "dirs",
+ "ignore",
  "pi-ai",
  "rich_rust",
 ]

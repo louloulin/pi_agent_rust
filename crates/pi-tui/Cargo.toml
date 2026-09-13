@@ -35,3 +35,5 @@ pi-ai = { workspace = true }
 dirs = { workspace = true }
 # tui.rs uses rich_rust for the markup-based renderer.
 rich_rust = { version = "0.2", features = ["markdown"] }
+# autocomplete.rs (Round 28.3): walks the project tree for @-file suggestions.
+ignore = { workspace = true }

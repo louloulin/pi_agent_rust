@@ -41,7 +41,7 @@ use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use crate::agent::{
     AbortHandle, Agent, AgentEvent, QueueMode, QueuedAgentMessage, SessionActionAdmissionGate,
 };
-use crate::autocomplete::{AutocompleteCatalog, AutocompleteItem, AutocompleteItemKind};
+use pi_tui::autocomplete::{AutocompleteCatalog, AutocompleteItem, AutocompleteItemKind};
 use crate::config::{Config, ExtensionPolicyConfig, SettingsScope, parse_queue_mode_or_default};
 use crate::extension_events::{InputEventOutcome, apply_input_event_response};
 use crate::extensions::{
@@ -1959,7 +1959,7 @@ pub enum PiMsg {
     /// once its session exists, so extension-contributed commands join the
     /// built-in list; the charmed stack builds its catalog inline and
     /// ignores this.
-    AutocompleteCatalog(crate::autocomplete::AutocompleteCatalog),
+    AutocompleteCatalog(pi_tui::autocomplete::AutocompleteCatalog),
     /// Text delta from assistant.
     TextDelta(String),
     /// Thinking delta from assistant.

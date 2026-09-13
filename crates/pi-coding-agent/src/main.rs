@@ -2568,7 +2568,7 @@ async fn run(
                 ftui_sessions,
                 config.markdown_spacing(),
                 pi_coding_agent::interactive_ftui::AutocompleteLaunch {
-                    catalog: pi_coding_agent::autocomplete::AutocompleteCatalog::from_resources(&resources),
+                    catalog: pi_tui::autocomplete::AutocompleteCatalog::from_resources(&resources),
                     cwd: cwd.clone(),
                     max_visible: config
                         .autocomplete_max_visible

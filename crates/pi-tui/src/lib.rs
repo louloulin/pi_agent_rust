@@ -8,8 +8,11 @@
 //!   for the `placeholder(mime_type, ...)` API (Round 28.1)
 //! - `tui.rs` — rich_rust-backed console + TUI-aware log redirection
 //!   (Round 28.2)
+//! - `autocomplete.rs` — file/slash/template/skill autocomplete provider,
+//!   rendering-agnostic (Round 28.3)
 
 #![forbid(unsafe_code)]
 
+pub mod autocomplete;
 pub mod terminal_images;
 pub mod tui;

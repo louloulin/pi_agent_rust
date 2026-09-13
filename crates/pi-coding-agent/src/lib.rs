@@ -145,7 +145,6 @@ pub mod debug;
 pub mod eval;
 pub mod xdev;
 pub mod lsp;
-pub mod autocomplete;
 pub mod interactive;
 pub mod interactive_ftui;
 

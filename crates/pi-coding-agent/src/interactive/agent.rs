@@ -8,7 +8,7 @@ use crate::extension_events::{BeforeAgentStartOutcome, apply_before_agent_start_
 
 pub fn extension_commands_for_catalog(
     manager: &ExtensionManager,
-) -> Vec<crate::autocomplete::NamedEntry> {
+) -> Vec<pi_tui::autocomplete::NamedEntry> {
     manager
         .list_commands()
         .into_iter()
@@ -18,7 +18,7 @@ pub fn extension_commands_for_catalog(
                 .get("description")
                 .and_then(|d| d.as_str())
                 .map(std::string::ToString::to_string);
-            Some(crate::autocomplete::NamedEntry { name, description })
+            Some(pi_tui::autocomplete::NamedEntry { name, description })
         })
         .collect()
 }

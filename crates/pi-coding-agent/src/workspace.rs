@@ -247,6 +247,16 @@ impl WorkspaceHandle {
     }
 }
 
+// Round 28.3: trait seam so `pi-tui::autocomplete` can read the canonical
+// root set without depending on the concrete `WorkspaceHandle` type.
+// `pi-tui` only needs the snapshot for @-file completion; confinement and
+// add/remove semantics remain in `pi-coding-agent`.
+impl pi_tui::autocomplete::WorkspaceRootProvider for WorkspaceHandle {
+    fn roots_or(&self, fallback: &Path) -> Vec<PathBuf> {
+        self.snapshot_or(fallback).all()
+    }
+}
+
 /// An immutable root-set snapshot for one confinement check.
 #[derive(Debug, Clone)]
 pub struct WorkspaceSnapshot {

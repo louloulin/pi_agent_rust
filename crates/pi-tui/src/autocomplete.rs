@@ -17,8 +17,33 @@ use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 use std::time::{Duration, Instant};
 
-use crate::resources::ResourceLoader;
 use ignore::WalkBuilder;
+
+/// Trait seam for autocomplete to read prompt / skill / model entries
+/// without reaching back into `pi-coding-agent` (Round 28.3). The concrete
+/// `ResourceLoader` lives in `pi-coding-agent/src/resources.rs` and
+/// implements this trait; `pi-tui` itself knows nothing about packages,
+/// skills, prompt templates, or models beyond their `(name, description)`
+/// shape.
+pub trait AutocompleteResourceSource {
+    fn autocomplete_prompts(&self) -> Vec<(String, Option<String>)>;
+    fn autocomplete_skills(&self) -> Vec<(String, Option<String>)>;
+    fn autocomplete_models(&self) -> Vec<(String, Option<String>)>;
+    fn autocomplete_enable_skill_commands(&self) -> bool;
+}
+
+/// Trait seam for the session workspace root set. The concrete
+/// `WorkspaceHandle` lives in `pi-coding-agent/src/workspace.rs`; pi-tui
+/// only needs the snapshot of canonical roots for @-file completion.
+///
+/// `: std::fmt::Debug + Send` so the `AutocompleteProvider` (stored inside
+/// `Debug`-derived, bubbletea-thread-shared `PiApp` types) keeps both
+/// bounds satisfied.
+pub trait WorkspaceRootProvider: std::fmt::Debug + Send {
+    /// Return the canonical workspace roots, or `vec![fallback]` when the
+    /// provider has no roots registered.
+    fn roots_or(&self, fallback: &Path) -> Vec<PathBuf>;
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum AutocompleteItemKind {
@@ -49,6 +74,7 @@ pub struct AutocompleteResponse {
 pub struct AutocompleteCatalog {
     pub prompt_templates: Vec<NamedEntry>,
     pub skills: Vec<NamedEntry>,
+    pub models: Vec<NamedEntry>,
     pub extension_commands: Vec<NamedEntry>,
     pub enable_skill_commands: bool,
 }
@@ -61,34 +87,46 @@ pub struct NamedEntry {
 
 impl AutocompleteCatalog {
     #[must_use]
-    pub fn from_resources(resources: &ResourceLoader) -> Self {
+    pub fn from_resources(resources: &dyn AutocompleteResourceSource) -> Self {
         let mut prompt_templates = resources
-            .prompts()
-            .iter()
-            .map(|template| NamedEntry {
-                name: template.name.clone(),
-                description: Some(template.description.clone()).filter(|d| !d.trim().is_empty()),
+            .autocomplete_prompts()
+            .into_iter()
+            .map(|(name, description)| NamedEntry {
+                name,
+                description: description.filter(|d| !d.trim().is_empty()),
             })
             .collect::<Vec<_>>();
 
         prompt_templates.sort_by(|a, b| a.name.cmp(&b.name));
 
         let mut skills = resources
-            .skills()
-            .iter()
-            .map(|skill| NamedEntry {
-                name: skill.name.clone(),
-                description: Some(skill.description.clone()).filter(|d| !d.trim().is_empty()),
+            .autocomplete_skills()
+            .into_iter()
+            .map(|(name, description)| NamedEntry {
+                name,
+                description: description.filter(|d| !d.trim().is_empty()),
             })
             .collect::<Vec<_>>();
 
         skills.sort_by(|a, b| a.name.cmp(&b.name));
 
+        let mut models = resources
+            .autocomplete_models()
+            .into_iter()
+            .map(|(name, description)| NamedEntry {
+                name,
+                description: description.filter(|d| !d.trim().is_empty()),
+            })
+            .collect::<Vec<_>>();
+
+        models.sort_by(|a, b| a.name.cmp(&b.name));
+
         Self {
             prompt_templates,
             skills,
+            models,
             extension_commands: Vec::new(),
-            enable_skill_commands: resources.enable_skill_commands(),
+            enable_skill_commands: resources.autocomplete_enable_skill_commands(),
         }
     }
 }
@@ -98,7 +136,12 @@ pub struct AutocompleteProvider {
     cwd: PathBuf,
     /// Session workspace roots (bd-cv653.3.12): when set, @-file
     /// suggestions span the primary root plus every additional root.
-    workspace: Option<crate::workspace::WorkspaceHandle>,
+    ///
+    /// Round 28.3: stored behind a trait-object seam so pi-tui does not
+    /// need to know the concrete `WorkspaceHandle` type that lives in
+    /// `pi-coding-agent`. Callers (`pi-coding-agent/src/interactive/...`)
+    /// box the handle on insert.
+    workspace: Option<Box<dyn WorkspaceRootProvider>>,
     home_dir_override: Option<PathBuf>,
     catalog: AutocompleteCatalog,
     file_cache: FileCache,
@@ -119,7 +162,7 @@ impl AutocompleteProvider {
     }
 
     /// Attach the session workspace root handle (bd-cv653.3.12).
-    pub fn set_workspace(&mut self, workspace: crate::workspace::WorkspaceHandle) {
+    pub fn set_workspace(&mut self, workspace: Box<dyn WorkspaceRootProvider>) {
         self.file_cache.invalidate();
         self.workspace = Some(workspace);
     }
@@ -141,10 +184,10 @@ impl AutocompleteProvider {
         self.max_items = max_items.max(1);
     }
 
-    pub(crate) fn refresh_background(&mut self) {
+    pub fn refresh_background(&mut self) {
         let roots = self.workspace.as_ref().map_or_else(
             || vec![self.cwd.clone()],
-            |w| w.snapshot_or(&self.cwd).all(),
+            |w| w.roots_or(&self.cwd),
         );
         self.file_cache.refresh_if_needed(&self.cwd, &roots);
     }
@@ -207,7 +250,7 @@ impl AutocompleteProvider {
         }
     }
 
-    pub(crate) fn resolve_file_ref(&mut self, candidate: &str) -> Option<String> {
+    pub fn resolve_file_ref(&mut self, candidate: &str) -> Option<String> {
         let normalized = normalize_file_ref_candidate(candidate);
         if normalized.is_empty() {
             return None;
@@ -218,7 +261,7 @@ impl AutocompleteProvider {
         }
         let roots = self.workspace.as_ref().map_or_else(
             || vec![self.cwd.clone()],
-            |w| w.snapshot_or(&self.cwd).all(),
+            |w| w.roots_or(&self.cwd),
         );
         self.file_cache.refresh_if_needed(&self.cwd, &roots);
         let stripped = normalized.strip_prefix("./").unwrap_or(&normalized);
@@ -375,7 +418,7 @@ impl AutocompleteProvider {
         let query = token.text.strip_prefix('@').unwrap_or(token.text);
         let roots = self.workspace.as_ref().map_or_else(
             || vec![self.cwd.clone()],
-            |w| w.snapshot_or(&self.cwd).all(),
+            |w| w.roots_or(&self.cwd),
         );
         self.file_cache.refresh_if_needed(&self.cwd, &roots);
 
@@ -494,19 +537,21 @@ impl AutocompleteProvider {
 
     fn suggest_model_argument(&self, token: &TokenAtCursor<'_>) -> AutocompleteResponse {
         let query = token.text.trim();
-        let mut items = crate::models::model_autocomplete_candidates()
+        let mut items = self
+            .catalog
+            .models
             .iter()
             .filter_map(|candidate| {
-                let (is_prefix, score) = fuzzy_match_score(&candidate.slug, query)?;
+                let (is_prefix, score) = fuzzy_match_score(&candidate.name, query)?;
                 Some(ScoredItem {
                     is_prefix,
                     score,
                     kind_rank: kind_rank(AutocompleteItemKind::Model),
-                    label: candidate.slug.clone(),
+                    label: candidate.name.clone(),
                     item: AutocompleteItem {
                         kind: AutocompleteItemKind::Model,
-                        label: candidate.slug.clone(),
-                        insert: candidate.slug.clone(),
+                        label: candidate.name.clone(),
+                        insert: candidate.name.clone(),
                         description: candidate.description.clone(),
                     },
                 })

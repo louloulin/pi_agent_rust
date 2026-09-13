@@ -5687,6 +5687,7 @@ dependencies = [
  "dirs",
  "filetime",
  "futures",
+ "pi-ai",
  "pi-error",
  "rustix",
  "semver",

@@ -43,6 +43,9 @@
 //! - `version.rs` — Background version check: semver compare, GitHub
 //!   release parsing, cached refresh + `HttpFetch` trait seam
 //!   (Round 33)
+//! - `turn_recovery.rs` — Classify model `StopReason` into
+//!   `RecoveryClass` (retry / continue / give-up) for the agent loop
+//!   (Round 34)
 
 #![forbid(unsafe_code)]
 
@@ -62,4 +65,5 @@ pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
 pub mod platform;
 pub mod skills_managed;
+pub mod turn_recovery;
 pub mod version;

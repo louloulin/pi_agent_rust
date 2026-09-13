@@ -39,7 +39,9 @@ pub mod stats;
 pub mod status_line;
 pub mod swarm_activity_ledger;
 pub mod swarm_progress_slo;
-pub mod turn_recovery;
+// Round 34: `turn_recovery` re-housed in `pi-chord` (only depends on
+// `pi_ai::model::StopReason`, zero `crate::` self-deps).
+pub use pi_chord::turn_recovery;
 pub mod undo;
 // Round 33: `version` re-housed in `pi-chord` (semver + cached refresh).
 pub use pi_chord::version;

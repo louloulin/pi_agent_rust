@@ -12,6 +12,7 @@
 //! validators as the skills loader) are kept as lessons only, with the
 //! warning surfaced.
 
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
@@ -21,10 +22,110 @@ use pi_error::{Error, Result};
 /// Tool-result schema tag for managed-skill operations.
 pub const SKILL_SCHEMA: &str = "pi.managed_skill.v1";
 
+// Skill validation constants (Round 30.4: inlined from
+// `pi-coding-agent::resources` to avoid a back-edge from `pi-chord` into
+// `pi-coding-agent`).
+const MAX_SKILL_NAME_LEN: usize = 64;
+const MAX_SKILL_DESC_LEN: usize = 1024;
+
+const ALLOWED_SKILL_FRONTMATTER: [&str; 8] = [
+    "name",
+    "description",
+    "license",
+    "compatibility",
+    "metadata",
+    "allowed-tools",
+    "disable-model-invocation",
+    // Agent-authored managed skills (bd-cv653.4.2): the marker protects
+    // user-authored skills from manage_skill mutations.
+    "managed",
+];
+
+// Resolve the agent global directory. Honors the same
+// `PI_CODING_AGENT_DIR` env override as `Config::global_dir()` so the
+// managed-skills dir tracks the rest of the agent state.
+fn managed_global_dir() -> PathBuf {
+    match std::env::var("PI_CODING_AGENT_DIR") {
+        Ok(path) => PathBuf::from(path),
+        Err(_) => dirs::home_dir()
+            .unwrap_or_else(|| PathBuf::from("."))
+            .join(".pi")
+            .join("agent"),
+    }
+}
+
+// Inlined from `pi-coding-agent::resources` so `pi-chord` does not need
+// to depend on `pi-coding-agent`. Identical rules: skill name must
+// match its parent dir, be lowercase + hyphen, ≤64 chars, no leading /
+// trailing / consecutive hyphens.
+fn validate_name(name: &str, parent_dir: &str) -> Vec<String> {
+    let mut errors = Vec::new();
+
+    if name != parent_dir {
+        errors.push(format!(
+            "name \"{name}\" does not match parent directory \"{parent_dir}\""
+        ));
+    }
+
+    if name.len() > MAX_SKILL_NAME_LEN {
+        errors.push(format!(
+            "name exceeds {MAX_SKILL_NAME_LEN} characters ({})",
+            name.len()
+        ));
+    }
+
+    if !name
+        .chars()
+        .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    {
+        errors.push(
+            "name contains invalid characters (must be lowercase a-z, 0-9, hyphens only)"
+                .to_string(),
+        );
+    }
+
+    if name.starts_with('-') || name.ends_with('-') {
+        errors.push("name must not start or end with a hyphen".to_string());
+    }
+
+    if name.contains("--") {
+        errors.push("name must not contain consecutive hyphens".to_string());
+    }
+
+    errors
+}
+
+fn validate_description(description: &str) -> Vec<String> {
+    let mut errors = Vec::new();
+    if description.trim().is_empty() {
+        errors.push("description is required".to_string());
+    } else if description.len() > MAX_SKILL_DESC_LEN {
+        errors.push(format!(
+            "description exceeds {MAX_SKILL_DESC_LEN} characters ({})",
+            description.len()
+        ));
+    }
+    errors
+}
+
+fn validate_frontmatter_fields<'a, I>(keys: I) -> Vec<String>
+where
+    I: IntoIterator<Item = &'a String>,
+{
+    let allowed: HashSet<&str> = ALLOWED_SKILL_FRONTMATTER.into_iter().collect();
+    let mut errors = Vec::new();
+    for key in keys {
+        if !allowed.contains(key.as_str()) {
+            errors.push(format!("unknown frontmatter field \"{key}\""));
+        }
+    }
+    errors
+}
+
 /// Directory the managed tier loads from (dead-last precedence).
 #[must_use]
 pub fn managed_skills_dir() -> PathBuf {
-    crate::config::Config::global_dir().join("skills.managed")
+    managed_global_dir().join("skills.managed")
 }
 
 /// One managed skill with its provenance.
@@ -42,10 +143,10 @@ pub struct ManagedSkillInfo {
 /// Returns the list of violations (empty = valid).
 #[must_use]
 pub fn lint_skill_draft(name: &str, description: &str, fields: &[&str]) -> Vec<String> {
-    let mut errors = crate::resources::validate_name(name, name);
-    errors.extend(crate::resources::validate_description(description));
+    let mut errors = validate_name(name, name);
+    errors.extend(validate_description(description));
     let owned: Vec<String> = fields.iter().map(|field| (*field).to_string()).collect();
-    errors.extend(crate::resources::validate_frontmatter_fields(owned.iter()));
+    errors.extend(validate_frontmatter_fields(owned.iter()));
     errors
 }
 

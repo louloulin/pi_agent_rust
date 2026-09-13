@@ -32,6 +32,9 @@
 //!   extension candidates; fetches GitHub + npm metrics (Round 29.2)
 //! - `extension_validation.rs` — Validation evidence + dry-run probes
 //!   for extension candidates (Round 29.2)
+//! - `skills_managed.rs` — User-managed skill CRUD (create / update /
+//!   delete / list) backed by a per-user ledger under the agent global dir
+//!   (Round 30.4)
 
 #![forbid(unsafe_code)]
 
@@ -48,3 +51,4 @@ pub mod hostcall_rewrite;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
+pub mod skills_managed;

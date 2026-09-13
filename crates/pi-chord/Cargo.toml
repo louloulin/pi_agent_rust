@@ -34,6 +34,8 @@ url = { workspace = true }
 pi-error = { workspace = true }
 # extension_popularity.rs (Round 29.2) — BoxFuture for the NpmHttpGet trait seam
 futures = { workspace = true }
+# skills_managed.rs (Round 30.4) — managed skill dir resolution
+dirs = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

@@ -1143,13 +1143,39 @@ Round 30 后(收尾)       : ~64%
 
 **Round 30 累计(本轮 + Round 30.1-30.2):** 805 LOC。pi-tui 现在持有 `tui / autocomplete / file_refs / text_utils / terminal_images / overlay_system / gallery` 共 7 个模块。
 
+### Round 30.4 — `skills_managed.rs` → `pi-chord` ✅ (helper 内联策略)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/skills_managed.rs crates/pi-chord/src/skills_managed.rs`(346 LOC)
+2. 文件原本 2 处 `crate::` 依赖(直接搬动会重开 `pi-chord → pi-coding-agent` cycle):
+   - `crate::config::Config::global_dir()` —— 全局 agent 目录路径解析
+   - `crate::resources::validate_name / validate_description / validate_frontmatter_fields` —— 技能草稿校验(3 个函数 + 3 个常量)
+3. **解决方案 — 内联 4 个 helper 到目标文件**(均为纯 std,无新依赖):
+   - `managed_global_dir() -> PathBuf` —— 复刻 `Config::global_dir()` 语义,honor `PI_CODING_AGENT_DIR` 环境变量,fallback 到 `dirs::home_dir()/.pi/agent`
+   - `validate_name(name, parent_dir) -> Vec<String>` —— 名字必须匹配 parent_dir / ≤64 字符 / 小写 + 数字 + 连字符 / 无前后置或连续连字符
+   - `validate_description(description) -> Vec<String>` —— 非空 / ≤1024 字符
+   - `validate_frontmatter_fields(keys) -> Vec<String>` —— 校验 frontmatter 字段在 8 个允许集合内
+   - 3 个对应常量:`MAX_SKILL_NAME_LEN = 64`、`MAX_SKILL_DESC_LEN = 1024`、`ALLOWED_SKILL_FRONTMATTER`(8 个字段名)
+4. `pi-chord/Cargo.toml` 加 `dirs = { workspace = true }`(`managed_global_dir` 用)。
+5. `pi-chord/src/lib.rs` 加 `pub mod skills_managed;` + 文档条目。
+6. `pi-coding-agent/src/lib.rs` 替换 `pub mod skills_managed;` 为 `pub use pi_chord::skills_managed;`(re-export,保留 `pi_coding_agent::skills_managed::*` 路径)。
+7. 调用方无需修改:`crates/pi/tests/skills_managed.rs` 和 `crates/pi/tests/url_router.rs` 走 `pi::skills_managed::*`,`pi` crate 通过 re-export 链解析到 `pi_coding_agent::skills_managed` → `pi_chord::skills_managed`。
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished(0 errors,1 既有 warning)
+- `cargo check -p pi-coding-agent`:✅ Finished in 52.55s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 53.06s(0 errors)
+
+**LOC 迁移:** 346 LOC(净代码 + ~80 行 helper 内联 + 3 个常量)
+
+**Round 30 累计(本轮 + Round 30.1-30.3):** 1,151 LOC。pi-chord 现在持有 15 个模块(13 个 hostcall/extension + skills_managed + extension_validation),合计 ~15K LOC。
+
 ### Round 30 后续候选(按文件大小排序)
 | 文件 | LOC | 候选归属 | 风险 |
 |------|-----|---------|------|
 | `completion.rs` | 188 | `pi-tui`(shell completion) | 零依赖 |
 | `btw.rs` | 272 | `pi-ai` 或 `pi-tui` | pi_ai dep |
 | `current_time.rs` | 276 | `pi-tui`(tool impl 较杂) | 有 `crate::tools::*` |
-| `skills_managed.rs` | 346 | `pi-chord`(skill mgmt) | 有 pi_error,无 crate |
 | `theme.rs` | 471 | `pi-tui`(theme) | 有 `crate::config::Config` |
 | `usage.rs` | 602 | `pi-ai` 或 `pi-coding-agent` | 有 `crate::auth + http::client` |
 | `conformance.rs` | 471 | `pi-evals` | 需评估 |
@@ -1157,6 +1183,6 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.19(2026-09-13)
+> 本文档版本:v2.20(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

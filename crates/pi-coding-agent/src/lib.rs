@@ -126,7 +126,9 @@ pub mod agent_hub;
 pub mod handoff;
 pub mod memory;
 pub mod resource_governor;
-pub mod skills_managed;
+// Round 30.4: `skills_managed` re-housed in `pi-chord`. Re-export it here
+// so binary + tests can keep using `pi_coding_agent::skills_managed::*`.
+pub use pi_chord::skills_managed;
 pub mod subagents;
 
 // Round 18: protocol / rpc / acp / sdk absorbed from pi-protocol.

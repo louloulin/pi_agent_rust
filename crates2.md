@@ -862,8 +862,26 @@ Round 30 后(收尾)       : ~64%
 
 真正的修复:把 `HostcallKind` / `HostcallRequest` 抽到 `pi-chord` 或共享类型模块。留 Round 31+。
 
+### Round 27.7 — `hostcall_queue.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_queue.rs crates/pi-chord/src/hostcall_queue.rs`(2,180 LOC)
+2. `pi-chord/Cargo.toml` 新增 `crossbeam-queue` + `tracing` 依赖
+3. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_queue;`
+4. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_queue;`
+5. Bulk rename `crate::hostcall_queue::*` → `pi_chord::hostcall_queue::*` in `extensions_api.rs` + `extensions_js.rs`
+6. 修复文件内 `pub use pi_chord::hostcall_s3_fifo::*` → `pub use crate::hostcall_s3_fifo::*`(自身已在 pi-chord)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 2,180 LOC
+
+**Round 27 累计迁出 8/15 chord 文件,累计 ~7,500 LOC**
+
 ---
 
-> 本文档版本:v2.7(2026-09-13)
+> 本文档版本:v2.8(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

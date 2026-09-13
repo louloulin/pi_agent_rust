@@ -13682,7 +13682,7 @@ fn js_runtime_shard_config(
         .map(|total| split_shard_budget(total, shard_count, shard_index, "module cache"))
         .transpose()?;
     let fast_queue_total = if config.limits.hostcall_fast_queue_capacity == 0 {
-        crate::hostcall_queue::HOSTCALL_FAST_RING_CAPACITY
+        pi_chord::hostcall_queue::HOSTCALL_FAST_RING_CAPACITY
     } else {
         config.limits.hostcall_fast_queue_capacity
     };
@@ -13693,7 +13693,7 @@ fn js_runtime_shard_config(
         "hostcall fast queue",
     )?;
     let overflow_queue_total = if config.limits.hostcall_overflow_queue_capacity == 0 {
-        crate::hostcall_queue::HOSTCALL_OVERFLOW_CAPACITY
+        pi_chord::hostcall_queue::HOSTCALL_OVERFLOW_CAPACITY
     } else {
         config.limits.hostcall_overflow_queue_capacity
     };

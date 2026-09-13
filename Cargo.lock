@@ -5682,11 +5682,13 @@ name = "pi-chord"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "crossbeam-queue",
  "filetime",
  "rustix",
  "serde",
  "serde_json",
  "tempfile",
+ "tracing",
 ]
 
 [[package]]

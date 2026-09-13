@@ -27,7 +27,7 @@ use pi_error::{Error, Result};
 use pi_chord::hostcall_io_uring_lane::{
     HostcallCapabilityClass, HostcallIoHint, IoUringLaneDecisionInput,
 };
-use crate::hostcall_queue::{
+use pi_chord::hostcall_queue::{
     HOSTCALL_FAST_RING_CAPACITY, HOSTCALL_OVERFLOW_CAPACITY, HostcallQueueEnqueueResult,
     HostcallQueueTelemetry, HostcallRequestQueue, QueueTenant,
 };

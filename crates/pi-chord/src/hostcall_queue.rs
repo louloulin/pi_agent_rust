@@ -4,7 +4,7 @@
 //! exceeds ring capacity, requests spill into a bounded overflow deque to
 //! preserve FIFO ordering across the two lanes.
 
-pub use pi_chord::hostcall_s3_fifo::S3FifoFallbackReason;
+pub use crate::hostcall_s3_fifo::S3FifoFallbackReason;
 use crossbeam_queue::ArrayQueue;
 use std::collections::{BTreeMap, VecDeque};
 use std::sync::Arc;

@@ -19,12 +19,15 @@
 //!   (Round 27.5)
 //! - `hostcall_trace_jit.rs` — Trace-JIT compiler producing guarded
 //!   superinstruction plans (Round 27.6)
+//! - `hostcall_queue.rs` — Hostcall dispatch queue with overflow handling
+//!   and S3-FIFO eviction telemetry (Round 27.7)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
 pub mod file_lock;
 pub mod hostcall_io_uring_lane;
+pub mod hostcall_queue;
 pub mod hostcall_rewrite;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;

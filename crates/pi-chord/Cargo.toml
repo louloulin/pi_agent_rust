@@ -21,6 +21,9 @@ filetime = { workspace = true }
 rustix = { workspace = true }
 # hostcall_superinstructions.rs (Round 27.3) uses serde derive
 serde = { workspace = true }
+# hostcall_queue.rs (Round 27.7) uses crossbeam_queue for the fast ring
+crossbeam-queue = { workspace = true }
+tracing = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

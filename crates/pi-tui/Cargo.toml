@@ -11,4 +11,12 @@ workspace = true
 [dependencies]
 # Round 18: pi-tui is now an empty placeholder. All tui files moved to
 # pi-coding-agent to break the pi-coding-agent ↔ pi-tui cycle.
+#
+# Round 28: re-housing leaves here, one at a time, to restore the upstream
+# surface. Each leaf gets its own dep list appended below.
+#
+# terminal_images.rs (Round 28.1)
 anyhow = { workspace = true }
+base64 = { workspace = true }
+# terminal_images.rs (Round 28.1) uses pi_ai::model for MIME sanitization
+pi-ai = { workspace = true }

@@ -47,7 +47,7 @@ pub(super) fn content_blocks_to_text(blocks: &[ContentBlock]) -> String {
                 // structured image blocks remain available to model input.
                 push_line(
                     &mut output,
-                    &crate::terminal_images::placeholder(&image.mime_type, None, None),
+                    &pi_tui::terminal_images::placeholder(&image.mime_type, None, None),
                 );
             }
             // Media blocks are never rendered inline; the sanitized
@@ -106,7 +106,7 @@ pub(super) fn tool_content_blocks_to_text(blocks: &[ContentBlock], show_images: 
                 if show_images {
                     push_line(
                         &mut output,
-                        &crate::terminal_images::placeholder(&image.mime_type, None, None),
+                        &pi_tui::terminal_images::placeholder(&image.mime_type, None, None),
                     );
                 } else {
                     hidden_images = hidden_images.saturating_add(1);

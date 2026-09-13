@@ -5749,6 +5749,7 @@ dependencies = [
  "pi-error",
  "pi-session-backends",
  "pi-telemetry",
+ "pi-tui",
  "portable-pty",
  "proptest",
  "regex",
@@ -5875,6 +5876,8 @@ name = "pi-tui"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64 0.23.1",
+ "pi-ai",
 ]
 
 [[package]]

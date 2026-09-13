@@ -900,8 +900,30 @@ Round 30 后(收尾)       : ~64%
 
 **剩余 hostcall_* 候选:** 仅 `hostcall_amac.rs`(cycle-blocked,Round 31+)
 
+### Round 27 收尾 + Round 28.1 — `terminal_images.rs` → `pi-tui` ✅
+
+**Round 27 hostcall_* 系列已完成(9 文件)。剩余:**
+- `extensions_api.rs`(~25K LOC,中心枢纽):用 `agent / config / session / connectors / permissions / resources / tools / extensions`,迁入会形成 `pi-chord → pi-coding-agent` cycle。与 `hostcall_amac.rs` 同模式 blocker,留 Round 31+。
+- `hostcall_amac.rs`:cycle-blocked。
+
+**本轮(Round 28.1):切到 `pi-tui`,迁 `terminal_images.rs`**
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/terminal_images.rs crates/pi-tui/src/terminal_images.rs`(957 LOC,base64 + std + pi_ai::model)
+2. `pi-coding-agent/Cargo.toml` 新增 `pi-tui = { workspace = true }` 依赖
+3. `pi-tui/Cargo.toml` 新增 `base64` + `pi-ai` 依赖
+4. `pi-tui/src/lib.rs` 从空 marker 改为 `pub mod terminal_images;`
+5. `pi-coding-agent/src/lib.rs` 移除 `pub mod terminal_images;`
+6. Bulk rename `crate::terminal_images::*` → `pi_tui::terminal_images::*` in `interactive/conversation.rs`(2 处)
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 957 LOC
+
 ---
 
-> 本文档版本:v2.9(2026-09-13)
+> 本文档版本:v2.10(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

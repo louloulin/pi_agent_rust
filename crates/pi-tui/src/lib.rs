@@ -1,13 +1,12 @@
-//! Phase-2 aggregator placeholder mirroring `@earendil-works/pi-tui`:
-//! Terminal UI rendering and input handling. After Round 18 the files
-//! that previously lived here were absorbed into `pi-coding-agent` to
-//! break the `pi-coding-agent ↔ pi-tui` cycle. This crate remains so
-//! the 11-package surface mirrors the upstream repository structure;
-//! downstream consumers should depend on `pi-coding-agent` instead.
+//! Phase-2 module for `@earendil-works/pi-tui`:
+//! terminal image rendering for the TUI extension surface.
+//!
+//! Round 28 begins re-housing leaves here, one at a time, to restore the
+//! upstream surface.
+//!
+//! - `terminal_images.rs` — terminal-specific image placeholder rendering
+//!   for the `placeholder(mime_type, ...)` API (Round 28.1)
 
 #![forbid(unsafe_code)]
 
-// Empty: all TUI / interactive / autocomplete / terminal_images modules
-// were moved to `pi-coding-agent` in Round 18 to break the dependency
-// cycle. This crate is retained as a marker so `crates/pi`'s facade
-// can still re-export a `tui` namespace.
+pub mod terminal_images;

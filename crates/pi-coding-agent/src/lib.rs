@@ -148,7 +148,6 @@ pub mod lsp;
 pub mod autocomplete;
 pub mod interactive;
 pub mod interactive_ftui;
-pub mod terminal_images;
 pub mod tui;
 
 pub use pi_error::{Error, Result as PiResult};

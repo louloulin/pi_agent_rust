@@ -36,6 +36,9 @@ pi-error = { workspace = true }
 futures = { workspace = true }
 # skills_managed.rs (Round 30.4) — managed skill dir resolution
 dirs = { workspace = true }
+# crash.rs (Round 32) — timestamp + signal-hook integration
+chrono = { workspace = true }
+signal-hook = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

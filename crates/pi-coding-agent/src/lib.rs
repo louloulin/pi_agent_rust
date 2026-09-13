@@ -15,7 +15,9 @@ pub mod advisor;
 pub mod cli;
 pub mod conformance;
 pub mod context_files;
-pub mod crash;
+// Round 32: `crash` re-housed in `pi-chord` (pure std + serde, zero
+// `crate::` self-deps — used to be inline under `pi-coding-agent`).
+pub use pi_chord::crash;
 pub mod crypto_shim;
 pub mod extension_replay;
 pub mod extension_scoring;

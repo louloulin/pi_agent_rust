@@ -37,10 +37,14 @@
 //!   (Round 30.4)
 //! - `platform.rs` — OS / filesystem abstraction: effective-mode access
 //!   context, trusted symlink resolution, OS + arch naming (Round 31)
+//! - `crash.rs` — Crash bundle capture + redacted panic hook + crash
+//!   list/show/delete/emit_startup_notice for the agent recovery flow
+//!   (Round 32)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
+pub mod crash;
 pub mod extension_inclusion;
 pub mod extension_license;
 pub mod extension_popularity;

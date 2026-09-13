@@ -1879,7 +1879,7 @@ pub async fn run_interactive(
         // Divert tracing output away from the terminal while the TUI owns it
         // (bd-trkef): stderr writes would be painted into the alt-screen
         // frame and corrupt the transcript. Restored on drop, even on error.
-        let _log_guard = crate::tui::TuiLogRedirectGuard::begin();
+        let _log_guard = pi_tui::tui::TuiLogRedirectGuard::begin();
         program.run()
     };
 

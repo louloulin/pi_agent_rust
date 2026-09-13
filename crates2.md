@@ -922,8 +922,40 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 957 LOC
 
+### Round 28.2 — `tui.rs` → `pi-tui` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/tui.rs crates/pi-tui/src/tui.rs`(1,450 LOC,rich_rust + std)
+2. **关键 cycle 修复**:`tui.rs` 内部有 2 处 `crate::` 引用,直接搬会形成 `pi-tui → pi-coding-agent` cycle:
+   - L33 `crate::config::Config::global_dir().join("logs")`(用于 TUI 日志目录)
+   - L114 `_theme: Option<crate::theme::Theme>`(但参数被 `_` 前缀,从未使用)
+3. 解决方案:不引入 cycle 边,而是在 pi-tui 暴露 `pub fn tui_log_init_dir(dir: PathBuf)`,由 pi-coding-agent 在启动时主动注入(保留 `PI_CODING_AGENT_DIR` 等环境变量语义)。
+   - `TUI_LOG_DIR: OnceLock<PathBuf>` + `pub fn tui_log_init_dir(dir: PathBuf)`(新接口)
+   - `tui_log_file()` 先查 `TUI_LOG_DIR.get()`,fallback 到 `dirs::home_dir()/.pi/agent/logs`
+   - `_theme` 参数直接删除(本就是 unused)
+4. `pi-tui/Cargo.toml` 新增 `dirs` + `rich_rust` 依赖,新增 `[features]` 默认空,`syntax-highlighting` feature 保留原 cfg 门控语义
+5. `pi-tui/src/lib.rs` 新增 `pub mod tui;`
+6. `pi-coding-agent/src/lib.rs` 移除 `pub mod tui;`
+7. Bulk rename 3 处调用方:
+   - `pi-coding-agent/src/session.rs:21` `use crate::tui::PiConsole` → `use pi_tui::tui::PiConsole`
+   - `pi-coding-agent/src/interactive_ftui.rs:4833` `crate::tui::TuiLogRedirectGuard` → `pi_tui::tui::TuiLogRedirectGuard`
+   - `pi-coding-agent/src/interactive/mod.rs:1882` 同上
+8. `pi-coding-agent/src/main.rs`:
+   - `use pi_coding_agent::tui::PiConsole` → `use pi_tui::tui::PiConsole`
+   - `with_writer(|| pi_coding_agent::tui::TuiAwareLogWriter)` → `with_writer(|| pi_tui::tui::TuiAwareLogWriter)`
+   - 在 `tracing_subscriber::fmt().init()` 之前调用 `pi_tui::tui::tui_log_init_dir(Config::global_dir().join("logs"))`
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished(仅 syntax-highlighting cfg 警告,已通过 `[features]` 暴露)
+- `cargo check -p pi-coding-agent`:✅ Finished(184 warnings,3 duplicates,与 Round 20 baseline 持平)
+- `cargo check -p pi-coding-agent --bin pi`:✅ Finished
+
+**LOC 迁移:** 1,450 LOC
+
+**cycle 阻断说明:** 通过 `tui_log_init_dir` 钩子而非 `pi-tui → pi-coding-agent` 边,保留了 `PI_CODING_AGENT_DIR` 环境变量语义,同时不引入新 cycle。这是 Round 28 系列里第二个完美迁出的 TUI 大文件(`terminal_images.rs` 是第一个)。
+
 ---
 
-> 本文档版本:v2.10(2026-09-13)
+> 本文档版本:v2.11(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

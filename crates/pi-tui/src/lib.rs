@@ -6,7 +6,10 @@
 //!
 //! - `terminal_images.rs` — terminal-specific image placeholder rendering
 //!   for the `placeholder(mime_type, ...)` API (Round 28.1)
+//! - `tui.rs` — rich_rust-backed console + TUI-aware log redirection
+//!   (Round 28.2)
 
 #![forbid(unsafe_code)]
 
 pub mod terminal_images;
+pub mod tui;

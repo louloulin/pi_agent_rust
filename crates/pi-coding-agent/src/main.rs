@@ -65,7 +65,7 @@ use pi_coding_agent::swarm_replay::{
     evaluate_swarm_replay_baseline_policies, replay_swarm_trace,
 };
 use pi_coding_agent::tools::ToolRegistry;
-use pi_coding_agent::tui::PiConsole;
+use pi_tui::tui::PiConsole;
 use pi_coding_agent::validation_broker::{
     VALIDATION_BROKER_CLI_LEASE_MUTATION_SCHEMA, VALIDATION_BROKER_CLI_PLAN_SCHEMA,
     VALIDATION_BROKER_CLI_STATUS_SCHEMA, VALIDATION_BROKER_DECISION_SCHEMA,
@@ -973,10 +973,16 @@ fn main_impl() -> Result<()> {
     // `<global_dir>/logs/tui.log` while the interactive TUI owns the
     // terminal, so tracing output (e.g. RUST_LOG=info) can never be painted
     // into the alt-screen transcript (bd-trkef).
+    //
+    // Round 28.2: `tui.rs` lives in `pi-tui`, which has no back-edge to
+    // `pi-coding-agent`. We hand it the config-derived log directory here,
+    // before the tracing subscriber is installed, so the writer can find
+    // its log file on the first divert.
+    pi_tui::tui::tui_log_init_dir(Config::global_dir().join("logs"));
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .with_target(false)
-        .with_writer(|| pi_coding_agent::tui::TuiAwareLogWriter)
+        .with_writer(|| pi_tui::tui::TuiAwareLogWriter)
         .init();
 
     // Run the application

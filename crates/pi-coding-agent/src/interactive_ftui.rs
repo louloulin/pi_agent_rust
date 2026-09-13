@@ -4830,7 +4830,7 @@ pub fn run(
     };
     // Divert tracing output away from the terminal while the TUI owns it
     // (bd-trkef); restored on drop.
-    let log_guard = crate::tui::TuiLogRedirectGuard::begin();
+    let log_guard = pi_tui::tui::TuiLogRedirectGuard::begin();
     let result = app.with_mouse().run();
     drop(log_guard);
 

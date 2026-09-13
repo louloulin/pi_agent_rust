@@ -4,6 +4,7 @@
 //! built on rich_rust for beautiful markup-based output.
 
 use std::io::{self, IsTerminal, Write};
+use std::path::PathBuf;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Mutex, OnceLock};
 
@@ -26,11 +27,32 @@ use rich_rust::segment::Segment;
 
 static TUI_OWNS_TERMINAL: AtomicBool = AtomicBool::new(false);
 static TUI_LOG_FILE: OnceLock<Option<Mutex<std::fs::File>>> = OnceLock::new();
+static TUI_LOG_DIR: OnceLock<PathBuf> = OnceLock::new();
+
+/// Pre-set the directory used for the TUI log file. The caller (typically
+/// `pi-coding-agent`) computes this once at startup from its config layer
+/// (e.g. honoring `PI_CODING_AGENT_DIR`). After this is called, the lazy
+/// `tui_log_file()` initialiser uses the supplied path; otherwise it falls
+/// back to a per-user default derived from `dirs::home_dir()`.
+pub fn tui_log_init_dir(dir: PathBuf) {
+    let _ = TUI_LOG_DIR.set(dir);
+}
+
+fn tui_log_dir() -> PathBuf {
+    if let Some(dir) = TUI_LOG_DIR.get() {
+        return dir.clone();
+    }
+    dirs::home_dir()
+        .unwrap_or_else(|| PathBuf::from("."))
+        .join(".pi")
+        .join("agent")
+        .join("logs")
+}
 
 fn tui_log_file() -> Option<&'static Mutex<std::fs::File>> {
     TUI_LOG_FILE
         .get_or_init(|| {
-            let dir = crate::config::Config::global_dir().join("logs");
+            let dir = tui_log_dir();
             std::fs::create_dir_all(&dir).ok()?;
             let file = std::fs::OpenOptions::new()
                 .create(true)
@@ -107,11 +129,15 @@ pub struct PiConsole {
 impl PiConsole {
     /// Create a new Pi console with auto-detected terminal capabilities.
     pub fn new() -> Self {
-        Self::new_with_theme(None)
+        Self::new_with_theme()
     }
 
-    /// Create a new Pi console with an optional theme.
-    pub fn new_with_theme(_theme: Option<crate::theme::Theme>) -> Self {
+    /// Create a new Pi console.
+    ///
+    /// Round 28.2: the previous `Option<crate::theme::Theme>` parameter was
+    /// dropped — the param was prefixed with `_` and unused. The theme is
+    /// honoured by the rich_rust styling layer, not by `PiConsole` itself.
+    pub fn new_with_theme() -> Self {
         let is_tty = io::stdout().is_terminal();
         let console = Console::builder().markup(is_tty).emoji(is_tty).build();
 

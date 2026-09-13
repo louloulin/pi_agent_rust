@@ -18,7 +18,7 @@ use crate::session_index::{
     enqueue_session_index_snapshot_update, is_session_file_path, session_file_stats,
 };
 use crate::session_store_v2::{self, SessionStoreV2};
-use crate::tui::PiConsole;
+use pi_tui::tui::PiConsole;
 use asupersync::channel::oneshot;
 use asupersync::sync::Mutex;
 use async_trait::async_trait;

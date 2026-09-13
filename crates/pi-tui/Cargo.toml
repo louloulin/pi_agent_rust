@@ -8,6 +8,12 @@ description = "Phase-2 placeholder mirroring @earendil-works/pi-tui. Round 18 ab
 [lints]
 workspace = true
 
+[features]
+# Round 28.2: tui.rs gates rich_rust's syntax-highlighting renderer behind a
+# feature so consumers that don't need code blocks can skip the cost.
+default = []
+syntax-highlighting = []
+
 [dependencies]
 # Round 18: pi-tui is now an empty placeholder. All tui files moved to
 # pi-coding-agent to break the pi-coding-agent ↔ pi-tui cycle.
@@ -20,3 +26,12 @@ anyhow = { workspace = true }
 base64 = { workspace = true }
 # terminal_images.rs (Round 28.1) uses pi_ai::model for MIME sanitization
 pi-ai = { workspace = true }
+# tui.rs (Round 28.2): the file's only pi-coding-agent dependency was
+# `crate::config::Config::global_dir()` (used to derive the TUI log
+# directory). That was rewritten into a `tui_log_init_dir(PathBuf)` hook
+# called from pi-coding-agent at startup, so pi-tui does not need a
+# back-edge to pi-coding-agent (which would re-create the cycle). tui.rs
+# falls back to `dirs::home_dir()` when no explicit init was performed.
+dirs = { workspace = true }
+# tui.rs uses rich_rust for the markup-based renderer.
+rich_rust = { version = "0.2", features = ["markdown"] }

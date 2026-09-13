@@ -2,7 +2,7 @@ use std::path::{Path, PathBuf};
 
 use url::Url;
 
-pub(super) fn next_non_whitespace_token(text: &str, start: usize) -> (&str, usize) {
+pub fn next_non_whitespace_token(text: &str, start: usize) -> (&str, usize) {
     if start >= text.len() {
         return ("", text.len());
     }
@@ -16,7 +16,7 @@ pub(super) fn next_non_whitespace_token(text: &str, start: usize) -> (&str, usiz
     (&text[start..end], end)
 }
 
-pub(super) fn parse_quoted_file_ref(text: &str, start: usize) -> Option<(String, String, usize)> {
+pub fn parse_quoted_file_ref(text: &str, start: usize) -> Option<(String, String, usize)> {
     let mut chars = text[start..].chars();
     let quote = chars.next()?;
     if quote != '"' && quote != '\'' {
@@ -63,7 +63,7 @@ pub(super) fn parse_quoted_file_ref(text: &str, start: usize) -> Option<(String,
     Some((path, trailing, token_end))
 }
 
-pub(super) fn strip_wrapping_quotes(input: &str) -> &str {
+pub fn strip_wrapping_quotes(input: &str) -> &str {
     let bytes = input.as_bytes();
     if bytes.len() >= 2 {
         let first = bytes[0];
@@ -75,12 +75,12 @@ pub(super) fn strip_wrapping_quotes(input: &str) -> &str {
     input
 }
 
-pub(super) fn looks_like_windows_path(input: &str) -> bool {
+pub fn looks_like_windows_path(input: &str) -> bool {
     let bytes = input.as_bytes();
     (bytes.len() >= 2 && bytes[1] == b':') || input.starts_with("\\\\")
 }
 
-pub(super) fn unescape_dragged_path(input: &str) -> String {
+pub fn unescape_dragged_path(input: &str) -> String {
     if looks_like_windows_path(input) {
         return input.to_string();
     }
@@ -104,21 +104,21 @@ pub(super) fn unescape_dragged_path(input: &str) -> String {
     out
 }
 
-pub(super) fn file_url_to_path(input: &str) -> Option<PathBuf> {
+pub fn file_url_to_path(input: &str) -> Option<PathBuf> {
     if !input.starts_with("file://") {
         return None;
     }
     Url::parse(input).ok()?.to_file_path().ok()
 }
 
-pub(super) fn path_for_display(path: &Path, cwd: &Path) -> String {
+pub fn path_for_display(path: &Path, cwd: &Path) -> String {
     path.strip_prefix(cwd).map_or_else(
         |_| path.to_string_lossy().to_string(),
         |p| p.to_string_lossy().to_string(),
     )
 }
 
-pub(super) fn format_file_ref(path: &str) -> String {
+pub fn format_file_ref(path: &str) -> String {
     let needs_quotes =
         path.chars().any(char::is_whitespace) || path.chars().last().is_some_and(is_trailing_punct);
 
@@ -146,7 +146,7 @@ fn escape_quoted_file_ref(path: &str, quote: char) -> String {
     escaped
 }
 
-pub(super) fn split_trailing_punct(token: &str) -> (&str, &str) {
+pub fn split_trailing_punct(token: &str) -> (&str, &str) {
     let mut split = token.len();
     for (idx, ch) in token.char_indices().rev() {
         if is_trailing_punct(ch) {
@@ -165,7 +165,7 @@ const fn is_trailing_punct(ch: char) -> bool {
     )
 }
 
-pub(super) fn is_file_ref_boundary(text: &str, at: usize) -> bool {
+pub fn is_file_ref_boundary(text: &str, at: usize) -> bool {
     if at == 0 {
         return true;
     }

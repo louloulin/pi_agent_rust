@@ -5881,6 +5881,7 @@ dependencies = [
  "ignore",
  "pi-ai",
  "rich_rust",
+ "url",
 ]
 
 [[package]]

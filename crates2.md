@@ -981,8 +981,24 @@ Round 30 后(收尾)       : ~64%
 
 **trait seam 设计:** 这是 Round 28 系列首次需要 trait seam 桥接的类型;之前的 `terminal_images.rs` 与 `tui.rs` 都只用了基础类型(std / base64 / rich_rust / dirs)。trait seam 让 pi-tui 不需要知道 `ResourceLoader`、`WorkspaceHandle` 这些 pi-coding-agent 内部类型,且为 Round 31+ 的更深层解耦提供了可复用模式。
 
+### Round 28.4 — `interactive/file_refs.rs` → `pi-tui` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/interactive/file_refs.rs crates/pi-tui/src/file_refs.rs`(414 LOC,std + url,无 `crate::` 依赖)
+2. 全部 `pub(super)` → `pub`(10 个函数):跨 crate 后父模块不再可见
+3. pi-tui/Cargo.toml 加 `url = { workspace = true }`
+4. pi-tui/src/lib.rs 加 `pub mod file_refs;`
+5. pi-coding-agent/src/interactive/mod.rs:`use self::file_refs::` → `use pi_tui::file_refs::`,移除 `pub mod file_refs;`
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,baseline 持平)
+- `cargo check --bin pi -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 414 LOC
+
 ---
 
-> 本文档版本:v2.12(2026-09-13)
+> 本文档版本:v2.13(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

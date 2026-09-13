@@ -37,3 +37,5 @@ dirs = { workspace = true }
 rich_rust = { version = "0.2", features = ["markdown"] }
 # autocomplete.rs (Round 28.3): walks the project tree for @-file suggestions.
 ignore = { workspace = true }
+# file_refs.rs (Round 28.4): parses file:// URLs into paths for @-file completion.
+url = { workspace = true }

@@ -89,7 +89,7 @@ use self::commands::{
 pub use self::conversation::conversation_from_session;
 use self::ext_session::{InteractiveExtensionHostActions, InteractiveExtensionSession};
 pub use self::ext_session::{format_extension_ui_prompt, parse_extension_ui_response};
-use self::file_refs::{
+use pi_tui::file_refs::{
     file_url_to_path, format_file_ref, is_file_ref_boundary, next_non_whitespace_token,
     parse_quoted_file_ref, path_for_display, split_trailing_punct, strip_wrapping_quotes,
     unescape_dragged_path,
@@ -3712,7 +3712,6 @@ pub mod agent;
 pub mod commands;
 pub mod conversation;
 pub mod ext_session;
-pub mod file_refs;
 pub mod keybindings;
 pub mod model_selector_ui;
 pub mod perf;

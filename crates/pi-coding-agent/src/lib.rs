@@ -55,9 +55,13 @@ pub mod enforcement;
 pub mod extension_conformance_matrix;
 pub mod extension_dispatcher;
 pub mod extension_events;
-pub mod extension_inclusion;
 pub mod extension_index;
-pub mod extension_license;
+// Round 29.1: `extension_license` and `extension_inclusion` re-housed in
+// `pi-chord`. Re-export them here so binary + tests keep resolving them
+// under `pi_coding_agent::extension_*` (and via `pi::extension_*` for the
+// legacy example/test surface).
+pub use pi_chord::extension_inclusion;
+pub use pi_chord::extension_license;
 pub mod extension_popularity;
 pub mod extension_preflight;
 pub mod extension_tools;

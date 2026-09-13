@@ -1015,8 +1015,35 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** ~50 LOC(纯代码)
 
+### Round 29.1 — `extension_license + extension_inclusion` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/extension_license.rs crates/pi-chord/src/extension_license.rs`(1,298 LOC)
+2. `git mv crates/pi-coding-agent/src/extension_inclusion.rs crates/pi-chord/src/extension_inclusion.rs`(764 LOC)
+3. 两个文件本来生产代码中**无 `crate::` 依赖**,仅在被搬动后才发现 2 处隐式引用:
+   - `extension_inclusion.rs:315` `crate::package_manager::hex_encode(...)` 
+   - `extension_license.rs:438` `crate::extension_validation::chrono_now_iso()`
+4. **解决方案 — 内联 2 个 helper 到目标文件**(均为纯 std,无依赖):
+   - `extension_inclusion.rs` 末尾追加 `fn hex_encode(bytes: &[u8]) -> String`(8 行,lowercase hex)
+   - `extension_license.rs` 末尾追加 `fn chrono_now_iso() / fn days_to_ymd / fn is_leap`(约 40 行,ISO 时间戳)
+5. pi-chord/Cargo.toml 加 `sha2 = { workspace = true }`
+6. pi-chord/src/lib.rs 加 `pub mod extension_inclusion;` 和 `pub mod extension_license;`
+7. pi-coding-agent/src/lib.rs:
+   - 移除 `pub mod extension_inclusion;` 和 `pub mod extension_license;`
+   - 加 `pub use pi_chord::extension_inclusion;` 和 `pub use pi_chord::extension_license;`(保留 `pi_coding_agent::extension_license::*` 路径)
+8. 内部调用方无需修改:`crate::extension_inclusion::*` 在 pi-coding-agent 中通过 re-export 仍可用
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,baseline 持平)
+- `cargo check --bin pi -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 2,062 LOC(净代码 + 内联 helpers)
+
+**helper 内联策略 vs 搬动上游:** 搬动 `package_manager::hex_encode` 或 `extension_validation::chrono_now_iso` 到 pi-chord 会引入新依赖或更大搬动成本。这两个 helper 都是纯 std 实现,内联副本比 trait seam 更直接(无运行时开销、无 trait 对象)。
+
 ---
 
-> 本文档版本:v2.14(2026-09-13)
+> 本文档版本:v2.15(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

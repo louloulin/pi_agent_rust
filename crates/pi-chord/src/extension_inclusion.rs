@@ -312,7 +312,20 @@ pub fn normalized_manifest_hash_from_value(
     let bytes = serde_json::to_vec(&normalized)?;
     let mut hasher = sha2::Sha256::new();
     hasher.update(&bytes);
-    Ok(crate::package_manager::hex_encode(&hasher.finalize()))
+    Ok(hex_encode(&hasher.finalize()))
+}
+
+/// Lowercase hex encoder for byte slices. Inlined here so `pi-chord` does
+/// not need to reach back into `pi-coding-agent::package_manager` just
+/// to format a digest. Identical algorithm to the original helper.
+fn hex_encode(bytes: &[u8]) -> String {
+    const LUT: &[u8; 16] = b"0123456789abcdef";
+    let mut out = String::with_capacity(bytes.len().saturating_mul(2));
+    for &b in bytes {
+        out.push(LUT[(b >> 4) as usize] as char);
+        out.push(LUT[(b & 0x0f) as usize] as char);
+    }
+    out
 }
 
 // ────────────────────────────────────────────────────────────────────────────

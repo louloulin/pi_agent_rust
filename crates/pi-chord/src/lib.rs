@@ -23,10 +23,17 @@
 //!   and S3-FIFO eviction telemetry (Round 27.7)
 //! - `hostcall_egraph.rs` — Equality-saturation e-graph for discovering
 //!   hostcall rewrite plans (Round 27.8)
+//! - `extension_license.rs` — SPDX license detection and screening for Pi
+//!   extension candidates (Round 29.1)
+//! - `extension_inclusion.rs` — Final inclusion list generation: merges
+//!   scoring tiers, license verdicts, validation evidence into a pinned
+//!   inclusion list (Round 29.1)
 
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
+pub mod extension_inclusion;
+pub mod extension_license;
 pub mod file_lock;
 pub mod hostcall_egraph;
 pub mod hostcall_io_uring_lane;

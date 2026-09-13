@@ -435,7 +435,7 @@ pub fn screen_extensions(inputs: &[ScreeningInput], task_id: &str) -> ScreeningR
         .count();
 
     ScreeningReport {
-        generated_at: crate::extension_validation::chrono_now_iso(),
+        generated_at: chrono_now_iso(),
         task: task_id.to_string(),
         stats: ScreeningStats {
             total_screened: verdicts.len(),
@@ -1295,4 +1295,55 @@ mod tests {
             }
         }
     }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Time helpers (inlined from `pi-coding-agent::extension_validation` to
+// avoid a `pi-chord -> pi-coding-agent` back-edge). Pure std, no deps.
+// ────────────────────────────────────────────────────────────────────────────
+
+/// Simple ISO timestamp (avoids pulling in chrono). Deterministic in tests.
+fn chrono_now_iso() -> String {
+    let now = std::time::SystemTime::now();
+    let secs = now
+        .duration_since(std::time::UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs();
+    let days = secs / 86400;
+    let rem = secs % 86400;
+    let hours = rem / 3600;
+    let mins = (rem % 3600) / 60;
+    let s = rem % 60;
+    let (year, month, day) = days_to_ymd(days);
+    format!("{year:04}-{month:02}-{day:02}T{hours:02}:{mins:02}:{s:02}Z")
+}
+
+fn days_to_ymd(mut days: u64) -> (u64, u64, u64) {
+    let mut year = 1970;
+    loop {
+        let days_in_year = if is_leap(year) { 366 } else { 365 };
+        if days < days_in_year {
+            break;
+        }
+        days -= days_in_year;
+        year += 1;
+    }
+    let month_days: &[u64] = if is_leap(year) {
+        &[31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    } else {
+        &[31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    };
+    let mut month = 1;
+    for &md in month_days {
+        if days < md {
+            break;
+        }
+        days -= md;
+        month += 1;
+    }
+    (year, month, days + 1)
+}
+
+const fn is_leap(y: u64) -> bool {
+    (y.is_multiple_of(4) && !y.is_multiple_of(100)) || y.is_multiple_of(400)
 }

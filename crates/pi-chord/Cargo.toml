@@ -26,6 +26,8 @@ crossbeam-queue = { workspace = true }
 # hostcall_egraph.rs (Round 27.8) uses serde_json for plan encoding
 serde_json = { workspace = true }
 tracing = { workspace = true }
+# extension_inclusion.rs (Round 29.1) uses sha2 for content addressing
+sha2 = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

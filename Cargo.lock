@@ -5575,13 +5575,11 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
- "pi-advisor",
  "pi-agent-cx",
  "pi-agent-hub",
  "pi-bpe",
  "pi-buffer-shim",
  "pi-cli",
- "pi-compaction-snap",
  "pi-conformance",
  "pi-context-files",
  "pi-crash",
@@ -5590,7 +5588,6 @@ dependencies = [
  "pi-dialects",
  "pi-embedded-assets",
  "pi-error",
- "pi-extension-inclusion",
  "pi-extension-replay",
  "pi-extension-scoring",
  "pi-failover",
@@ -5625,11 +5622,9 @@ dependencies = [
  "pi-token-count",
  "pi-turn-recovery",
  "pi-undo",
- "pi-usage",
  "pi-version",
  "pi-web-remote",
  "pi-workspace",
- "pi-worktree-iso",
  "portable-pty",
  "pprof",
  "pretty_assertions",
@@ -5674,19 +5669,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-advisor"
-version = "0.1.0"
-dependencies = [
- "asupersync",
- "chrono",
- "futures",
- "pi-error",
- "pi-model",
- "pi-provider",
- "serde_json",
-]
-
-[[package]]
 name = "pi-agent-cx"
 version = "0.1.0"
 dependencies = [
@@ -5723,18 +5705,6 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "proptest",
-]
-
-[[package]]
-name = "pi-compaction-snap"
-version = "0.1.0"
-dependencies = [
- "base64 0.23.1",
- "flate2",
- "pi-model",
- "serde",
- "serde_json",
- "tracing",
 ]
 
 [[package]]
@@ -5827,16 +5797,6 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.20",
-]
-
-[[package]]
-name = "pi-extension-inclusion"
-version = "0.1.0"
-dependencies = [
- "proptest",
- "serde",
- "serde_json",
- "sha2 0.11.0",
 ]
 
 [[package]]
@@ -6148,18 +6108,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "pi-usage"
-version = "0.1.0"
-dependencies = [
- "asupersync",
- "async-trait",
- "pi-error",
- "serde",
- "serde_json",
- "tracing",
-]
-
-[[package]]
 name = "pi-version"
 version = "0.1.0"
 dependencies = [
@@ -6184,16 +6132,6 @@ name = "pi-workspace"
 version = "0.1.0"
 dependencies = [
  "pi-error",
-]
-
-[[package]]
-name = "pi-worktree-iso"
-version = "0.1.0"
-dependencies = [
- "filetime",
- "ignore",
- "pi-error",
- "serde",
 ]
 
 [[package]]

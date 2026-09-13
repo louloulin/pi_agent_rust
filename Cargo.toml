@@ -5,14 +5,12 @@ resolver = "2"
 # xtask hosts workspace plumbing (cargo xtask ci).
 members = [
     "crates/pi",
-    "crates/pi-advisor",
     "crates/pi-agent-cx",
     "crates/pi-agent-hub",
     "crates/pi-bpe",
     "crates/pi-mono",
     "crates/pi-buffer-shim",
     "crates/pi-cli",
-    "crates/pi-compaction-snap",
     "crates/pi-context-files",
     "crates/pi-crypto-shim",
     "crates/pi-delight",
@@ -29,7 +27,6 @@ members = [
     "crates/pi-extension-replay",
     "crates/pi-swarm-activity-ledger",
     "crates/pi-extension-scoring",
-    "crates/pi-extension-inclusion",
     "crates/pi-scheduler",
     "crates/pi-secrets",
     "crates/pi-secret-screener",
@@ -55,11 +52,9 @@ members = [
     "crates/pi-token-count",
     "crates/pi-turn-recovery",
     "crates/pi-undo",
-    "crates/pi-usage",
     "crates/pi-version",
     "crates/pi-web-remote",
     "crates/pi-workspace",
-    "crates/pi-worktree-iso",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -86,12 +81,10 @@ clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
 pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
-pi-advisor = { path = "crates/pi-advisor", version = "0.1.0" }
 pi-agent-hub = { path = "crates/pi-agent-hub", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
 pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
-pi-compaction-snap = { path = "crates/pi-compaction-snap", version = "0.1.0" }
 pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
 pi-crypto-shim = { path = "crates/pi-crypto-shim", version = "0.1.0" }
 pi-delight = { path = "crates/pi-delight", version = "0.1.0" }
@@ -103,11 +96,9 @@ pi-file-lock = { path = "crates/pi-file-lock", version = "0.1.0" }
 pi-http-shim = { path = "crates/pi-http-shim", version = "0.1.0" }
 pi-session-metrics = { path = "crates/pi-session-metrics", version = "0.1.0" }
 pi-undo = { path = "crates/pi-undo", version = "0.1.0" }
-pi-usage = { path = "crates/pi-usage", version = "0.1.0" }
 pi-version = { path = "crates/pi-version", version = "0.1.0" }
 pi-web-remote = { path = "crates/pi-web-remote", version = "0.1.0" }
 pi-workspace = { path = "crates/pi-workspace", version = "0.1.0" }
-pi-worktree-iso = { path = "crates/pi-worktree-iso", version = "0.1.0" }
 pi-flake-classifier = { path = "crates/pi-flake-classifier", version = "0.1.0" }
 pi-hostcall-superinstructions = { path = "crates/pi-hostcall-superinstructions", version = "0.1.0" }
 pi-hostcall-io-uring-lane = { path = "crates/pi-hostcall-io-uring-lane", version = "0.1.0" }
@@ -116,7 +107,6 @@ pi-swarm-progress-slo = { path = "crates/pi-swarm-progress-slo", version = "0.1.
 pi-extension-replay = { path = "crates/pi-extension-replay", version = "0.1.0" }
 pi-swarm-activity-ledger = { path = "crates/pi-swarm-activity-ledger", version = "0.1.0" }
 pi-extension-scoring = { path = "crates/pi-extension-scoring", version = "0.1.0" }
-pi-extension-inclusion = { path = "crates/pi-extension-inclusion", version = "0.1.0" }
 pi-scheduler = { path = "crates/pi-scheduler", version = "0.1.0" }
 pi-secrets = { path = "crates/pi-secrets", version = "0.1.0" }
 pi-secret-screener = { path = "crates/pi-secret-screener", version = "0.1.0" }

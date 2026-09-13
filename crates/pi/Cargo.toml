@@ -89,13 +89,11 @@ harness = false
 [dependencies]
 clap = { workspace = true }
 clap_complete = { workspace = true }
-pi-advisor = { workspace = true }
 pi-agent-cx = { workspace = true }
 pi-agent-hub = { workspace = true }
 pi-bpe = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }
-pi-compaction-snap = { workspace = true }
 pi-context-files = { workspace = true }
 pi-crypto-shim = { workspace = true }
 pi-delight = { workspace = true }
@@ -107,11 +105,9 @@ pi-file-lock = { workspace = true }
 pi-http-shim = { workspace = true }
 pi-session-metrics = { workspace = true }
 pi-undo = { workspace = true }
-pi-usage = { workspace = true }
 pi-version = { workspace = true }
 pi-web-remote = { workspace = true }
 pi-workspace = { workspace = true }
-pi-worktree-iso = { workspace = true }
 pi-flake-classifier = { workspace = true }
 pi-hostcall-superinstructions = { workspace = true }
 pi-hostcall-io-uring-lane = { workspace = true }
@@ -120,7 +116,6 @@ pi-swarm-progress-slo = { workspace = true }
 pi-extension-replay = { workspace = true }
 pi-swarm-activity-ledger = { workspace = true }
 pi-extension-scoring = { workspace = true }
-pi-extension-inclusion = { workspace = true }
 pi-scheduler = { workspace = true }
 pi-secrets = { workspace = true }
 pi-secret-screener = { workspace = true }

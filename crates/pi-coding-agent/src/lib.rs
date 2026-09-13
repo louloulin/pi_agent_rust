@@ -181,8 +181,22 @@ pub mod model {
 }
 #[doc(hidden)]
 pub mod error {
-    pub use pi_error::{Error, Result};
+    pub use pi_error::{Error, Result, is_retryable_error};
 }
 
 // Re-export the web_search module so tool registry wiring finds it.
 pub mod web_search;
+
+// Re-export modules that main.rs and tests reference via
+// `pi_coding_agent::X`. Round 20: pulled in via `pub use` rather than
+// new local modules so binary call sites resolve without forcing a
+// re-implementation.
+pub use pi_ai::failover;
+pub use pi_ai::stream_rules;
+pub use pi_ai::token_count;
+pub use pi_error::is_retryable_error;
+pub use pi_telemetry::profiler;
+
+// `web_remote` already lives in this crate; declare it for module
+// resolution.
+pub mod web_remote;

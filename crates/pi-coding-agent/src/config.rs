@@ -442,18 +442,13 @@ pub struct TitlingSettings {
 /// itself); the most specific matching prefix wins over less specific
 /// prefixes and the global settings.
 ///
-/// Defined locally here (mirrors `pi_ai::failover::ModelScopeOverride`),
-/// to avoid pulling pi-coding-agent → pi-ai (pi-ai providers already pull
-/// pi-coding-agent types, creating a cycle).
-#[derive(Debug, Clone, Default, serde::Serialize, serde::Deserialize)]
-#[serde(default)]
-pub struct ModelScopeOverride {
-    /// Directory prefix this override applies to (absolute or `~`-rooted).
-    pub path: String,
-    #[serde(alias = "enabledModels")]
-    pub enabled_models: Option<Vec<String>>,
-    #[serde(alias = "disabledProviders")]
-    pub disabled_providers: Option<Vec<String>>,
+/// Re-export of `pi_ai::failover::ModelScopeOverride` so call sites can
+/// pass config-loaded slices directly to `pi_ai::failover::best_scope_override`.
+pub use pi_ai::failover::ModelScopeOverride;
+#[doc(hidden)]
+#[allow(dead_code)]
+fn _model_scope_override_alias() -> ModelScopeOverride {
+    ModelScopeOverride::default()
 }
 
 /// Tool load-mode configuration (bd-cv653.1.6).

@@ -22,6 +22,9 @@ default = ["tui", "wasm-host", "ftui"]
 tui = []
 wasm-host = []
 ftui = []
+# Round 20: opt-in sampling profiler (bd-cv653.7.12.1). Snapshots land
+# under the per-user agent dir when `PI_PROFILE=1` or `--profile` is set.
+profiler = []
 
 [dependencies]
 # Workspace deps required by the inlined Phase-1 leaves.
@@ -41,6 +44,7 @@ crossterm = { workspace = true }
 dirs = { workspace = true }
 flate2 = { workspace = true }
 crc32c = { workspace = true }
+ctrlc = { workspace = true }
 fs4 = { workspace = true }
 fsqlite = { workspace = true }
 ftui = { workspace = true }

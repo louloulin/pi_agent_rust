@@ -5713,6 +5713,7 @@ dependencies = [
  "crc32c",
  "crossbeam-queue",
  "crossterm",
+ "ctrlc",
  "dirs",
  "filetime",
  "flate2",

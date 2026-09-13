@@ -1187,6 +1187,24 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
+### Round 38 — `undo.rs` → `pi-chord` ✅(mutation history)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/undo.rs crates/pi-chord/src/undo.rs`（714 LOC，纯 std + serde + sha2，无 `crate::` 反向依赖）
+2. `pi-chord` 导出 undo 模块，`pi-coding-agent` 通过 re-export 保持现有 `crate::undo::*` 与 `pi_coding_agent::undo::*` 路径兼容
+3. 保留 `FileMutationRecorder`、内容寻址快照、预算淘汰、外部变更保护、undo/redo 与文本渲染行为
+
+**验证:**
+- `cargo check -p pi-chord`
+- `cargo test -p pi-chord undo --lib`
+- `cargo check -p pi-coding-agent --lib`
+- `cargo check -p pi`
+- `git diff --check`
+
+**LOC 迁移:** 714 LOC。pi-chord 现在持有 23 个模块。
+
+**进度:** 二期继续按叶子模块拆分推进，整体仍处于持续模块化阶段。
+
 ### Round 37 — `secrets.rs` → `pi-chord` ✅(credential vault)
 
 **做了什么:**

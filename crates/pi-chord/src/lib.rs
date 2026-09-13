@@ -51,6 +51,8 @@
 //!   (Round 35)
 //! - `secrets.rs` — credential detection, outbound gating, and the
 //!   session-scoped placeholder vault (Round 37)
+//! - `undo.rs` — bounded content-addressed file mutation history with
+//!   undo/redo and external-change protection (Round 38)
 
 #![forbid(unsafe_code)]
 
@@ -73,4 +75,5 @@ pub mod secrets;
 pub mod skills_managed;
 pub mod status_line;
 pub mod turn_recovery;
+pub mod undo;
 pub mod version;

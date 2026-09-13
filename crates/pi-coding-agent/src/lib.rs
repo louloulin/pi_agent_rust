@@ -36,6 +36,9 @@ pub use pi_chord::platform;
 // Round 37: `secrets` re-housed in `pi-chord`. Re-export it here so
 // existing agent/config callers keep resolving `crate::secrets::*`.
 pub use pi_chord::secrets;
+// Round 38: `undo` re-housed in `pi-chord`; keep the public path stable for
+// agent, tools, interactive, SDK, and binary callers.
+pub use pi_chord::undo;
 pub mod self_update;
 pub mod stats;
 // Round 35: `status_line` re-housed in `pi-chord` (powerline status,
@@ -46,7 +49,6 @@ pub mod swarm_progress_slo;
 // Round 34: `turn_recovery` re-housed in `pi-chord` (only depends on
 // `pi_ai::model::StopReason`, zero `crate::` self-deps).
 pub use pi_chord::turn_recovery;
-pub mod undo;
 // Round 33: `version` re-housed in `pi-chord` (semver + cached refresh).
 pub use pi_chord::version;
 pub mod workspace;

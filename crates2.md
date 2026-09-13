@@ -1183,9 +1183,25 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.22(2026-09-13)
+> 本文档版本:v2.23(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 32 — `crash.rs` → `pi-chord` ✅(panic hook + crash bundle)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/crash.rs crates/pi-chord/src/crash.rs`(509 LOC,纯 std + serde,零 `crate::` 自依赖)
+2. 内容:`SuppressPanicHook`(panic 钩子抑制)+ `record_operation` + `redact_text`(敏感字段脱敏)+ `CrashBundle`(磁盘 crash bundle 读写)+ `install / list_bundles / emit_startup_notice / show_latest / delete_all / send_preview`
+3. `pi-chord/Cargo.toml` 加 `chrono = { workspace = true }` + `signal-hook = { workspace = true }`(crash.rs 时间戳 + signal 监听)
+4. `pi-chord/src/lib.rs` 加 `pub mod crash;` + 文档条目
+5. `pi-coding-agent/src/lib.rs` 替换 `pub mod crash;` 为 `pub use pi_chord::crash;`(re-export)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished(0 errors)
+- `cargo check -p pi-coding-agent --lib`:✅ Finished in 56.38s(183 warnings,baseline 持平)
+- `cargo check -p pi`(binary):✅ Finished in 56.16s(0 errors)
+
+**LOC 迁移:** 509 LOC。pi-chord 现在持有 17 个模块。
 
 ### Round 31 — `platform.rs` → `pi-chord` ✅(OS/文件系统抽象,纯 std)
 

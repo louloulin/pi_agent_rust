@@ -13,9 +13,10 @@ workspace = true
 # / compaction / sqlite modules moved to pi-coding-agent to break the
 # pi-coding-agent ↔ pi-session-backends cycle.
 #
-# Round 26: re-housing `compaction_snap.rs` here. It only needs `pi_ai`
-# (for Message / ContentBlock types) and the existing serialization /
-# base64 dependencies already on pi-coding-agent.
+# Round 26: re-housing leaves here, one at a time, to restore the upstream
+# surface. Each leaf gets its own dep list appended below.
+#
+# compaction_snap.rs (Round 26.1)
 anyhow = { workspace = true }
 pi-ai = { workspace = true }
 base64 = { workspace = true }
@@ -23,3 +24,15 @@ flate2 = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+
+# Note: session_import.rs (Round 26.2) had to stay in pi-coding-agent for
+# this round because Session lives in pi-coding-agent and pulling
+# session_import into pi-session-backends would re-introduce the cycle
+# Round 18 broke. The migration will resume once a Session trait seam is
+# available.
+
+[dev-dependencies]
+# tests/session_persistence.rs (Round 26.2 integration test)
+asupersync = { workspace = true }
+pi-coding-agent = { workspace = true }
+tempfile = { workspace = true }

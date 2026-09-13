@@ -111,7 +111,6 @@ pub mod session_index;
 pub mod session_picker;
 pub mod session_sqlite;
 pub mod session_store_v2;
-pub mod session_test;
 pub mod swarm_flight_recorder;
 pub mod swarm_replay;
 

@@ -5839,11 +5839,14 @@ name = "pi-session-backends"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "asupersync",
  "base64 0.23.1",
  "flate2",
  "pi-ai",
+ "pi-coding-agent",
  "serde",
  "serde_json",
+ "tempfile",
  "tracing",
 ]
 

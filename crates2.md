@@ -693,8 +693,36 @@ Round 30 后(收尾)       : ~64%
 
 **留下的工作:** Round 26 剩余 7 个文件待迁出(下一轮执行)
 
+### Round 26.2 — `session_test.rs` → `pi-session-backends/tests/` ⚠️ 部分完成
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/session_test.rs crates/pi-session-backends/tests/session_persistence.rs`(56 LOC,集成测试)
+2. `pi-session-backends/Cargo.toml` 新增 `[dev-dependencies]`:asupersync / pi-coding-agent / tempfile
+3. 把 `use crate::session::Session` 改为 `use pi_coding_agent::session::{Session, SessionEntry, SessionMessage}`
+4. 修复 `timestamp: 0` → `timestamp: Some(0)`(上游 `SessionMessage::User` 字段类型变更后未同步)
+
+**`session_import.rs` 暂未迁出:**
+- 它用 `use crate::session::Session`,如果迁入 `pi-session-backends/src/` 会引入
+  `pi-coding-agent ↔ pi-session-backends` 循环依赖(Round 18 已通过把 session 移出
+  pi-session-backends 打破该循环)
+- **决策**:Round 26.2 先放过 `session_import.rs`,等设计 `Session` trait seam 后再迁
+- 已 `git mv` 回原位置,文件未变化
+
+**为什么放在 `tests/` 而不是 `src/`:**
+- `src/` 内的 `pub mod` 会强制 `pi-session-backends → pi-coding-agent` 编译期依赖
+- `tests/` 是外部集成测试,只在 `cargo test` 时拉 `pi-coding-agent`,不影响 lib 编译
+- 这是把 Round 18 已拆开的循环依赖继续保持拆开的标准做法
+
+**验证:**
+- `cargo check -p pi-session-backends`:✅ Finished
+- `cargo check -p pi-session-backends --tests`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(189 warnings,比 Round 26.1 少 6 个)
+- `cargo check -p pi-coding-agent --bin pi`:✅ Finished
+
+**LOC 迁移:** 56 LOC(纯测试)
+
 ---
 
-> 本文档版本:v2.1(2026-09-13)
+> 本文档版本:v2.2(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

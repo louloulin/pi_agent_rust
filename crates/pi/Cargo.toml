@@ -120,6 +120,7 @@ pi-swarm-progress-slo = { workspace = true }
 pi-extension-replay = { workspace = true }
 pi-swarm-activity-ledger = { workspace = true }
 pi-extension-scoring = { workspace = true }
+pi-extension-inclusion = { workspace = true }
 pi-scheduler = { workspace = true }
 pi-secrets = { workspace = true }
 pi-secret-screener = { workspace = true }

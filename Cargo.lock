@@ -5590,6 +5590,7 @@ dependencies = [
  "pi-dialects",
  "pi-embedded-assets",
  "pi-error",
+ "pi-extension-inclusion",
  "pi-extension-replay",
  "pi-extension-scoring",
  "pi-failover",
@@ -5826,6 +5827,16 @@ dependencies = [
  "serde",
  "serde_json",
  "thiserror 2.0.20",
+]
+
+[[package]]
+name = "pi-extension-inclusion"
+version = "0.1.0"
+dependencies = [
+ "proptest",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
 ]
 
 [[package]]

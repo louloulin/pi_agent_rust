@@ -39,3 +39,6 @@ rich_rust = { version = "0.2", features = ["markdown"] }
 ignore = { workspace = true }
 # file_refs.rs (Round 28.4): parses file:// URLs into paths for @-file completion.
 url = { workspace = true }
+# text_utils.rs (Round 28.5): display-width truncation helpers used by the
+# message-rendering stack.
+unicode-width = { workspace = true }

@@ -264,7 +264,7 @@ fn fork_candidates(session: &Session) -> Vec<ForkCandidate> {
         let summary = if first_line.is_empty() {
             "(empty)".to_string()
         } else {
-            super::truncate(first_line, 80)
+            pi_tui::text_utils::truncate(first_line, 80)
         };
 
         out.push(ForkCandidate {

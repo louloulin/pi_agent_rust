@@ -12,10 +12,13 @@
 //!   rendering-agnostic (Round 28.3)
 //! - `file_refs.rs` — file URL / quoted-ref parsing helpers shared between
 //!   the bubbletea and ftui editor stacks (Round 28.4)
+//! - `text_utils.rs` — display-width truncation helpers for the message
+//!   renderer (Round 28.5)
 
 #![forbid(unsafe_code)]
 
 pub mod autocomplete;
 pub mod file_refs;
 pub mod terminal_images;
+pub mod text_utils;
 pub mod tui;

@@ -1,6 +1,6 @@
 use unicode_width::{UnicodeWidthChar, UnicodeWidthStr};
 
-pub(super) fn push_line(out: &mut String, line: &str) {
+pub fn push_line(out: &mut String, line: &str) {
     if line.is_empty() {
         return;
     }
@@ -10,7 +10,7 @@ pub(super) fn push_line(out: &mut String, line: &str) {
     out.push_str(line);
 }
 
-pub(super) fn truncate(s: &str, max_len: usize) -> String {
+pub fn truncate(s: &str, max_len: usize) -> String {
     if max_len == 0 {
         return String::new();
     }
@@ -40,7 +40,7 @@ pub(super) fn truncate(s: &str, max_len: usize) -> String {
     out
 }
 
-pub(super) fn queued_message_preview(text: &str, max_len: usize) -> String {
+pub fn queued_message_preview(text: &str, max_len: usize) -> String {
     let first_line = text
         .lines()
         .find(|line| !line.trim().is_empty())

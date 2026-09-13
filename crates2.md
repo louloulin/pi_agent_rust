@@ -997,8 +997,26 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 414 LOC
 
+### Round 28.5 — `interactive/text_utils.rs` → `pi-tui` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/interactive/text_utils.rs crates/pi-tui/src/text_utils.rs`(1.1 KB,unicode-width only,无 `crate::` 依赖)
+2. 3 个 `pub(super)` 函数 → `pub`(`push_line` / `truncate` / `queued_message_preview`)
+3. pi-tui/Cargo.toml 加 `unicode-width = { workspace = true }`
+4. pi-tui/src/lib.rs 加 `pub mod text_utils;`
+5. `interactive/mod.rs` `use self::text_utils::` → `use pi_tui::text_utils::`,移除 `pub mod text_utils;`
+6. `interactive/conversation.rs:8` `use super::text_utils::push_line` → `use pi_tui::text_utils::push_line`
+7. `interactive/tree.rs:267` `super::truncate(...)` → `pi_tui::text_utils::truncate(...)`
+
+**验证:**
+- `cargo check -p pi-tui`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(183 warnings,3 duplicates,baseline 持平)
+- `cargo check --bin pi -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** ~50 LOC(纯代码)
+
 ---
 
-> 本文档版本:v2.13(2026-09-13)
+> 本文档版本:v2.14(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

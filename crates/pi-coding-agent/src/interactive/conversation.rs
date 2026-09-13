@@ -5,7 +5,7 @@ use crate::models::ModelEntry;
 use crate::session::{Session, SessionEntry, SessionMessage, bash_execution_to_text};
 use serde_json::{Value, json};
 
-use super::text_utils::push_line;
+use pi_tui::text_utils::push_line;
 use super::{ConversationMessage, MessageRole};
 
 pub(super) fn user_content_to_text(content: &UserContent) -> String {

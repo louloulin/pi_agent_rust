@@ -109,7 +109,7 @@ use self::state::{
     TOOL_COLLAPSE_PREVIEW_LINES, ThemePickerItem, ThemePickerOverlay, ToolProgress, format_count,
 };
 pub use self::state::{ConversationMessage, MessageRole};
-use self::text_utils::{queued_message_preview, truncate};
+use pi_tui::text_utils::{queued_message_preview, truncate};
 use self::tool_render::{format_tool_output, render_tool_message};
 use self::tree::{
     PendingTreeNavigation, TreeCustomPromptState, TreeSelectorState, TreeSummaryChoice,
@@ -3718,7 +3718,6 @@ pub mod perf;
 pub mod share;
 pub mod state;
 pub mod tests;
-pub mod text_utils;
 pub mod tool_render;
 pub mod tree;
 pub mod tree_ui;

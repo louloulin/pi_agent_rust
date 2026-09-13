@@ -15,6 +15,10 @@
 //!   and execution runtime (Round 27.3)
 //! - `hostcall_io_uring_lane.rs` — io_uring dispatch lane policy and
 //!   fallback telemetry (Round 27.4)
+//! - `hostcall_s3_fifo.rs` — S3-FIFO eviction policy with tier telemetry
+//!   (Round 27.5)
+//! - `hostcall_trace_jit.rs` — Trace-JIT compiler producing guarded
+//!   superinstruction plans (Round 27.6)
 
 #![forbid(unsafe_code)]
 
@@ -22,4 +26,6 @@ pub mod buffer_shim;
 pub mod file_lock;
 pub mod hostcall_io_uring_lane;
 pub mod hostcall_rewrite;
+pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
+pub mod hostcall_trace_jit;

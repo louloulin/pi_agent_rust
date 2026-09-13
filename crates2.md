@@ -825,8 +825,45 @@ Round 30 后(收尾)       : ~64%
 
 **Round 27 累计迁出 5/15 chord 文件**
 
+### Round 27.5 — `hostcall_s3_fifo.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_s3_fifo.rs crates/pi-chord/src/hostcall_s3_fifo.rs`(1,288 LOC,std only)
+2. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_s3_fifo;`
+3. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_s3_fifo;`
+4. `pi-coding-agent/src/hostcall_queue.rs` 的 `pub use crate::hostcall_s3_fifo::S3FifoFallbackReason;` → `pub use pi_chord::hostcall_s3_fifo::S3FifoFallbackReason;`
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 1,288 LOC
+
+### Round 27.6 — `hostcall_trace_jit.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_trace_jit.rs crates/pi-chord/src/hostcall_trace_jit.rs`(1,364 LOC,std + serde + 内依赖 hostcall_superinstructions)
+2. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_trace_jit;`
+3. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_trace_jit;`
+4. Bulk rename `crate::hostcall_trace_jit::*` → `pi_chord::hostcall_trace_jit::*` in `extensions_api.rs`
+5. 修复文件内 `use pi_chord::hostcall_superinstructions::*` → `use crate::hostcall_superinstructions::*`(文件自身就在 `pi-chord` 里,不能自引用)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished
+
+**LOC 迁移:** 1,364 LOC
+
+**Round 27 累计迁出 7/15 chord 文件,累计 ~5,300 LOC**
+
+### Round 27.7 计划:跳过 `hostcall_amac.rs`(cycle 阻断)
+
+`hostcall_amac.rs` 用 `use crate::extensions_js::{HostcallKind, HostcallRequest};`,迁入会形成 `pi-chord → pi-coding-agent` 编译期依赖,加上 R27.1 加的 `pi-coding-agent → pi-chord`,构成 cycle。**与 `session_import.rs` 同样的 blocker**。
+
+真正的修复:把 `HostcallKind` / `HostcallRequest` 抽到 `pi-chord` 或共享类型模块。留 Round 31+。
+
 ---
 
-> 本文档版本:v2.6(2026-09-13)
+> 本文档版本:v2.7(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

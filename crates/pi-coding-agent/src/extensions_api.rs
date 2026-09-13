@@ -33,7 +33,7 @@ use pi_chord::hostcall_rewrite::{
 use pi_chord::hostcall_superinstructions::{
     HostcallSuperinstructionCompiler, HostcallSuperinstructionPlan, execute_with_superinstruction,
 };
-use crate::hostcall_trace_jit::{GuardContext, TraceJitCompiler};
+use pi_chord::hostcall_trace_jit::{GuardContext, TraceJitCompiler};
 use crate::permissions::{PermissionStore, PersistedDecision};
 use crate::resources::ExtensionResourcePaths;
 pub(crate) use pi_agent_core::scheduler::HostcallOutcome;
@@ -11105,7 +11105,7 @@ thread_local! {
 ///
 /// Returns `None` if no plans have been evaluated yet.
 #[must_use]
-pub fn trace_jit_telemetry_snapshot() -> Option<crate::hostcall_trace_jit::TraceJitTelemetry> {
+pub fn trace_jit_telemetry_snapshot() -> Option<pi_chord::hostcall_trace_jit::TraceJitTelemetry> {
     TRACE_JIT.with(|cell| {
         let jit = cell.borrow();
         let t = jit.telemetry().clone();

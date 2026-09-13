@@ -40,6 +40,9 @@
 //! - `crash.rs` — Crash bundle capture + redacted panic hook + crash
 //!   list/show/delete/emit_startup_notice for the agent recovery flow
 //!   (Round 32)
+//! - `version.rs` — Background version check: semver compare, GitHub
+//!   release parsing, cached refresh + `HttpFetch` trait seam
+//!   (Round 33)
 
 #![forbid(unsafe_code)]
 
@@ -59,3 +62,4 @@ pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
 pub mod platform;
 pub mod skills_managed;
+pub mod version;

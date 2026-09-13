@@ -20,7 +20,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use pi_error::{Error, Result};
-use crate::version::{CURRENT_VERSION, is_newer};
+use pi_chord::version::{is_newer, CURRENT_VERSION};
 use sha2::{Digest, Sha256};
 
 const RELEASES_API_BASE: &str =

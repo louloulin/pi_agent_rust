@@ -39,6 +39,8 @@ dirs = { workspace = true }
 # crash.rs (Round 32) — timestamp + signal-hook integration
 chrono = { workspace = true }
 signal-hook = { workspace = true }
+# version.rs (Round 33) — semver compare + GitHub release parsing
+semver = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

@@ -41,7 +41,8 @@ pub mod swarm_activity_ledger;
 pub mod swarm_progress_slo;
 pub mod turn_recovery;
 pub mod undo;
-pub mod version;
+// Round 33: `version` re-housed in `pi-chord` (semver + cached refresh).
+pub use pi_chord::version;
 pub mod workspace;
 
 // Files relocated from `crates/pi/src/` in Round 13.

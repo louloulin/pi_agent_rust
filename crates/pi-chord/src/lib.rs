@@ -49,6 +49,8 @@
 //! - `status_line.rs` — Powerline status line builder: presets,
 //!   separators, segment IDs, responsive dropping, accent-hue hash
 //!   (Round 35)
+//! - `secrets.rs` — credential detection, outbound gating, and the
+//!   session-scoped placeholder vault (Round 37)
 
 #![forbid(unsafe_code)]
 
@@ -67,6 +69,7 @@ pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
 pub mod platform;
+pub mod secrets;
 pub mod skills_managed;
 pub mod status_line;
 pub mod turn_recovery;

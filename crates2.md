@@ -1187,7 +1187,25 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 36 — `advisor.rs` → `pi-agent-core` ✅(advisor runtime)
+### Round 37 — `secrets.rs` → `pi-chord` ✅(credential vault)
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/secrets.rs crates/pi-chord/src/secrets.rs`（683 LOC，纯 `serde`/`regex`/`sha2`/`pi-error`，无 `crate::` 反向依赖）
+2. `pi-chord` 补充 `regex` 与 `sha2` 依赖并导出 `secrets` 模块
+3. `pi-coding-agent` 改为 `pub use pi_chord::secrets`，保持 agent/config 既有调用路径与插件侧兼容
+4. 保留 `SecretsMode`、检测规则、稳定 placeholder、restore、outbound gate 与审计接口，未改变协议行为
+
+**验证:**
+- `cargo check -p pi-chord`
+- `cargo test -p pi-chord secrets --lib`
+- `cargo check -p pi-coding-agent --lib`
+- `cargo check -p pi`
+- `git diff --check`
+
+**LOC 迁移:** 683 LOC。pi-chord 现在持有 22 个模块。
+
+**进度:** 按当前 `crates2.md` 的 Phase-2 包迁移统计，`pi-agent-core` 已完成 advisor 归位，`pi-chord` 继续收敛纯叶子模块；二期仍为持续拆分阶段，不能宣称整体完成。
+
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/advisor.rs crates/pi-agent-core/src/advisor.rs`(589 LOC，纯 `pi-ai` provider + serde/futures，无 `crate::` 反向依赖)

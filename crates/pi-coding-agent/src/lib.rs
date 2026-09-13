@@ -33,7 +33,9 @@ pub use pi_tui::overlay_system;
 // `models.rs` / `providers/model_fetch.rs` / tests keep resolving
 // `crate::platform::*` and `pi_coding_agent::platform::*` unchanged.
 pub use pi_chord::platform;
-pub mod secrets;
+// Round 37: `secrets` re-housed in `pi-chord`. Re-export it here so
+// existing agent/config callers keep resolving `crate::secrets::*`.
+pub use pi_chord::secrets;
 pub mod self_update;
 pub mod stats;
 // Round 35: `status_line` re-housed in `pi-chord` (powerline status,

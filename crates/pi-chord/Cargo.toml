@@ -43,8 +43,12 @@ signal-hook = { workspace = true, features = ["iterator"] }
 semver = { workspace = true }
 # turn_recovery.rs (Round 34) — classify StopReason into RecoveryClass
 pi-ai = { workspace = true }
+# secrets.rs (Round 37) — credential detection and in-memory vault
+regex = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+proptest = { workspace = true }
+asupersync = { workspace = true }
 # file_lock.rs in-crate tests need tempfile for scratch dirs.
 tempfile = { workspace = true }

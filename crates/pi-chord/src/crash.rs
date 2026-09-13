@@ -24,6 +24,8 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::Serialize;
 
+use crate::secrets::{obfuscate, SecretVault};
+
 /// Schema tag for crash bundles.
 pub const CRASH_SCHEMA: &str = "pi.crash.v1";
 /// Ring capacity for recent-operation context.
@@ -92,12 +94,9 @@ fn ring_tail() -> Vec<String> {
 /// crash-path redaction cannot drift.
 #[must_use]
 pub fn redact_text(text: &str) -> String {
-    // Round 19 placeholder: the upstream `@pi/secrets` scanner was a
-    // separate package that has not yet been ported into this workspace.
-    // Until the detector lands we hand back the original text; downstream
-    // crash dumps still go through the format-and-write helpers below.
-    let _ = text;
-    text.to_string()
+    let mut vault = SecretVault::default();
+    let (redacted, _audit) = obfuscate(text, &mut vault, &[]);
+    redacted
 }
 
 /// Crash bundle written to disk (`pi.crash.v1`).

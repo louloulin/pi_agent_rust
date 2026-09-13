@@ -761,8 +761,37 @@ Round 30 后(收尾)       : ~64%
 - Round 27 价值:迁出 `buffer_shim + file_lock` 这两个零依赖 leaf 文件,验证 Round 18 的"反向修复"路径可行
 - Round 27.2+ 候选:`hostcall_*` 系列(8 文件,中等依赖),`extensions_api.rs`(25K,最大 chord 资产)
 
+### Round 27.2 — `hostcall_rewrite.rs` → `pi-chord` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/hostcall_rewrite.rs crates/pi-chord/src/hostcall_rewrite.rs`(386 LOC,**零依赖**)
+2. `pi-chord/src/lib.rs` 新增 `pub mod hostcall_rewrite;`
+3. `pi-coding-agent/src/lib.rs` 移除 `pub mod hostcall_rewrite;`
+4. Bulk rename `crate::hostcall_rewrite::*` → `pi_chord::hostcall_rewrite::*`:
+   - `pi-coding-agent/src/hostcall_egraph.rs`(3 处使用 + 2 处 doc comment)
+   - `pi-coding-agent/src/extensions_api.rs`(1 处使用)
+
+**验证:**
+- `cargo check -p pi-chord`:✅ Finished
+- `cargo check -p pi-coding-agent`:✅ Finished(189 warnings,与 R27.1 持平)
+- `cargo check -p pi-coding-agent --bin pi`:✅ Finished(隐含)
+
+**LOC 迁移:** 386 LOC
+
+**剩余 Round 27 chord 文件:**
+| 文件 | LOC | 依赖 |
+|------|-----|------|
+| `hostcall_superinstructions.rs` | 859 | 待评估 |
+| `hostcall_io_uring_lane.rs` | 1,085 | 待评估 |
+| `hostcall_trace_jit.rs` | 1,364 | 待评估 |
+| `hostcall_amac.rs` | 1,460 | 待评估 |
+| `hostcall_s3_fifo.rs` | 1,288 | 待评估 |
+| `hostcall_queue.rs` | 2,180 | 待评估 |
+| `hostcall_egraph.rs` | 2,450 | 依赖 hostcall_rewrite (已迁) |
+| `extensions_api.rs` | ~25,000 | 中心枢纽,需最后迁 |
+
 ---
 
-> 本文档版本:v2.3(2026-09-13)
+> 本文档版本:v2.4(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

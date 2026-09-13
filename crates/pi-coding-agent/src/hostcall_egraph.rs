@@ -1,7 +1,7 @@
 //! Equality-saturation rewrite search over hot hostcall execution plans
 //! (bd-3ar8v.4.22).
 //!
-//! [`crate::hostcall_rewrite`] already decides *between* plans: given a
+//! [`pi_chord::hostcall_rewrite`] already decides *between* plans: given a
 //! baseline and a candidate list it picks the unique cheapest and refuses on a
 //! tie. What it never had was anything to produce those candidates — the plans
 //! were hand-enumerated. This module is the search that fills that gap, and it
@@ -48,7 +48,7 @@
 
 use std::collections::{BTreeMap, BTreeSet, HashMap};
 
-use crate::hostcall_rewrite::{HostcallRewritePlan, HostcallRewritePlanKind};
+use pi_chord::hostcall_rewrite::{HostcallRewritePlan, HostcallRewritePlanKind};
 
 /// Schema tag for emitted decision telemetry.
 pub const HOSTCALL_EGRAPH_SCHEMA: &str = "pi.ext.hostcall_egraph_decision.v1";
@@ -1197,7 +1197,7 @@ impl EGraphDecision {
         u32::try_from(scaled).ok()
     }
 
-    /// Hand the result to [`crate::hostcall_rewrite::HostcallRewriteEngine`],
+    /// Hand the result to [`pi_chord::hostcall_rewrite::HostcallRewriteEngine`],
     /// which owns the final authorization.
     ///
     /// Deliberately does not decide anything itself: this converts the search
@@ -1290,7 +1290,7 @@ impl HostcallEGraphEngine {
     /// Parse the kill switch from an explicit value.
     ///
     /// Split out of [`Self::from_env`] for the same reason
-    /// [`crate::hostcall_rewrite::HostcallRewriteEngine::from_opt`] is: the
+    /// [`pi_chord::hostcall_rewrite::HostcallRewriteEngine::from_opt`] is: the
     /// crate is `#![forbid(unsafe_code)]` and `std::env::set_var` is unsafe in
     /// Rust 2024, so the parsing has to be testable without touching the
     /// process environment. Absent means enabled, matching that engine exactly
@@ -2351,7 +2351,7 @@ mod tests {
     fn handoff_to_the_existing_selector_authorizes_the_fast_path() {
         // The search proposes; hostcall_rewrite disposes. A selected rewrite
         // must survive that engine's own guard.
-        use crate::hostcall_rewrite::HostcallRewriteEngine;
+        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
 
         let egraph = HostcallEGraphEngine::new(true);
         let decision = egraph.optimize(&typed_plan_with_roundtrip("tool.read"));
@@ -2381,7 +2381,7 @@ mod tests {
     fn a_fallback_is_rejected_by_the_selector_too() {
         // Defense in depth: even if a caller forwards a fallback decision, the
         // selector refuses it because its cost cannot beat the baseline.
-        use crate::hostcall_rewrite::HostcallRewriteEngine;
+        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
 
         let egraph = HostcallEGraphEngine::new(false);
         let decision = egraph.optimize(&canonical_plan("tool.read"));
@@ -2426,7 +2426,7 @@ mod tests {
     fn the_kill_switch_agrees_with_the_existing_planner() {
         // One variable governs both halves of the rewrite path, so the two
         // parsers must never disagree about what a value means.
-        use crate::hostcall_rewrite::HostcallRewriteEngine;
+        use pi_chord::hostcall_rewrite::HostcallRewriteEngine;
 
         for value in [
             Some("0"),

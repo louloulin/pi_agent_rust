@@ -27,7 +27,7 @@ pub(crate) use crate::extensions_js::{js_to_json, json_to_js};
 use crate::hostcall_amac::AmacBatchExecutor;
 #[cfg(test)]
 use crate::hostcall_amac::AmacBatchExecutorConfig;
-use crate::hostcall_rewrite::{
+use pi_chord::hostcall_rewrite::{
     HostcallRewriteEngine, HostcallRewritePlan, HostcallRewritePlanKind,
 };
 use crate::hostcall_superinstructions::{

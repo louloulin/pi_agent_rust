@@ -135,7 +135,7 @@ pub mod swarm_replay;
 // pi-coding-agent ↔ pi-agent-core cycle by making pi-coding-agent the
 // sole owner of the orchestration code).
 pub mod agent;
-pub mod agent_cx;
+pub use pi_agent_core::agent_cx;
 pub mod agent_hub;
 pub mod handoff;
 pub mod memory;

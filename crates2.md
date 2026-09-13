@@ -1187,6 +1187,23 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
+### Round 37 — `agent_cx.rs` → `pi-agent-core` ✅(capability-scoped context)
+
+**做了什么:**
+1. 将 `crates/pi-coding-agent/src/agent_cx.rs` 迁移至 `crates/pi-agent-core/src/agent_cx.rs`（246 LOC）；该模块仅依赖 `asupersync` 与标准库，无反向业务依赖。
+2. `pi-agent-core/Cargo.toml` 将 `asupersync` 纳入生产依赖，并在 `src/lib.rs` 暴露 `pub mod agent_cx;`。
+3. `pi-coding-agent/src/lib.rs` 改为 `pub use pi_agent_core::agent_cx;`，保留现有 `crate::agent_cx::*` 与公开模块路径，避免调用方批量改名。
+4. capability context、filesystem、time、process accessor 及原有单元测试全部随模块归位。
+
+**验证:**
+- `git diff --check`:✅
+- `cargo check -p pi-agent-core`:✅（仅仓库既有 dead-code warning）
+- `cargo test -p pi-agent-core agent_cx --lib`:✅ 11 passed
+- `cargo check -p pi-coding-agent --lib`:✅（188 warnings，0 errors；警告为既有配置/未使用代码问题）
+- `dsr quality --tool pi_agent_rust`:⚠️ 当前环境未安装 `dsr`（command not found），无法运行仓库规定的完整质量配方。
+
+**LOC 迁移:** 246 LOC。
+
 ### Round 36 — `advisor.rs` → `pi-agent-core` ✅(advisor runtime)
 
 **做了什么:**

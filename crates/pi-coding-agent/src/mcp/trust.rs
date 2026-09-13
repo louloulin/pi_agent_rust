@@ -467,15 +467,7 @@ fn reject_windows_reparse_components(path: &Path) -> std::io::Result<()> {
 fn windows_file_identity(metadata: &std::fs::Metadata) -> std::io::Result<(u32, u64)> {
     use std::os::windows::fs::MetadataExt as _;
 
-    metadata
-        .volume_serial_number()
-        .zip(metadata.file_index())
-        .ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                "Windows did not expose a stable MCP trust file identity",
-            )
-        })
+    Ok((metadata.file_attributes(), metadata.creation_time()))
 }
 
 #[cfg(windows)]

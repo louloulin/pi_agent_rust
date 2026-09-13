@@ -941,10 +941,8 @@ fn same_file_identity(left: &std::fs::Metadata, right: &std::fs::Metadata) -> bo
 fn same_file_identity(left: &std::fs::Metadata, right: &std::fs::Metadata) -> bool {
     use std::os::windows::fs::MetadataExt as _;
 
-    left.volume_serial_number().is_some()
-        && left.file_index().is_some()
-        && left.volume_serial_number() == right.volume_serial_number()
-        && left.file_index() == right.file_index()
+    left.creation_time() == right.creation_time()
+        && left.file_attributes() == right.file_attributes()
 }
 
 #[cfg(not(any(unix, windows)))]

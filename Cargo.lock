@@ -5796,6 +5796,7 @@ dependencies = [
  "url",
  "uuid",
  "wasmtime",
+ "win32job",
  "xxhash-rust",
 ]
 

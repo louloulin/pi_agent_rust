@@ -11,9 +11,9 @@ use std::sync::Arc;
 
 use futures::StreamExt;
 
-use pi_error::Result;
 use pi_ai::model::{Message, UserContent, UserMessage};
 use pi_ai::provider::Provider;
+use pi_error::Result;
 
 /// System contract for side questions (omp btw-user.md semantics).
 pub const BTW_SYSTEM_PROMPT: &str = "You are answering an ephemeral side question about the \
@@ -96,87 +96,14 @@ impl BtwClient {
             }
         }
         if answer.trim().is_empty() {
-            return Err(pi_error::Error::api(
-                "side question returned empty reply",
-            ));
+            return Err(pi_error::Error::api("side question returned empty reply"));
         }
         Ok(answer)
     }
 }
 
 /// Compact context summary from the live agent message list.
-///
-/// The most recent exchanges, truncated to [`CONTEXT_BUDGET_CHARS`]. Tool
-/// noise (calls/results) is summarized as one-liners so the budget buys
-/// prose.
-#[must_use]
-pub fn build_context_summary(messages: &[Message]) -> String {
-    // Pieces accumulate newest-first (walking backwards); each message's
-    // OWN pieces are appended in reverse so the final flip restores true
-    // chronological order within a message too. The budget drops the
-    // OLDEST content — the newest exchange is what a side question is
-    // usually about.
-    let mut pieces: Vec<String> = Vec::new();
-    let mut used = 0usize;
-    for message in messages.iter().rev() {
-        let mut message_pieces: Vec<String> = Vec::new();
-        match message {
-            Message::User(user) => {
-                if let UserContent::Text(text) = &user.content {
-                    message_pieces.push(format!("user: {}", truncate(text, 400)));
-                }
-            }
-            Message::Assistant(assistant) => {
-                for block in &assistant.content {
-                    match block {
-                        pi_ai::model::ContentBlock::Text(t) => {
-                            message_pieces.push(format!("assistant: {}", truncate(&t.text, 400)));
-                        }
-                        pi_ai::model::ContentBlock::ToolCall(call) => {
-                            message_pieces.push(format!("assistant ran tool {}", call.name));
-                        }
-                        _ => {}
-                    }
-                }
-            }
-            Message::ToolResult(result) => {
-                let first = result.content.iter().find_map(|block| match block {
-                    pi_ai::model::ContentBlock::Text(t) => Some(t.text.clone()),
-                    _ => None,
-                });
-                message_pieces.push(format!(
-                    "tool {}: {}",
-                    result.tool_name,
-                    truncate(first.as_deref().unwrap_or(""), 160)
-                ));
-            }
-            Message::Custom(_) => {}
-        }
-        let mut over_budget = false;
-        for piece in message_pieces.into_iter().rev() {
-            // +1 for the join separator; stop BEFORE exceeding the budget
-            // so the newest pieces are never tail-truncated later.
-            if used + piece.len() + 1 > CONTEXT_BUDGET_CHARS {
-                over_budget = true;
-                break;
-            }
-            used += piece.len() + 1;
-            pieces.push(piece);
-        }
-        if over_budget {
-            break;
-        }
-    }
-    pieces.reverse();
-    pieces.join("\n")
-}
-
-fn truncate(text: &str, limit: usize) -> &str {
-    match text.char_indices().nth(limit) {
-        Some((index, _)) => &text[..index],
-        None => text,
-    }
-}
+pub use pi_chord::btw_context::build_context_summary;
 
 #[cfg(test)]
 mod tests {
@@ -186,52 +113,6 @@ mod tests {
     fn system_prompt_forbids_tools_and_followups() {
         assert!(BTW_SYSTEM_PROMPT.contains("NEVER use tools"));
         assert!(BTW_SYSTEM_PROMPT.contains("NEVER ask follow-up"));
-    }
-
-    #[test]
-    fn context_summary_captures_recent_exchanges_and_tool_noise() {
-        let messages = vec![
-            Message::User(UserMessage {
-                content: UserContent::Text("fix the flaky test".into()),
-                timestamp: 0,
-            }),
-            Message::Assistant(
-                pi_ai::model::AssistantMessage {
-                    content: vec![pi_ai::model::ContentBlock::ToolCall(
-                        pi_ai::model::ToolCall {
-                            id: "c1".into(),
-                            name: "bash".into(),
-                            arguments: serde_json::json!({ "command": "cargo test" }),
-                            thought_signature: None,
-                        },
-                    )],
-                    api: "test-api".into(),
-                    provider: "test-provider".into(),
-                    model: "test-model".into(),
-                    ..Default::default()
-                }
-                .into(),
-            ),
-            Message::User(UserMessage {
-                content: UserContent::Text("second question".into()),
-                timestamp: 0,
-            }),
-        ];
-        let summary = build_context_summary(&messages);
-        assert!(summary.contains("fix the flaky test"), "{summary}");
-        assert!(summary.contains("ran tool bash"), "{summary}");
-        assert!(summary.contains("second question"), "{summary}");
-    }
-
-    #[test]
-    fn context_summary_respects_budget() {
-        let big = "x".repeat(10_000);
-        let messages = vec![Message::User(UserMessage {
-            content: UserContent::Text(big),
-            timestamp: 0,
-        })];
-        let summary = build_context_summary(&messages);
-        assert!(summary.len() <= CONTEXT_BUDGET_CHARS + 32);
     }
 
     #[test]

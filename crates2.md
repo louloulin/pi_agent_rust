@@ -1291,3 +1291,8 @@ Round 30 后(收尾)       : ~64%
 **LOC 迁移:** 188 LOC(`pi-coding-agent/src/` → `pi-coding-agent/src/cli/`)。
 
 **Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。
+### Round 36 — `/btw` 上下文摘要 → `pi-chord`（进行中）
+
+**设计:** 将无状态的会话消息压缩逻辑放入 `pi-chord::btw_context`，模型、认证和 Provider 绑定仍保留在 `pi-coding-agent::btw`，通过 re-export 保持既有调用路径，避免引入反向依赖。
+
+**本轮变更:** 新增 `crates/pi-chord/src/btw_context.rs` 及其预算/工具调用回归测试；`pi-coding-agent::btw::build_context_summary` 改为 re-export；更新 `pi-chord` 依赖声明。

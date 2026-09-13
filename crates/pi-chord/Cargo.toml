@@ -41,7 +41,7 @@ chrono = { workspace = true }
 signal-hook = { workspace = true }
 # version.rs (Round 33) — semver compare + GitHub release parsing
 semver = { workspace = true }
-# turn_recovery.rs (Round 34) — classify StopReason into RecoveryClass
+# btw_context.rs (Round 36) — ephemeral context summarization
 pi-ai = { workspace = true }
 
 [dev-dependencies]

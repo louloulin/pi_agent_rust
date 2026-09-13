@@ -939,12 +939,9 @@ fn same_file_identity(left: &std::fs::Metadata, right: &std::fs::Metadata) -> bo
 
 #[cfg(windows)]
 fn same_file_identity(left: &std::fs::Metadata, right: &std::fs::Metadata) -> bool {
-    use std::os::windows::fs::MetadataExt as _;
-
-    left.volume_serial_number().is_some()
-        && left.file_index().is_some()
-        && left.volume_serial_number() == right.volume_serial_number()
-        && left.file_index() == right.file_index()
+    // The stable Windows metadata API does not expose a file identifier on
+    // this toolchain. Fail closed instead of conflating distinct files.
+    false
 }
 
 #[cfg(not(any(unix, windows)))]

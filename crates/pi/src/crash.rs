@@ -276,6 +276,7 @@ fn payload_of(info: &std::panic::PanicHookInfo<'_>) -> String {
 /// Best-effort fatal-signal watcher: writes a minimal bundle naming the
 /// signal with redacted ring context. See module docs for the coverage
 /// caveat under `forbid(unsafe_code)`.
+#[cfg(not(windows))]
 fn spawn_signal_watcher(agent_dir: PathBuf, session_path: Option<String>) {
     // SIGSEGV/SIGILL/SIGFPE are forbidden by signal-hook's safe registry
     // (registration panics, not errors) — the module docs already scope
@@ -314,6 +315,12 @@ fn spawn_signal_watcher(agent_dir: PathBuf, session_path: Option<String>) {
             }
         })
         .ok();
+}
+
+#[cfg(windows)]
+fn spawn_signal_watcher(_agent_dir: PathBuf, _session_path: Option<String>) {
+    // signal-hook's iterator and POSIX signal constants are unavailable on
+    // Windows; crash bundles still capture panic-hook events there.
 }
 
 /// One-line summary of an existing bundle directory.

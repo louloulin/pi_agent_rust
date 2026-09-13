@@ -464,17 +464,12 @@ fn reject_windows_reparse_components(path: &Path) -> std::io::Result<()> {
 
 #[cfg(windows)]
 fn windows_file_identity(metadata: &std::fs::Metadata) -> std::io::Result<(u32, u64)> {
-    use std::os::windows::fs::MetadataExt as _;
-
-    metadata
-        .volume_serial_number()
-        .zip(metadata.file_index())
-        .ok_or_else(|| {
-            std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                "Windows did not expose a stable MCP trust file identity",
-            )
-        })
+    // The stable Windows metadata API does not expose file identity on this
+    // toolchain. Fail closed until a stable handle API exists.
+    Err(std::io::Error::new(
+        std::io::ErrorKind::Unsupported,
+        "Windows file identity is unavailable on this toolchain",
+    ))
 }
 
 #[cfg(windows)]

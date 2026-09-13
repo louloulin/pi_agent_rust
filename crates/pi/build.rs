@@ -12,25 +12,34 @@ struct EmbeddedTextAsset {
 
 const EMBEDDED_TEXT_ASSETS: [EmbeddedTextAsset; 4] = [
     EmbeddedTextAsset {
-        source: "legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts",
+        source: concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts"
+        ),
         output_name: "legacy-models-generated.ts.gz",
         metadata_prefix: "LEGACY_MODELS_GENERATED_TS",
         checksum_prefix: Some("LEGACY_MODELS_GENERATED_TS"),
     },
     EmbeddedTextAsset {
-        source: "docs/provider-upstream-model-ids-snapshot.json",
+        source: concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../docs/provider-upstream-model-ids-snapshot.json"
+        ),
         output_name: "provider-upstream-model-ids.json.gz",
         metadata_prefix: "PROVIDER_UPSTREAM_MODEL_IDS_JSON",
         checksum_prefix: Some("PROVIDER_UPSTREAM_MODEL_IDS_JSON"),
     },
     EmbeddedTextAsset {
-        source: "docs/extension-artifact-provenance.json",
+        source: concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/../../docs/extension-artifact-provenance.json"
+        ),
         output_name: "extension-artifact-provenance.json.gz",
         metadata_prefix: "EXTENSION_ARTIFACT_PROVENANCE_JSON",
         checksum_prefix: None,
     },
     EmbeddedTextAsset {
-        source: "CHANGELOG.md",
+        source: concat!(env!("CARGO_MANIFEST_DIR"), "/CHANGELOG.md"),
         output_name: "changelog.md.gz",
         metadata_prefix: "CHANGELOG",
         checksum_prefix: None,

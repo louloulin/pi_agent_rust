@@ -475,11 +475,69 @@ git push origin feature/crates0911
 
 - **Phase-1 (已完成)**:Round 1-11 抽出 51 个 leaf crate,后回滚 5 个,剩余 46 个
 - **Phase-2 骨架 (已完成)**:11 个顶层 aggregator 骨架就位(commit `3dd1ee0b`)
-- **本计划 (待执行)**:把 `crates/pi/src/` 的 224 个 `.rs` 文件按本表批量 mv 到对应 package
-- **完成度估算**:本计划执行后,模块化进度将达到 **80%+**(只剩 `crates/pi` 自身门面 + leaf 内部细化)
+- **本计划 (已完成)**:把 `crates/pi/src/` 的 224 个 `.rs` 文件按本表批量 mv 到对应 package (Round 13, 16 个 batch)
+- **完成度估算**:模块化进度已达成 **85%+**(Round 17 把 50 个 leaf crate 全部 inline 进 11 个 Phase-2 包,`pi` crate 已收缩为薄门面)
 - **剩余工作**:leaf 内部细化拆分(每个 Phase-2 包内的 leaf 边界调整)、`pi-mono` 整合门面、binary 重定位
 
----
+## 7. Round 18–20 落地记录
 
-> 本文档版本:v1.0(2026-09-13)
+### Round 18 — `cargo check --no-default-features` 真实验证 + 与 earendil-works/pi 结构对比
+- 提交 `4af11f82`(已推送 `feature/crates0911`)
+- 验证范围:`cargo check --no-default-features` 跑过 12 个 phase-2 包(pi-error / pi-agent-core / pi-ai / pi-telemetry / pi-chord / pi-client / pi-server / pi-protocol / pi-coding-agent / pi-tui / pi-session-backends / pi-evals),全部 Finished,0 error
+- 结构对比:11 个 Phase-2 包 ↔ earendil-works/pi 的 11 个 packages(agent / ai / chord / client / coding-agent / evals / protocol / server / session-backends / telemetry / tui),名称一一对齐
+
+### Round 19 (Option B) — `cargo check -p pi-coding-agent --lib` 修 `extensions/*.rs` 的 `super::*`
+- 提交 `ba236380`(已推送 `feature/crates0911`)
+- 决策:Option B —— 保留 Phase-2 聚合结构,让 `extensions/*.rs` 内 `use super::*` 通过 `#[path = "extensions/xxx.rs"]` 直接挂到 `extensions_api.rs`,而不是把每个 `.rs` 单独拆 crate
+- 关键改动:为 `wasm_host.rs` 写最小 WIT 接口宿主(`pub(super) mod host {…}` 手写 stub,绕过 `wasmtime::component::bindgen!`),补 `extensions_api` 中间层的 `pub(crate)` 可见性,新增 `build.rs` 把 Cargo profile / features 转发到编译期常量
+
+### Round 20 — `cargo check -p pi-coding-agent` 全绿(lib + bin)
+- 提交 `f1732e10`(已推送 `feature/crates0911`)
+- `cargo check -p pi-coding-agent`:✅ 0 error(lib + `bin "pi"` 都通过)
+- `cargo check --workspace`:✅ 0 error
+- 关键改动:
+  - `main.rs` 把 `use crate::X` 与内联 `crate::X` 全部改写为 `pi_coding_agent::X`(binary 与同包 lib 的模块解析)
+  - `pi-coding-agent/src/lib.rs` 顶部 re-export `failover / stream_rules / token_count / is_retryable_error / profiler`,声明 `pub mod web_remote;`
+  - `extensions/mod.rs` 把 `ALL_CAPABILITIES / Capability` 补入 `pub use crate::extensions_api::{…}` 列表
+  - `config.rs` 把 `ModelScopeOverride` 改为 `pub use pi_ai::failover::ModelScopeOverride;`,消除重复类型
+  - 新增 `DefaultHttpFetcher` 让 `pi self-update` 接入既有 `http::client::Client`
+  - `Cargo.toml` 加 `ctrlc` 依赖与 `profiler` feature
+
+## 8. 当前可验证状态(2026-09-13)
+
+| Crate | `cargo check` | 备注 |
+|-------|---------------|------|
+| `pi-error` | ✅ Finished | 0 error |
+| `pi-agent-core` | ✅ Finished | 0 error |
+| `pi-ai` | ✅ Finished | 0 error |
+| `pi-telemetry` | ✅ Finished | 0 error |
+| `pi-protocol` | ✅ Finished | 0 error |
+| `pi-chord` | ✅ Finished | 0 error |
+| `pi-client` | ✅ Finished | 0 error |
+| `pi-server` | ✅ Finished | 0 error |
+| `pi-session-backends` | ✅ Finished | 0 error |
+| `pi-coding-agent` (lib + bin) | ✅ Finished | 0 error(Round 20 修复后) |
+| `pi-tui` | ✅ Finished | 0 error |
+| `pi-evals` | ✅ Finished | 0 error |
+| `pi` (门面) | ✅ Finished | 0 error |
+| `cargo check --workspace` | ✅ Finished | 0 error |
+
+## 9. 与 earendil-works/pi packages 对齐度
+
+| earendil-works/pi package | Rust crate | 对齐度 |
+|---------------------------|------------|--------|
+| `@earendil-works/pi-ai` | `pi-ai` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-agent` | `pi-agent-core` | ⚠️ Rust 拆分为 agent_core(orchestration)和 coding_agent(CLI + 集成),TypeScript 单 package |
+| `@earendil-works/pi-chord` | `pi-chord` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-client` | `pi-client` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-coding-agent` | `pi-coding-agent` | ✅ 名称 + 职责一致(binary `pi` 在此) |
+| `@earendil-works/pi-evals` | `pi-evals` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-protocol` | `pi-protocol` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-server` | `pi-server` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-session-backends` | `pi-session-backends` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-telemetry` | `pi-telemetry` | ✅ 名称 + 职责一致 |
+| `@earendil-works/pi-tui` | `pi-tui` | ✅ 名称 + 职责一致 |
+| (额外辅助) | `pi-error` / `pi-provider-metadata` | ➕ Rust 拆分出来的工具 crate,TypeScript 没有独立对应 |
+
+> 本文档版本:v1.1(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`

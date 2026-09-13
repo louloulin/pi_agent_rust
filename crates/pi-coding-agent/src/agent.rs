@@ -2177,7 +2177,7 @@ impl Agent {
             messages
         } else {
             let mut owned = messages.into_owned();
-            let _stats = crate::compaction_snap::strip_snapcompact_images(&mut owned, false);
+            let _stats = pi_session_backends::compaction_snap::strip_snapcompact_images(&mut owned, false);
             std::borrow::Cow::Owned(owned)
         };
 

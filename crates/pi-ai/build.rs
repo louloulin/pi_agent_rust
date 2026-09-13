@@ -11,7 +11,7 @@ struct EmbeddedTextAsset {
 
 const EMBEDDED_TEXT_ASSETS: [EmbeddedTextAsset; 4] = [
     EmbeddedTextAsset {
-        source: "legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts",
+        source: "legacy_pi_mono_code/pi/packages/ai/src/models.generated.ts",
         output_name: "legacy-models-generated.ts.gz",
         metadata_prefix: "LEGACY_MODELS_GENERATED_TS",
         checksum_prefix: Some("LEGACY_MODELS_GENERATED_TS"),

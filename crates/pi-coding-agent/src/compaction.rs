@@ -186,7 +186,7 @@ pub struct CompactionResult {
     /// Rasterized snapcompact frames; `None` unless
     /// [`ResolvedCompactionSettings::render_mode`] is
     /// [`CompactionRenderMode::SnapCompact`].
-    pub snap_payload: Option<crate::compaction_snap::SnapPayload>,
+    pub snap_payload: Option<pi_session_backends::compaction_snap::SnapPayload>,
 }
 
 #[derive(Debug, Clone)]
@@ -2139,7 +2139,7 @@ fn finish_compaction(preparation: CompactionPreparation, mut summary: String) ->
             .filter_map(session_message_to_model)
             .collect();
         let transcript = serialize_conversation(&model_messages);
-        let frames = crate::compaction_snap::render_frames(&transcript);
+        let frames = pi_session_backends::compaction_snap::render_frames(&transcript);
         (!frames.is_empty()).then(|| {
             tracing::info!(
                 target: "snapcompact",
@@ -2148,7 +2148,7 @@ fn finish_compaction(preparation: CompactionPreparation, mut summary: String) ->
                 reason_code = "snapcompact_frames_generated",
                 "Rasterized compacted span into deterministic PNG frames"
             );
-            crate::compaction_snap::SnapPayload::new(frames)
+            pi_session_backends::compaction_snap::SnapPayload::new(frames)
         })
     } else {
         None

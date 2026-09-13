@@ -69,6 +69,10 @@ pdf-extract = { workspace = true }
 pi-ai = { workspace = true }
 pi-agent-core = { workspace = true }
 pi-error = { workspace = true }
+# Round 26.1: re-house `compaction_snap.rs` (Snapcompact mode) inside
+# `pi-session-backends`. Add the workspace dep so call sites can switch
+# from `crate::compaction_snap` to `pi_session_backends::compaction_snap`.
+pi-session-backends = { workspace = true }
 pi-telemetry = { workspace = true }
 portable-pty = { workspace = true }
 proptest = { workspace = true, optional = true }

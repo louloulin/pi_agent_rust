@@ -421,13 +421,13 @@ mod tests {
         assert_eq!(
             super::legacy_models_generated_ts().as_bytes(),
             include_bytes!(
-                "../../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts"
+                "../../../legacy_pi_mono_code/pi/packages/ai/src/models.generated.ts"
             )
         );
         assert_eq!(
             super::legacy_models_generated_ts_crc32c(),
             crc32c::crc32c(include_bytes!(
-                "../../../legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts"
+                "../../../legacy_pi_mono_code/pi/packages/ai/src/models.generated.ts"
             ))
         );
         assert_eq!(

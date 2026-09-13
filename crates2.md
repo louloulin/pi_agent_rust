@@ -665,6 +665,36 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.0(2026-09-13)
+## Round 26 执行记录
+
+### Round 26.1 — `compaction_snap.rs` → `pi-session-backends` ✅
+
+**做了什么:**
+1. `git mv crates/pi-coding-agent/src/compaction_snap.rs crates/pi-session-backends/src/compaction_snap.rs`
+2. `pi-session-backends/Cargo.toml` 新增 deps:`pi-ai / base64 / flate2 / serde / serde_json / tracing / anyhow`
+3. `pi-session-backends/src/lib.rs` 新增 `pub mod compaction_snap;`
+4. `pi-coding-agent/Cargo.toml` 新增 `pi-session-backends = { workspace = true }` 依赖
+5. `pi-coding-agent/src/lib.rs` 移除 `pub mod compaction_snap;`(文件已迁出)
+6. 8 处 `crate::compaction_snap::*` 替换为 `pi_session_backends::compaction_snap::*`:
+   - `pi-coding-agent/src/session.rs:5717,5719`
+   - `pi-coding-agent/src/agent.rs:2180`
+   - `pi-coding-agent/src/rpc.rs:3408,10866`
+   - `pi-coding-agent/src/compaction.rs:189,2142,2151`
+
+**附带修复:**
+- `crates/pi-ai/build.rs:14` 与 `crates/pi-ai/src/embedded_assets.rs:424,430` 旧路径 `legacy_pi_mono_code/pi-mono/...` → `legacy_pi_mono_code/pi/...`(Round 22 重命名未同步)
+
+**验证:**
+- `cargo check -p pi-session-backends`:✅ 通过
+- `cargo check -p pi-coding-agent`:✅ 通过(195 warnings,0 errors,与 Round 20 基线持平)
+- `cargo check -p pi-coding-agent --bin pi`:✅ 通过
+
+**LOC 迁移:** 579 LOC(纯代码)
+
+**留下的工作:** Round 26 剩余 7 个文件待迁出(下一轮执行)
+
+---
+
+> 本文档版本:v2.1(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)

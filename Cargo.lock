@@ -5740,6 +5740,7 @@ dependencies = [
  "pi-agent-core",
  "pi-ai",
  "pi-error",
+ "pi-session-backends",
  "pi-telemetry",
  "portable-pty",
  "proptest",
@@ -5838,6 +5839,12 @@ name = "pi-session-backends"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64 0.23.1",
+ "flate2",
+ "pi-ai",
+ "serde",
+ "serde_json",
+ "tracing",
 ]
 
 [[package]]

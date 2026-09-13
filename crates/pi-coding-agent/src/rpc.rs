@@ -3405,7 +3405,7 @@ pub async fn run(
                     let details_value = compaction_details_to_value(&result_data.details)?;
                     let details_value = match result_data.snap_payload.as_ref() {
                         Some(payload) => {
-                            crate::compaction_snap::payload_to_details(Some(details_value), payload)
+                            pi_session_backends::compaction_snap::payload_to_details(Some(details_value), payload)
                         }
                         None => details_value,
                     };
@@ -10863,7 +10863,7 @@ async fn maybe_auto_compact(
 
             let details_value = match result.snap_payload.as_ref() {
                 Some(payload) => {
-                    crate::compaction_snap::payload_to_details(Some(details_value), payload)
+                    pi_session_backends::compaction_snap::payload_to_details(Some(details_value), payload)
                 }
                 None => details_value,
             };

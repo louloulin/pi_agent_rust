@@ -89,6 +89,28 @@ impl ImportSource {
     }
 }
 
+/// Pure import planning value shared by filesystem and native adapters.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ImportPlan {
+    pub source: ImportSource,
+    pub session_id: String,
+}
+
+impl ImportPlan {
+    #[must_use]
+    pub fn for_content(source: ImportSource, content: &[u8]) -> Self {
+        Self { source, session_id: session_id_for(source, content) }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ImportErrorKind {
+    Read,
+    InvalidLine,
+    UnmappableEntry,
+    Persistence,
+}
+
 /// Content-addressed session id: same file content → same id (idempotent).
 fn session_id_for(source: ImportSource, content: &[u8]) -> String {
     let digest = sha2::Sha256::digest(content);
@@ -196,7 +218,8 @@ fn import_bytes<F: SessionImportFactory>(
     target_dir: Option<&Path>,
     factory: &F,
 ) -> Result<ImportOutcome> {
-    let id = session_id_for(source, raw);
+    let plan = ImportPlan::for_content(source, raw);
+    let id = &plan.session_id;
     let target_root =
         target_dir.map_or_else(factory.sessions_dir(), Path::to_path_buf);
     // Idempotency probe: the session store nests by cwd, so scan for the
@@ -207,7 +230,7 @@ fn import_bytes<F: SessionImportFactory>(
             schema: IMPORT_SCHEMA.to_string(),
             source: source.as_str().to_string(),
             original_path: original_path.display().to_string(),
-            session_id: id,
+            session_id: id.clone(),
             session_path: existing_path.display().to_string(),
             imported: 0,
             skipped: 0,
@@ -285,7 +308,7 @@ fn import_bytes<F: SessionImportFactory>(
         schema: IMPORT_SCHEMA.to_string(),
         source: source.as_str().to_string(),
         original_path: original_path.display().to_string(),
-        session_id: id,
+        session_id: id.clone(),
         session_path: actual_path.display().to_string(),
         imported,
         skipped,

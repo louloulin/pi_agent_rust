@@ -82,6 +82,7 @@ pub mod http;
 pub mod model_routing;
 pub mod platform;
 pub mod secrets;
+pub mod semantic_graph;
 pub mod skills_managed;
 pub mod status_line;
 pub mod turn_recovery;

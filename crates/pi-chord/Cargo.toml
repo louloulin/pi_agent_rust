@@ -46,5 +46,9 @@ pi-ai = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+# Property tests are compiled by the crate-local test modules.
+proptest = { workspace = true }
+# version.rs tests use the deterministic runtime harness.
+asupersync = { workspace = true }
 # file_lock.rs in-crate tests need tempfile for scratch dirs.
 tempfile = { workspace = true }

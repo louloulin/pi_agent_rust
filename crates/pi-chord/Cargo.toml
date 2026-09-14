@@ -48,6 +48,7 @@ regex = { workspace = true }
 
 # hostcall_amac protocol boundary and scheduler outcome types
 pi-agent-core = { workspace = true }
+pi-scheduler-core = { workspace = true }
 pi-protocol = { workspace = true }
 
 [dev-dependencies]

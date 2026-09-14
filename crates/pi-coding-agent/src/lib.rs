@@ -207,7 +207,9 @@ pub use pi_ai::error_hints;
 pub use pi_ai::model as model_module;
 pub use pi_ai::provider;
 pub use pi_ai::provider as provider_module;
-pub use pi_agent_core::scheduler;
+pi-scheduler-core = { workspace = true }
+
+pub use pi_scheduler_core as scheduler;
 
 // Convenience aliases used by inlined extension manager code that
 // originally addressed `crate::model::*` and `crate::error::*`.

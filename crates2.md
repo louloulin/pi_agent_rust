@@ -8,7 +8,22 @@
 
 ---
 
-### Round 65 — session 状态机核心拆分 ✅
+### Round 66 — scheduler 调度核心拆分 ✅
+
+**做了什么:**
+1. 新增 `pi-scheduler-core`，迁入完整 scheduler 状态机、timer heap、tick/事件循环纯逻辑及其单元/property tests（约 4,591 LOC）。
+2. `pi-agent-core` 与 `pi-coding-agent` 保留 `scheduler` facade/re-export，既有调用路径不变；coding-agent 仍承载具体 hostcall/JS adapter。
+3. `pi-chord::hostcall_amac` 改为直接依赖 `pi-scheduler-core` 的 `HostcallOutcome`，避免通过 agent 聚合 crate 形成不必要耦合。
+4. workspace 注册新 crate，scheduler-core 仅依赖 `serde_json` 与 `tracing`。
+
+**验证:**
+- `cargo test -p pi-scheduler-core` 待执行
+- `cargo check -p pi-coding-agent` 待执行
+- `git diff --check` 待执行
+
+**进度:** Round 66 scheduler 核心完成。
+
+
 
 **做了什么:**
 1. 新增 `pi-session-core`，仅依赖 `serde`，承载纯 `Session` trait、生命周期状态机、`Checkpoint` 与 `SessionSnapshot` 模型。

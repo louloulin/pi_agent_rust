@@ -15,6 +15,7 @@ chrono = { workspace = true }
 futures = { workspace = true }
 pi-ai = { workspace = true }
 pi-error = { workspace = true }
+pi-scheduler-core = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }

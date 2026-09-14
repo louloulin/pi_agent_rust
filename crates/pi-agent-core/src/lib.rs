@@ -9,4 +9,7 @@
 
 pub mod advisor;
 pub mod flake_classifier;
-pub mod scheduler;
+
+/// Compatibility facade; the scheduler state machine is owned by the
+/// dependency-free `pi-scheduler-core` package.
+pub use pi_scheduler_core as scheduler;

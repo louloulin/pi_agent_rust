@@ -26,6 +26,7 @@
 //! consent and are deliberately not gated here.
 
 use crate::config::Config;
+use pi_chord::workspace_trust::*;
 use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest as _, Sha256};
@@ -46,34 +47,6 @@ const TRUST_STORE_VERSION: u32 = 1;
 const TRUST_SURFACE_DIGEST_DOMAIN: &[u8] = b"pi_agent_rust:workspace-trust-surface:v2";
 const MAX_TRUST_CONFIG_BYTES: usize = 1024 * 1024;
 const MAX_TRUST_EXTENSION_BYTES: usize = 16 * 1024 * 1024;
-
-/// A recorded (or requested) trust decision.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum TrustDecision {
-    Trusted,
-    Untrusted,
-}
-
-/// What the workspace declares that could execute local code.
-#[derive(Debug, Clone)]
-pub struct WorkspaceTrustSurface {
-    /// Escaped canonical workspace path suitable for an untrusted terminal
-    /// prompt. The trust-store key retains the underlying canonical path.
-    pub workspace_display: String,
-    /// True when `.pi/settings.json` exists.
-    pub has_project_settings: bool,
-    /// Number of `packages` entries declared in `.pi/settings.json`.
-    pub package_count: usize,
-    /// Files under `.pi/extensions/`, relative to the workspace root, sorted.
-    pub extension_entries: Vec<String>,
-    /// Project-local MCP configuration files, relative to the workspace root,
-    /// sorted. Explicit CLI and global MCP files are deliberate operator
-    /// inputs and are not workspace trust surfaces.
-    pub mcp_config_entries: Vec<String>,
-    /// Hex sha256 over the canonical surface manifest.
-    pub digest: String,
-}
 
 impl WorkspaceTrustSurface {
     /// Scan `cwd` for project-controlled executable surfaces.
@@ -365,46 +338,6 @@ impl WorkspaceTrustStore {
         }
         Ok(())
     }
-}
-
-/// How the effective trust decision was reached (for logs and warnings).
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TrustSource {
-    /// The workspace declares nothing that could execute code.
-    NoSurface,
-    /// `--trust` on the command line (persisted).
-    CliFlag,
-    /// `trustAllWorkspaces` in the global settings (not persisted).
-    TrustAllConfig,
-    /// `PI_WORKSPACE_TRUST` environment override (not persisted).
-    EnvOverride,
-    /// A stored decision whose digest still matches.
-    Store,
-    /// The interactive first-use prompt (persisted).
-    Prompt,
-    /// Non-interactive launch with no stored decision: fail closed.
-    NonInteractive,
-}
-
-/// The effective trust state for this launch.
-#[derive(Debug)]
-pub struct WorkspaceTrustState {
-    pub trusted: bool,
-    pub source: TrustSource,
-    pub surface: Option<WorkspaceTrustSurface>,
-}
-
-/// Inputs to [`establish`] that the caller resolves from CLI/config/env.
-#[derive(Debug, Clone)]
-pub struct TrustInputs {
-    /// `--trust` was passed on the command line.
-    pub cli_trust: bool,
-    /// `trustAllWorkspaces` from the *global* settings file.
-    pub trust_all_workspaces: bool,
-    /// Value of [`TRUST_ENV_VAR`], if set.
-    pub env_override: Option<String>,
-    /// Whether an interactive first-use prompt may be shown.
-    pub interactive: bool,
 }
 
 #[cfg(unix)]

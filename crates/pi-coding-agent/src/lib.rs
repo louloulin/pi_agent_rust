@@ -128,7 +128,7 @@ pub mod url_read;
 pub mod url_router;
 pub mod vcr;
 pub mod version_check;
-pub mod workspace_trust;
+pub use pi_chord::workspace_trust;
 pub mod worktree_iso;
 
 // Round 18: modules absorbed from pi-chord and pi-session-backends.

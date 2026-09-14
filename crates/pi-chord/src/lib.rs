@@ -86,6 +86,7 @@ pub mod semantic_graph;
 pub mod skills_managed;
 pub mod status_line;
 pub mod turn_recovery;
+pub mod theme;
 pub mod undo;
 pub mod version;
 // Round 52: workspace roots and path-confinement state moved here. The

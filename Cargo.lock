@@ -5686,6 +5686,7 @@ name = "pi-chord"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "asupersync",
  "chrono",
  "crossbeam-queue",
  "dirs",
@@ -5693,6 +5694,7 @@ dependencies = [
  "futures",
  "pi-ai",
  "pi-error",
+ "proptest",
  "rustix",
  "semver",
  "serde",

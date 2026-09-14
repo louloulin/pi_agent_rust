@@ -61,6 +61,7 @@
 #![forbid(unsafe_code)]
 
 pub mod banner;
+pub mod btw;
 pub mod buffer_shim;
 pub mod commit_split;
 pub mod crash;

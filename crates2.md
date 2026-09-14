@@ -8,6 +8,18 @@
 
 ---
 
+## 0. `Round 47` 进展
+
+**做了什么:**
+1. 确认 `crates/pi-coding-agent/src/btw.rs` 存在，272 LOC
+2. 依赖盘点发现完整 BtwClient 绑定 `models`/`providers`/`auth`，直接迁移会形成反向依赖；先抽取无外部业务依赖的纯文本上下文 seam
+3. 新增 `crates/pi-chord/src/btw.rs`，承载 `build_context_summary`、预算截断与纯 `pi-ai` 消息格式处理
+4. `pi-coding-agent::btw` 通过 re-export 保持 `crate::btw::build_context_summary`，BtwClient provider/auth 适配保留在 coding-agent
+
+**验证:**
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` 待提交后执行
+
 ## 0. `Round 46` 进展
 
 **做了什么:**

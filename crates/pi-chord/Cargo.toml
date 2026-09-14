@@ -49,7 +49,10 @@ pi-ai = { workspace = true }
 regex = { workspace = true }
 
 [dev-dependencies]
+# secrets-core contracts are backend-neutral; the vault implementation remains
+# in pi-chord for compatibility until the next extraction step.
 serde_json = { workspace = true }
+pi-secrets-core = { workspace = true }
 proptest = { workspace = true }
 asupersync = { workspace = true }
 # file_lock.rs in-crate tests need tempfile for scratch dirs.

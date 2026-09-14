@@ -1,15 +1,15 @@
-## 0. `Round 68` 进展
+## 0. `Round 69` 进展
 
 **做了什么:**
-1. 新增 `crates/pi-index-core`，承载无 IO/agent 依赖的查询词法化、查询解析、倒排 posting 与字段相关性计算原语。
-2. `pi-coding-agent::extension_index` 保留数据模型、缓存、远端 NPM/GitHub IO 与旧 `search` facade，改用 `pi-index-core` 的 tokenize/relevance primitives；旧字段权重与排序保持不变。
-3. `pi-coding-agent` 依赖并 re-export `pi-index-core`，为后续 session 索引核心拆分保留稳定边界；session 文件/SQLite IO 仍留在 coding-agent。
+1. 新增 `crates/pi-secrets-core`，承载无平台依赖的 `SecretBackend` trait、`SecretReference`、`SecretScope` 与加密 `SecretEnvelope` 数据契约。
+2. `pi-chord` 与 `pi-coding-agent` 接入 core crate；旧 `pi_coding_agent::secrets` facade 与现有内存 vault 保持不变，OS keychain、agent 集成和检测逻辑未越界迁移。
+3. 通过 serde round-trip 与内存 backend contract tests 固化边界。
 
 **验证:**
-- `cargo test -p pi-index-core`: ✅ 4 passed
-- `cargo check -p pi-coding-agent --lib`: ⚠️ 被基线 `pi-session-backends/src/session_import.rs` 的 2 个既有编译错误阻塞（`map_or_else` 闭包与 `Box<dyn SessionImportSink>` coercion），错误与本轮 index core 无关
-- `cargo fmt -p pi-index-core`: ✅
-- `cargo fmt --all -- --check`: ⚠️ Windows 路径长度错误（OS error 206）
+- `cargo test -p pi-secrets-core`: ✅ 2 passed
+- `cargo check -p pi-chord`: ⚠️ 被基线 `btw.rs` / `semantic_graph.rs` 的既有缺失符号阻塞，未出现 secrets-core 错误
+- `cargo check -p pi-coding-agent --lib`: ⚠️ 被基线 `pi-session-backends/src/session_import.rs` 的 2 个既有编译错误阻塞，未出现 secrets-core 错误
+- `git diff --check`: ✅
 
 
 > 本文档是 `crates1.md` v1.2 + Round 23 差距分析的续篇,**逐文件**对比

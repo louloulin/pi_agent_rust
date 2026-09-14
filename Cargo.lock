@@ -5695,6 +5695,7 @@ dependencies = [
  "futures",
  "pi-ai",
  "pi-error",
+ "pi-secrets-core",
  "pi-tui",
  "proptest",
  "regex",
@@ -5767,6 +5768,7 @@ dependencies = [
  "pi-error",
  "pi-index-core",
  "pi-protocol",
+ "pi-secrets-core",
  "pi-session-backends",
  "pi-telemetry",
  "pi-tui",
@@ -5859,6 +5861,14 @@ name = "pi-protocol"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-secrets-core"
+version = "0.1.0"
+dependencies = [
  "serde",
  "serde_json",
 ]

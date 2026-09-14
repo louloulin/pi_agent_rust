@@ -37,8 +37,9 @@ pub use pi_tui::overlay_system;
 // `models.rs` / `providers/model_fetch.rs` / tests keep resolving
 // `crate::platform::*` and `pi_coding_agent::platform::*` unchanged.
 pub use pi_chord::platform;
-// Round 37: `secrets` re-housed in `pi-chord`. Re-export it here so
-// existing agent/config callers keep resolving `crate::secrets::*`.
+# Round 69: the pure secret contracts live in pi-secrets-core; this facade
+# remains for legacy callers and the agent's platform-backed integration.
+pub use pi_secrets_core as secrets_core;
 pub use pi_chord::secrets;
 // Round 38: `undo` re-housed in `pi-chord`; keep the public path stable for
 // agent, tools, interactive, SDK, and binary callers.

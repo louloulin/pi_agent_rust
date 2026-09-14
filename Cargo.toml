@@ -1,3 +1,6 @@
+[workspace]
+members = ["crates/pi-conformance-matrix-core"]
+
 [package]
 name = "pi_agent_rust"
 version = "0.4.0"
@@ -203,6 +206,8 @@ name = "test_time"
 path = "examples/test_time.rs"
 
 [dependencies]
+pi-conformance-matrix-core = { path = "crates/pi-conformance-matrix-core" }
+
 # CLI
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"

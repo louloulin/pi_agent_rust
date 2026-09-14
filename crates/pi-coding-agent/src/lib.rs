@@ -13,7 +13,9 @@
 // Inlined from the Phase-1 leaves (Round 17).
 pub use pi_agent_core::advisor;
 pub mod cli;
-pub mod conformance;
+// Round 42: conformance comparison utilities moved to `pi-evals`; keep
+// the historical path available for existing coding-agent callers.
+pub use pi_evals::conformance;
 pub mod context_files;
 // Round 32: `crash` re-housed in `pi-chord` (pure std + serde, zero
 // `crate::` self-deps — used to be inline under `pi-coding-agent`).

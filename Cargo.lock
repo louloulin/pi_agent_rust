@@ -5762,7 +5762,7 @@ dependencies = [
  "pi-agent-core",
  "pi-ai",
  "pi-chord",
- "pi-error",
+ "pi-evals",
  "pi-protocol",
  "pi-session-backends",
  "pi-telemetry",
@@ -5822,7 +5822,13 @@ dependencies = [
 name = "pi-evals"
 version = "0.1.0"
 dependencies = [
- "anyhow",
+ "chrono",
+ "proptest",
+ "regex",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "tempfile",
 ]
 
 [[package]]

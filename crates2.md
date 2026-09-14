@@ -8,7 +8,19 @@
 
 ---
 
-## 0. `Round 41` 进展
+## `Round 42` 进展
+
+**做了什么:**
+1. 将 `crates/pi-coding-agent/src/conformance.rs`（4,387 LOC）的 fixture/diff 语义比较实现归位到 `crates/pi-evals/src/conformance.rs`。
+2. `pi-evals` 从 marker crate 变为可独立使用的 conformance 包，补齐 `serde_json` 与测试用 `proptest` 依赖。
+3. `pi-coding-agent` 通过 `pub use pi_evals::conformance` 保留历史模块路径，未改变现有调用方 API。
+
+**验证:**
+- `git diff --check` 待执行
+- `dsr quality --tool pi_agent_rust`：环境未安装 `dsr`，无法执行权威质量配方
+
+**LOC 迁移:** 4,387 LOC；`pi-evals` 不再是空占位 crate。
+
 
 **做了什么:**
 1. 新增 `crates/pi-protocol/src/tool_effects.rs`，承载 read/write/append/network/process effects、labels、parallel-safety 与 barrier 规则

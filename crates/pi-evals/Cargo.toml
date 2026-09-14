@@ -9,6 +9,12 @@ description = "Phase-2 placeholder mirroring @earendil-works/pi-evals. Round 18 
 workspace = true
 
 [dependencies]
-# Round 18: pi-evals is now an empty placeholder. All eval files moved
-# to pi-coding-agent to break the pi-coding-agent ↔ pi-evals cycle.
-anyhow = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true }
+chrono = { workspace = true }
+regex = { workspace = true }
+sha2 = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = { workspace = true }

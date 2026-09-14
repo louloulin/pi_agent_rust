@@ -1,3 +1,24 @@
+[workspace]
+resolver = "2"
+members = ["crates/pi-plan-core"]
+
+[workspace.package]
+version = "0.4.0"
+edition = "2024"
+rust-version = "1.95"
+license = "MIT"
+repository = "https://github.com/louloulin/pi_agent_rust"
+
+[workspace.dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+pedantic = "warn"
+
 [package]
 name = "pi_agent_rust"
 version = "0.4.0"

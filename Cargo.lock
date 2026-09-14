@@ -5756,6 +5756,7 @@ dependencies = [
  "pi-ai",
  "pi-chord",
  "pi-diff-core",
+ "pi-env-core",
  "pi-error",
  "pi-protocol",
  "pi-session-backends",
@@ -5792,7 +5793,7 @@ dependencies = [
  "unicode-width",
  "url",
  "uuid",
- "wasmtime",
+ "win32job",
  "xxhash-rust",
 ]
 
@@ -5804,6 +5805,10 @@ dependencies = [
  "serde_json",
  "similar",
 ]
+
+[[package]]
+name = "pi-env-core"
+version = "0.1.0"
 
 [[package]]
 name = "pi-error"

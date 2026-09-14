@@ -1298,6 +1298,8 @@ Round 30 后(收尾)       : ~64%
 **本轮变更:** 新增 `crates/pi-chord/src/btw_context.rs` 及其预算/工具调用回归测试；`pi-coding-agent::btw::build_context_summary` 改为 re-export；更新 `pi-chord` 依赖声明。
 
 
-### Round 74 — diff 纯算法 → pi-diff-core ✅
+### Round 76 — env 纯核心拆分 → `pi-env-core`
 
-新增 crates/pi-diff-core，承载 DiffHunk、unified diff parser、hunk merge 与纯文本 diff；pi-coding-agent 保留兼容包装及 commit/runtime。验证：cargo test -p pi-diff-core（2 passed）、cargo check -p pi-diff-core（通过）。pi-coding-agent 全量 check 受 Windows 基线 signal_hook iterator/SIGBUS 错误阻塞。
+新增 `crates/pi-env-core`，承载纯环境变量解析、布尔值/默认值处理和敏感变量名过滤；runtime 环境读取、agent 启动逻辑与 tools 继续留在 `pi-coding-agent`。`pi-coding-agent` 已接入 workspace 依赖，crate 内回归测试覆盖 trim、非法值回退、布尔值和敏感值脱敏。
+
+验证：`cargo test -p pi-env-core` 通过（1 passed）；`cargo check -p pi-env-core` 通过。`cargo check -p pi-coding-agent --lib` 仍受 Windows 基线 `signal_hook` 的 `iterator`/`SIGBUS` 配置错误阻塞，与本轮无关。进度：本轮 env 核心拆分 100%。

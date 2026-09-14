@@ -1398,3 +1398,9 @@ Round 30 后(收尾)       : ~64%
 **LOC 迁移:** 188 LOC(`pi-coding-agent/src/` → `pi-coding-agent/src/cli/`)。
 
 **Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。
+
+## Round 43 进展
+
+- 将可复用的 `TimeSnapshot` 时钟领域类型、文本渲染和 details 序列化归位到 `pi-agent-core::current_time`。
+- `pi-coding-agent::current_time` 保留工具适配层，并 re-export `TimeSnapshot`，兼容既有调用路径。
+- 验证：`cargo check -p pi-agent-core` 通过；`pi-coding-agent` 检查已启动，但本地 180 秒前台预算耗尽于依赖编译阶段，未宣称通过。

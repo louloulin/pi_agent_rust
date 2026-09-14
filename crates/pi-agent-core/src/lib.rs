@@ -8,5 +8,6 @@
 #![forbid(unsafe_code)]
 
 pub mod advisor;
+pub mod current_time;
 pub mod flake_classifier;
 pub mod scheduler;

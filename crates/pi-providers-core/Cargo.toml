@@ -1,0 +1,10 @@
+[package]
+name = "pi-providers-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure provider registration, routing fallback, and health state"
+
+[dependencies]
+
+[dev-dependencies]

@@ -263,6 +263,7 @@ pub mod pmu_telemetry;
 pub mod profiler;
 #[doc(hidden)]
 pub mod provider;
+pub use pi_providers_core::{HealthTracker, ProviderHealth, ProviderRegistration, ProviderRegistry, ProviderRoute};
 #[doc(hidden)]
 pub mod provider_metadata;
 #[doc(hidden)]

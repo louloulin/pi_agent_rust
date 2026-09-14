@@ -1,0 +1,60 @@
+{
+  "schema": "pi.plugin_protocol_compatibility.v1",
+  "upstream": "pi-mono/pi.dev",
+  "wire": {
+    "encoding": "json-lines",
+    "event_type_field": "type",
+    "event_type_style": "snake_case",
+    "field_style": "camelCase"
+  },
+  "agent_events": [
+    {
+      "id": "agent-start",
+      "event": "agent_start",
+      "expected": {"type": "agent_start", "sessionId": "session-1"}
+    },
+    {
+      "id": "turn-start",
+      "event": "turn_start",
+      "expected": {"type": "turn_start", "sessionId": "session-1", "turnIndex": 2, "timestamp": 1700000000}
+    },
+    {
+      "id": "tool-start",
+      "event": "tool_execution_start",
+      "expected": {"type": "tool_execution_start", "toolCallId": "call-1", "toolName": "read", "args": {"path": "README.md"}}
+    },
+    {
+      "id": "tool-end",
+      "event": "tool_execution_end",
+      "expected": {"type": "tool_execution_end", "toolCallId": "call-1", "toolName": "read", "result": {"content": [{"type": "text", "text": "ok"}], "details": null}, "isError": false}
+    }
+  ],
+  "extension_ui": [
+    {
+      "id": "confirm",
+      "method": "confirm",
+      "payload": {"title": "Continue?", "message": "Use the plugin?"},
+      "expected": {"type": "extension_ui_request", "id": "ui-1", "method": "confirm", "title": "Continue?", "message": "Use the plugin?", "capabilityPrompt": false}
+    },
+    {
+      "id": "select",
+      "method": "select",
+      "payload": {"title": "Pick a provider", "options": ["anthropic", "openai"]},
+      "expected": {"type": "extension_ui_request", "id": "ui-2", "method": "select", "title": "Pick a provider", "options": ["anthropic", "openai"], "capabilityPrompt": false}
+    }
+  ],
+  "protocol_messages": [
+    {
+      "id": "register-minimal",
+      "message": {"id": "ext-1", "version": "1.0", "type": "register", "payload": {"name": "demo", "version": "1.0.0", "api_version": "1.0", "capabilities": [], "tools": [], "slash_commands": [], "event_hooks": []}}
+    },
+    {
+      "id": "host-call-tool",
+      "message": {"id": "call-1", "version": "1.0", "type": "host_call", "payload": {"call_id": "call-1", "capability": "tool", "method": "tool", "params": {"name": "read", "path": "README.md"}}}
+    },
+    {
+      "id": "host-result-error",
+      "message": {"id": "call-1", "version": "1.0", "type": "host_result", "payload": {"call_id": "call-1", "output": {}, "is_error": true, "error": {"code": "denied", "message": "capability denied"}}}
+    }
+  ]
+}

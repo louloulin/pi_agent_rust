@@ -25,6 +25,7 @@ include = [
     "/docs/wit/extension.wit",
     "/docs/provider-upstream-model-ids-snapshot.json",
     "/docs/schema/extension_protocol.json",
+    "/tests/fixtures/plugin_protocol_compatibility.json",
     "/legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts",
     # Compile-time unit-test fixture referenced by src/doctor.rs.
     "/tests/fixtures/agent_mail/schema_corrupt_health.json",

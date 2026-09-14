@@ -5560,7 +5560,6 @@ dependencies = [
  "futures",
  "getrandom 0.4.3",
  "glob",
- "globset",
  "grep-regex",
  "grep-searcher",
  "hmac",
@@ -5580,6 +5579,7 @@ dependencies = [
  "pi-buffer-shim",
  "pi-cli",
  "pi-conformance",
+ "pi-context-files",
  "pi-crypto-shim",
  "pi-delight",
  "pi-dialects",
@@ -5693,6 +5693,16 @@ dependencies = [
  "serde_json",
  "sha2 0.11.0",
  "tempfile",
+]
+
+[[package]]
+name = "pi-context-files"
+version = "0.1.0"
+dependencies = [
+ "globset",
+ "serde",
+ "tempfile",
+ "tracing",
 ]
 
 [[package]]

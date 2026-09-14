@@ -138,7 +138,9 @@ pub mod conformance;
 pub mod conformance_shapes;
 #[doc(hidden)]
 pub mod connectors;
-pub mod context_files;
+pub mod context_files {
+    pub use pi_context_files::*;
+}
 pub mod crash;
 #[doc(hidden)]
 pub mod crypto_shim;

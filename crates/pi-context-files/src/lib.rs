@@ -367,8 +367,8 @@ fn normalized_body(content: &str) -> String {
 fn relative_display(path: &Path, workspace_root: &Path) -> String {
     path.strip_prefix(workspace_root)
         .unwrap_or(path)
-        .display()
-        .to_string()
+        .to_string_lossy()
+        .replace('\\', "/")
 }
 
 fn read_rule_file(path: &Path) -> Option<String> {

@@ -26,6 +26,7 @@ members = [
     "crates/pi-extension-scoring",
     "crates/pi-scheduler",
     "crates/pi-conformance",
+    "crates/pi-context-files",
     "crates/pi-gallery",
     "crates/pi-http-shim",
     "crates/pi-jsonrpc",
@@ -90,6 +91,7 @@ pi-swarm-activity-ledger = { path = "crates/pi-swarm-activity-ledger", version =
 pi-extension-scoring = { path = "crates/pi-extension-scoring", version = "0.1.0" }
 pi-scheduler = { path = "crates/pi-scheduler", version = "0.1.0" }
 pi-conformance = { path = "crates/pi-conformance", version = "0.1.0" }
+pi-context-files = { path = "crates/pi-context-files", version = "0.1.0" }
 pi-gallery = { path = "crates/pi-gallery", version = "0.1.0" }
 pi-jsonrpc = { path = "crates/pi-jsonrpc", version = "0.1.0" }
 pi-markdown-rich = { path = "crates/pi-markdown-rich", version = "0.1.0" }

@@ -113,6 +113,7 @@ pi-swarm-activity-ledger = { workspace = true }
 pi-extension-scoring = { workspace = true }
 pi-scheduler = { workspace = true }
 pi-conformance = { workspace = true }
+pi-context-files = { workspace = true }
 pi-gallery = { workspace = true }
 pi-jsonrpc = { workspace = true }
 pi-markdown-rich = { workspace = true }
@@ -155,7 +156,6 @@ tempfile = { workspace = true }
 fs4 = { workspace = true }
 glob = { workspace = true }
 ignore = { workspace = true }
-globset = { workspace = true }
 grep-regex = { workspace = true }
 grep-searcher = { workspace = true }
 jsonschema = { workspace = true }

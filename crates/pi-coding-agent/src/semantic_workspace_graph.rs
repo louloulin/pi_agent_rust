@@ -8,8 +8,7 @@
 
 use chrono::{DateTime, Duration, Utc};
 use pi_chord::semantic_graph::*;
-use serde::de::{MapAccess, SeqAccess, Visitor};
-use serde::{Deserialize, Deserializer, Serialize};
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use sha1::Sha1;
 use sha2::{Digest, Sha256};
@@ -32,101 +31,7 @@ const DEFAULT_CACHE_TTL_SECONDS: u64 = 6 * 60 * 60;
 const DEFAULT_CONTEXT_CACHE_TTL_SECONDS: u64 = 15 * 60;
 const CONTEXT_PRIVACY_POLICY_VERSION: &str = "pi.context_privacy.v1";
 
-struct DuplicateRejectingJsonValue(Value);
-
-impl<'de> Deserialize<'de> for DuplicateRejectingJsonValue {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        deserializer.deserialize_any(DuplicateRejectingJsonVisitor)
-    }
-}
-
-struct DuplicateRejectingJsonVisitor;
-
-impl<'de> Visitor<'de> for DuplicateRejectingJsonVisitor {
-    type Value = DuplicateRejectingJsonValue;
-
-    fn expecting(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
-        formatter.write_str("a JSON value without duplicate object keys")
-    }
-
-    fn visit_bool<E>(self, value: bool) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::Bool(value)))
-    }
-
-    fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::Number(value.into())))
-    }
-
-    fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::Number(value.into())))
-    }
-
-    fn visit_f64<E>(self, value: f64) -> Result<Self::Value, E>
-    where
-        E: serde::de::Error,
-    {
-        serde_json::Number::from_f64(value)
-            .map(Value::Number)
-            .map(DuplicateRejectingJsonValue)
-            .ok_or_else(|| E::custom("JSON number must be finite"))
-    }
-
-    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::String(
-            value.to_string(),
-        )))
-    }
-
-    fn visit_string<E>(self, value: String) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::String(value)))
-    }
-
-    fn visit_none<E>(self) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::Null))
-    }
-
-    fn visit_unit<E>(self) -> Result<Self::Value, E> {
-        Ok(DuplicateRejectingJsonValue(Value::Null))
-    }
-
-    fn visit_seq<A>(self, mut sequence: A) -> Result<Self::Value, A::Error>
-    where
-        A: SeqAccess<'de>,
-    {
-        let mut values = Vec::new();
-        while let Some(value) = sequence.next_element::<DuplicateRejectingJsonValue>()? {
-            values.push(value.0);
-        }
-        Ok(DuplicateRejectingJsonValue(Value::Array(values)))
-    }
-
-    fn visit_map<A>(self, mut entries: A) -> Result<Self::Value, A::Error>
-    where
-        A: MapAccess<'de>,
-    {
-        let mut object = serde_json::Map::new();
-        while let Some(key) = entries.next_key::<String>()? {
-            let value = entries.next_value::<DuplicateRejectingJsonValue>()?;
-            if object.insert(key, value.0).is_some() {
-                return Err(<A::Error as serde::de::Error>::custom(
-                    "duplicate JSON object key",
-                ));
-            }
-        }
-        Ok(DuplicateRejectingJsonValue(Value::Object(object)))
-    }
-}
-
-pub(crate) fn parse_json_rejecting_duplicate_keys(content: &str) -> serde_json::Result<Value> {
-    let mut deserializer = serde_json::Deserializer::from_str(content);
-    let value = DuplicateRejectingJsonValue::deserialize(&mut deserializer)?.0;
-    deserializer.end()?;
-    Ok(value)
-}
-
+pub use pi_protocol::duplicate_json::parse_json_rejecting_duplicate_keys;
 #[derive(Debug, Clone)]
 pub struct SemanticWorkspaceGraphBuilder {
     root: PathBuf,

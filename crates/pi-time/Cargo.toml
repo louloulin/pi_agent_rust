@@ -1,0 +1,11 @@
+[package]
+name = "pi-time"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Shared wall-clock snapshot primitives for Pi"
+license = "MIT"
+
+[dependencies]
+chrono = "0.4"
+serde_json = "1"

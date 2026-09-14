@@ -1229,3 +1229,22 @@ Round 30 后(收尾)       : ~64%
 **LOC 迁移:** 约 1,460 LOC，另迁移约 32 LOC 协议类型。
 
 **进度:** Round 62 完成。本文“约 65%”是路线图估算，不是当前 Rust LOC 或编译通过率：分母为第 1–12 节多 crate 目标模块范围，分子为 Round 24–30 已记录的归属迁移、依赖边界与 facade 兼容目标；第 15 节 Round 30 后约 64% 取整为约 65%。未迁移 provider/API、agent runtime 和平台 hostcall 不计入已完成。
+
+### Round 65 — tools registry core seam（进行中）
+
+**本轮已完成:**
+1. 新增 `crates/pi-tools`，抽出工具协议边界：`Tool` trait、`ToolOutput` / `ToolUpdate`、`ToolOrigin`、session scope、provider schema 转换与 JSON Schema 输入校验。
+2. `crates/pi-chord/src/tool_policy.rs` 新增工具权限决策 (`ToolPermission`) 与稳定错误分类 (`ToolErrorClass`)，避免具体工具实现和 agent runtime 进入 chord。
+3. workspace 注册 `pi-tools`，`pi-chord` 通过 workspace 依赖使用协议层；旧 `pi-coding-agent::tools` facade 暂保持不变，具体实现和 registry 未迁移。
+4. 新增协议回归测试：缺少 required 参数时 JSON Schema 校验失败；写入/进程 effects 默认需要确认；错误分类输出稳定 machine code。
+
+**验证:**
+- `cargo test -p pi-tools --lib` ✅ 1 passed
+- `cargo test -p pi-chord tool_policy --lib` ✅ 1 passed（既有 warning 保持）
+- `cargo check -p pi-protocol` ✅
+- `git diff --check` ✅
+- `cargo check -p pi-coding-agent --lib` ❌ 基线存在 Windows `win32job` / `windows_by_handle` 与缺失 `pi-error` 依赖等错误；本轮未将未完成的 facade 替换强行合入。
+
+**LOC 迁移:** 本轮新增约 180 LOC 协议与策略代码；ToolRegistry、具体 tool implementations、agent runtime integration 仍在 `pi-coding-agent`，因此本轮不是完整迁移。
+
+**进度:** Round 65 约 20%。下一步需先解决 `ToolSessionScope` 与 coding-agent `jobs::JobSessionScope` 的无反向依赖适配，再迁移 registry 的 snapshot/update 核心并保留旧 API facade。

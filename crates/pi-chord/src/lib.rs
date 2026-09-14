@@ -81,6 +81,7 @@ pub mod secrets;
 pub mod skills_managed;
 pub mod status_line;
 pub mod turn_recovery;
+pub mod tool_policy;
 pub mod undo;
 pub mod version;
 pub mod hostcall_amac;

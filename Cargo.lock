@@ -5692,8 +5692,11 @@ dependencies = [
  "dirs",
  "filetime",
  "futures",
+ "pi-agent-core",
  "pi-ai",
  "pi-error",
+ "pi-protocol",
+ "pi-tools",
  "proptest",
  "regex",
  "rustix",
@@ -5893,6 +5896,21 @@ dependencies = [
  "serde",
  "serde_json",
  "tracing",
+]
+
+[[package]]
+name = "pi-tools"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "futures",
+ "jsonschema",
+ "pi-ai",
+ "pi-error",
+ "pi-protocol",
+ "serde",
+ "serde_json",
+ "uuid",
 ]
 
 [[package]]

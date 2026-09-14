@@ -168,6 +168,7 @@ pub mod subagents;
 pub mod acp;
 pub mod http;
 pub use pi_protocol::framing;
+pub use pi_protocol::mcp;
 pub use pi_protocol::jsonrpc;
 pub mod rpc;
 pub mod sdk;

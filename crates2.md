@@ -8,9 +8,19 @@
 
 ---
 
-## 0. `Round 49` 进展
+## 0. `Round 50` 进展
 
 **做了什么:**
+1. 盘点 `mcp.rs`（381 LOC）：顶层为 Tool/Manager handler；实际配置与 stdio/HTTP transport 在子模块，包含 filesystem/process/async 运行时依赖，未整体迁移
+2. 新增 `crates/pi-protocol/src/mcp.rs`，承载无 runtime 的 MCP wire/config 类型：`McpTransportKind`、`McpProtocolVersion`、`McpCapabilities`、`McpServerConfig`、`McpToolDescriptor`
+3. `pi-coding-agent` 通过 `pub use pi_protocol::mcp` 透传协议路径；handler、trust、process、transport 继续留在 coding-agent
+4. `pi-protocol` 复用现有 serde/serde_json workspace 依赖，无新增 runtime 依赖
+
+**验证:**
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` 待提交后执行
+
+
 1. 确认 `version_check.rs` 已在 Round 33 将版本实现迁移到 `pi-chord::version`（历史提交 `8d463da83`）
 2. `pi-chord` 增加 `pub use version as check` 轻量兼容别名
 3. `pi-coding-agent/src/version_check.rs` 改为从 `pi_chord::check::*` 透传；保留唯一不可下沉的 `ClientHttpFetch` HTTP adapter

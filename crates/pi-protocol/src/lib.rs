@@ -14,5 +14,6 @@
 
 pub mod framing;
 pub mod jsonrpc;
+pub mod mcp;
 pub mod tail;
 pub mod tool_effects;

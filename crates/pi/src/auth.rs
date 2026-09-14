@@ -8,6 +8,10 @@ use crate::provider_metadata::{
     canonical_provider_id, provider_auth_env_keys, provider_ids_match, provider_metadata,
 };
 use base64::Engine as _;
+use pi_html_core::{
+    build_url_with_query, parse_oauth_code_input, parse_query_pairs, percent_decode_component,
+    percent_encode_component,
+};
 use serde::{Deserialize, Serialize};
 use sha2::Digest as _;
 use std::collections::HashMap;
@@ -4826,74 +4830,19 @@ impl Default for GitLabOAuthConfig {
 }
 
 fn percent_encode_component(value: &str) -> String {
-    let mut out = String::with_capacity(value.len());
-    for b in value.as_bytes() {
-        match *b {
-            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
-                out.push(*b as char);
-            }
-            b' ' => out.push_str("%20"),
-            other => {
-                let _ = write!(out, "%{other:02X}");
-            }
-        }
-    }
-    out
+    pi_html_core::percent_encode_component(value)
 }
 
 fn percent_decode_component(value: &str) -> Option<String> {
-    if !value.as_bytes().contains(&b'%') && !value.as_bytes().contains(&b'+') {
-        return Some(value.to_string());
-    }
-
-    let mut out = Vec::with_capacity(value.len());
-    let mut bytes = value.as_bytes().iter().copied();
-    while let Some(b) = bytes.next() {
-        match b {
-            b'+' => out.push(b' '),
-            b'%' => {
-                let hi = bytes.next()?;
-                let lo = bytes.next()?;
-                let hex = [hi, lo];
-                let hex = std::str::from_utf8(&hex).ok()?;
-                let decoded = u8::from_str_radix(hex, 16).ok()?;
-                out.push(decoded);
-            }
-            other => out.push(other),
-        }
-    }
-
-    String::from_utf8(out).ok()
+    pi_html_core::percent_decode_component(value)
 }
 
 fn parse_query_pairs(query: &str) -> Vec<(String, String)> {
-    query
-        .split('&')
-        .filter(|part| !part.trim().is_empty())
-        .filter_map(|part| {
-            let (k, v) = part.split_once('=').unwrap_or((part, ""));
-            let key = percent_decode_component(k.trim())?;
-            let value = percent_decode_component(v.trim())?;
-            Some((key, value))
-        })
-        .collect()
+    pi_html_core::parse_query_pairs(query)
 }
 
 fn build_url_with_query(base: &str, params: &[(&str, &str)]) -> String {
-    let mut url = String::with_capacity(base.len() + 128);
-    url.push_str(base);
-    url.push('?');
-
-    for (idx, (k, v)) in params.iter().enumerate() {
-        if idx > 0 {
-            url.push('&');
-        }
-        url.push_str(&percent_encode_component(k));
-        url.push('=');
-        url.push_str(&percent_encode_component(v));
-    }
-
-    url
+    pi_html_core::build_url_with_query(base, params)
 }
 
 fn kimi_code_oauth_host_with_env_lookup<F>(env_lookup: F) -> String
@@ -6647,33 +6596,7 @@ fn generate_pkce() -> (String, String) {
 }
 
 fn parse_oauth_code_input(input: &str) -> (Option<String>, Option<String>) {
-    let value = input.trim();
-    if value.is_empty() {
-        return (None, None);
-    }
-
-    if let Some((_, query)) = value.split_once('?') {
-        let query = query.split('#').next().unwrap_or(query);
-        let pairs = parse_query_pairs(query);
-        let code = pairs
-            .iter()
-            .find_map(|(k, v)| k.eq("code").then(|| v.clone()));
-        let state = pairs
-            .iter()
-            .find_map(|(k, v)| k.eq("state").then(|| v.clone()));
-        return (code, state);
-    }
-
-    if let Some((code, state)) = value.split_once('#') {
-        let code = code.trim();
-        let state = state.trim();
-        return (
-            (!code.is_empty()).then(|| code.to_string()),
-            (!state.is_empty()).then(|| state.to_string()),
-        );
-    }
-
-    (Some(value.to_string()), None)
+    pi_html_core::parse_oauth_code_input(input)
 }
 
 /// Convenience to load auth from default path.

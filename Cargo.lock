@@ -5593,6 +5593,7 @@ dependencies = [
  "pi-hostcall-io-uring-lane",
  "pi-hostcall-s3-fifo",
  "pi-hostcall-superinstructions",
+ "pi-html-core",
  "pi-http-shim",
  "pi-jsonrpc",
  "pi-magic-keywords",
@@ -5824,6 +5825,10 @@ dependencies = [
  "serde",
  "serde_json",
 ]
+
+[[package]]
+name = "pi-html-core"
+version = "0.1.0"
 
 [[package]]
 name = "pi-http-shim"

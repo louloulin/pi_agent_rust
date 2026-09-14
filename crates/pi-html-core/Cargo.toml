@@ -1,0 +1,10 @@
+[package]
+name = "pi-html-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure HTML escaping and URL component helpers for Pi"
+license = "MIT"
+
+[lib]
+path = "src/lib.rs"

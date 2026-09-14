@@ -88,6 +88,7 @@ pub mod status_line;
 pub mod turn_recovery;
 pub mod theme;
 pub mod undo;
+pub mod usage;
 pub mod version;
 // Round 52: workspace roots and path-confinement state moved here. The
 // coding-agent crate re-exports this module to preserve its public API.

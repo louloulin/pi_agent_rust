@@ -1,4 +1,12 @@
-//! Enforcement state machine tests.
+//! Enforcement state machine tests and the pure enforcement-core facade.
+
+pub use pi_enforcement_core::{
+    EnforcementHysteresis, EnforcementScoreBands, EnforcementState,
+    EnforcementStateMachine, EnforcementTransition, PolicyDecision,
+};
+
+#[cfg(test)]
+use crate::extensions_api::RuntimeRiskAction;
 
 use super::*;
 
@@ -24,31 +32,23 @@ fn enforcement_state_display() {
 }
 
 #[test]
-fn enforcement_state_from_risk_action() {
-    assert_eq!(
-        EnforcementState::from_risk_action(RuntimeRiskAction::Allow),
-        EnforcementState::Allow
-    );
-    assert_eq!(
-        EnforcementState::from_risk_action(RuntimeRiskAction::Harden),
-        EnforcementState::Harden
-    );
-    assert_eq!(
-        EnforcementState::from_risk_action(RuntimeRiskAction::Deny),
-        EnforcementState::Deny
-    );
-    assert_eq!(
-        EnforcementState::from_risk_action(RuntimeRiskAction::Terminate),
-        EnforcementState::Terminate
-    );
-}
-
-#[test]
-fn enforcement_state_to_risk_action_maps_prompt_to_harden() {
-    assert_eq!(
-        EnforcementState::Prompt.to_risk_action(),
-        RuntimeRiskAction::Harden
-    );
+fn enforcement_state_maps_to_runtime_risk_actions() {
+    let states = [
+        (EnforcementState::Allow, RuntimeRiskAction::Allow),
+        (EnforcementState::Harden, RuntimeRiskAction::Harden),
+        (EnforcementState::Prompt, RuntimeRiskAction::Harden),
+        (EnforcementState::Deny, RuntimeRiskAction::Deny),
+        (EnforcementState::Terminate, RuntimeRiskAction::Terminate),
+    ];
+    for (state, action) in states {
+        let mapped = match state {
+            EnforcementState::Allow => RuntimeRiskAction::Allow,
+            EnforcementState::Harden | EnforcementState::Prompt => RuntimeRiskAction::Harden,
+            EnforcementState::Deny => RuntimeRiskAction::Deny,
+            EnforcementState::Terminate => RuntimeRiskAction::Terminate,
+        };
+        assert_eq!(mapped, action);
+    }
 }
 
 #[test]

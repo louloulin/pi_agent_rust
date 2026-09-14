@@ -8,7 +8,17 @@
 
 ---
 
-## `Round 42` 进展
+## `Round 88` 进展
+
+**做了什么:**
+1. 新增 `crates/pi-enforcement-core`，承载无 runtime/UI 依赖的 `EnforcementState`、评分阈值、滞回状态机、策略合并和 `PolicyDecision` 纯算法。
+2. `pi-coding-agent` 纳入该 crate 作为 enforcement core 依赖；runtime 风险评估与 UI/agent 行为继续留在 coding-agent。
+3. 核心 crate 提供独立单元测试，覆盖阈值分类、终止态和滞回冷却。
+
+**验证:**
+- `cargo test -p pi-enforcement-core` 待执行
+- `git diff --check` 待执行
+
 
 **做了什么:**
 1. 将 `crates/pi-coding-agent/src/conformance.rs`（4,387 LOC）的 fixture/diff 语义比较实现归位到 `crates/pi-evals/src/conformance.rs`。

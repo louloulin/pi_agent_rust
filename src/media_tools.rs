@@ -11,20 +11,18 @@ use crate::error::{Error, Result};
 use crate::model::{ContentBlock, TextContent};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolUpdate};
 use async_trait::async_trait;
+pub use pi_media_tools_core::{
+    media_mime_type_for_extension, MediaAsset, MediaError, MediaTransform,
+    DEFAULT_MEDIA_MAX_BYTES, MAX_IMAGE_FILE_SIZE_BYTES, MAX_TTS_TEXT_CHARS,
+    READ_MEDIA_EXTENSIONS,
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::fs;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
-pub const MAX_IMAGE_FILE_SIZE_BYTES: u64 = 20 * 1024 * 1024; // 20 MiB
-pub const MAX_TTS_TEXT_CHARS: usize = 4096;
-/// Default hard cap on one inline video/audio block produced by `read_media`.
-///
-/// 5 MiB of decoded bytes (gh #212), configurable via `media.maxBytes`. The
-/// payload is base64-inlined into the session file and re-sent every turn
-/// until compaction, so this is deliberately conservative.
-pub const DEFAULT_MEDIA_MAX_BYTES: u64 = 5 * 1024 * 1024;
+
 
 // Minimal valid 1x1 PNG bytes for fixture / VCR fallback
 const MIN_VALID_PNG: &[u8] = &[
@@ -306,35 +304,7 @@ impl Tool for InspectImageTool {
     }
 }
 
-// ============================================================================
-// 1b. read_media Tool (gh #212)
-// ============================================================================
-
-/// Map a `read_media` file extension to its MIME type.
-///
-/// The list is the intersection of common containers and what the Gemini API
-/// documents for inline `inline_data` parts (video: mp4/webm/mov; audio:
-/// mp3/wav/m4a/ogg/flac). The MIME spellings follow the Gemini docs verbatim
-/// (`video/mov`, `audio/m4a`) rather than the IANA registrations, since that
-/// transport is the only native consumer.
-pub fn media_mime_type_for_extension(ext: &str) -> Option<&'static str> {
-    match ext.to_ascii_lowercase().as_str() {
-        "mp4" => Some("video/mp4"),
-        "webm" => Some("video/webm"),
-        "mov" => Some("video/mov"),
-        "mp3" => Some("audio/mpeg"),
-        "wav" => Some("audio/wav"),
-        "m4a" => Some("audio/m4a"),
-        "ogg" => Some("audio/ogg"),
-        "flac" => Some("audio/flac"),
-        _ => None,
-    }
-}
-
-/// Extensions `read_media` accepts, in the order the tool schema advertises them.
-pub const READ_MEDIA_EXTENSIONS: &[&str] =
-    &["mp4", "webm", "mov", "mp3", "wav", "m4a", "ogg", "flac"];
-
+// `read_media` uses the MIME mapping and extension list supplied by the core crate.
 /// `read_media`: load a local video/audio file as an inline
 /// [`ContentBlock::Media`] so Gemini/Vertex models can consume it. Every
 /// other provider receives the block's text placeholder instead.

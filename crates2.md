@@ -24,6 +24,14 @@
 
 ---
 
+## Round 77 — `pi-glob-core` ✅
+
+新增 `crates/pi-glob-core`，承载 glob matcher 导出与 gitconfig `core.excludesFile` 解析/安全长度限制；`pi-coding-agent` 保留兼容 facade，文件 IO、ignore 控件访问、walker、grep/find 与 agent runtime 仍留在 coding-agent。
+
+验证：`cargo test -p pi-glob-core`、`cargo check -p pi-coding-agent --lib`。
+
+---
+
 
 
 | 维度 | 当前 | 目标(Round 30) |

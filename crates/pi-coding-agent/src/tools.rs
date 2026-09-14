@@ -3413,41 +3413,7 @@ fn parse_gitconfig_excludes_path(
     data: &[u8],
     home_dir: Option<&Path>,
 ) -> std::io::Result<Option<PathBuf>> {
-    static RE: OnceLock<regex::bytes::Regex> = OnceLock::new();
-    let re = RE.get_or_init(|| {
-        regex::bytes::Regex::new(r#"(?im-u)^\s*excludesfile\s*=\s*"?\s*(\S+?)\s*"?\s*$"#)
-            .expect("valid git excludesFile regex")
-    });
-    let Some(candidate) = re
-        .captures(data)
-        .and_then(|captures| captures.get(1))
-        .and_then(|capture| std::str::from_utf8(capture.as_bytes()).ok())
-    else {
-        return Ok(None);
-    };
-    let home = home_dir.map(Path::to_string_lossy);
-    // ignore 0.4.25 deliberately replaces every `~`, not only a leading one.
-    // Preserve that behavior while bounding its potential allocation growth.
-    let tilde_count = candidate.bytes().filter(|byte| *byte == b'~').count();
-    let expanded_len = home.as_ref().map_or(Some(candidate.len()), |home| {
-        candidate
-            .len()
-            .checked_sub(tilde_count)?
-            .checked_add(tilde_count.checked_mul(home.len())?)
-    });
-    if expanded_len.is_none_or(|len| len > GIT_GLOBAL_IGNORE_PATH_MAX_BYTES) {
-        return Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidData,
-            format!(
-                "expanded git global ignore path exceeds {GIT_GLOBAL_IGNORE_PATH_MAX_BYTES} bytes"
-            ),
-        ));
-    }
-    let expanded = home.map_or_else(
-        || candidate.to_string(),
-        |home| candidate.replace('~', &home),
-    );
-    Ok(Some(PathBuf::from(expanded)))
+    pi_glob_core::parse_gitconfig_excludes_path(data, home_dir)
 }
 
 fn read_checked_ignore_control_if_present(

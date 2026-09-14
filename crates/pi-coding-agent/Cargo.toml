@@ -69,6 +69,7 @@ pdf-extract = { workspace = true }
 pi-ai = { workspace = true }
 pi-model-core = { workspace = true }
 pi-log-core = { workspace = true }
+pi-glob-core = { workspace = true }
 pi-agent-core = { workspace = true }
 pi-queue-core = { workspace = true }
 win32job = { workspace = true }

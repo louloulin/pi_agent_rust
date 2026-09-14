@@ -5757,6 +5757,8 @@ dependencies = [
  "pi-chord",
  "pi-error",
  "pi-model-core",
+ "pi-glob-core",
+ "pi-log-core",
  "pi-protocol",
  "pi-queue-core",
  "pi-session-backends",
@@ -5854,6 +5856,23 @@ name = "pi-protocol"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "pi-glob-core"
+version = "0.1.0"
+dependencies = [
+ "globset",
+ "ignore",
+ "regex",
+]
+
+[[package]]
+name = "pi-log-core"
+version = "0.1.0"
+dependencies = [
  "serde",
  "serde_json",
 ]

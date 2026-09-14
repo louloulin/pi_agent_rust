@@ -14,6 +14,7 @@ members = [
     "crates/pi-agent-core",
     "crates/pi-queue-core",
     "crates/pi-log-core",
+    "crates/pi-glob-core",
     "crates/pi-mono",
     "crates/pi-chord",
     "crates/pi-client",
@@ -57,6 +58,7 @@ pi-model-core = { path = "crates/pi-model-core", version = "0.4.0" }
 pi-agent-core = { path = "crates/pi-agent-core", version = "0.1.0" }
 pi-queue-core = { path = "crates/pi-queue-core", version = "0.1.0" }
 pi-log-core = { path = "crates/pi-log-core", version = "0.1.0" }
+pi-glob-core = { path = "crates/pi-glob-core", version = "0.1.0" }
 pi-coding-agent = { path = "crates/pi-coding-agent", version = "0.1.0" }
 pi-error = { path = "crates/pi-error", version = "0.1.0" }
 pi-tui = { path = "crates/pi-tui", version = "0.1.0" }

@@ -1399,7 +1399,20 @@ Round 30 后(收尾)       : ~64%
 
 **Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。
 
-## Round 43 进展
+## Round 62 — `crypto_shim` protocol seam
+
+**做了什么:**
+1. 新增 `crates/pi-protocol/src/crypto.rs`，承载纯协议层的 `CryptoEncoding`、`CryptoErrorClass`、`encode_output` 与规范化十六进制编码。
+2. `pi-coding-agent::crypto_shim` 继续拥有 QuickJS hostcall、密钥材料、KDF、AES/Ed25519 和 OS 熵源；编码调用通过 `pi-protocol` seam，未迁移密钥存储或平台后端。
+3. 保留原有 `pi-coding-agent::crypto_shim` facade 与行为，新增协议单元测试覆盖编码和错误分类契约。
+
+**验证:**
+- `cargo test -p pi-protocol crypto`：✅ 3 passed
+- `cargo check -p pi-coding-agent --lib`：受当前 Windows/nightly 基线错误阻塞（`windows_by_handle` 及多个既有类型推导错误；未见本轮协议模块错误）
+- `git diff --check`：✅
+
+**进度:** 本轮完成 `crypto_shim` 纯协议/编码/错误分类 seam；整体模块化进度按既有记录仍为持续拆分阶段。
+
 
 - 将可复用的 `TimeSnapshot` 时钟领域类型、文本渲染和 details 序列化归位到 `pi-agent-core::current_time`。
 - `pi-coding-agent::current_time` 保留工具适配层，并 re-export `TimeSnapshot`，兼容既有调用路径。

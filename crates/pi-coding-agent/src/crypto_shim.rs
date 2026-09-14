@@ -592,30 +592,12 @@ fn register_ed25519_hostcalls(global: &rquickjs::Object<'_>) -> rquickjs::Result
     )
 }
 
-/// Encode bytes as hex or base64 string.
 fn encode_output(bytes: &[u8], encoding: &str) -> String {
-    match encoding {
-        "base64" => {
-            use base64::Engine;
-            base64::engine::general_purpose::STANDARD.encode(bytes)
-        }
-        _ => hex_lower(bytes),
-    }
+    pi_protocol::crypto::encode_output(bytes, encoding)
 }
 
-/// Convert bytes to lowercase hex string.
 fn hex_lower(bytes: &[u8]) -> String {
-    const HEX: &[u8; 16] = b"0123456789abcdef";
-    let mut output = String::with_capacity(bytes.len() * 2);
-    for &byte in bytes {
-        output.push(char::from(
-            HEX.get(usize::from(byte >> 4)).copied().unwrap_or(b'?'),
-        ));
-        output.push(char::from(
-            HEX.get(usize::from(byte & 0x0f)).copied().unwrap_or(b'?'),
-        ));
-    }
-    output
+    pi_protocol::crypto::hex_lower(bytes)
 }
 
 /// Decode a hex string to bytes, ignoring invalid chars.

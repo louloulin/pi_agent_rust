@@ -172,7 +172,11 @@ fn compat_env_fallback_value(key: &str, env: &HashMap<String, String>) -> Option
 // Promise Bridge Types (bd-2ke)
 // ============================================================================
 
-pub use pi_pijs_core::{ExtensionToolDef, HostcallKind, HostcallRequest};
+pub use pi_pijs_core::{
+    ExtensionToolDef, HostcallKind, HostcallRequest, ExtensionToolSchema, PluginLifecycle,
+    PluginLifecycleEvent, PluginState, PluginTransitionError, RpcError, RpcRequest, RpcResponse,
+    ToolSchemaError,
+};
 
 impl QueueTenant for HostcallRequest {
     fn tenant_key(&self) -> Option<&str> {

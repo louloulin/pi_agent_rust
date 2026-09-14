@@ -1216,7 +1216,23 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 66 — `pi-pijs-core` PiJS 协议核心拆分 ✅
+### Round 67 — `extensions_js` 插件协议与生命周期拆分 ✅
+
+**做了什么:**
+1. 在 `crates/pi-pijs-core` 新增纯协议 `PluginLifecycle` 状态机：注册 → 激活中 → 活跃 → 停用中 → 已停止；失败/取消进入终态并保留原因，非法重入被拒绝。
+2. 新增可序列化 JSON-RPC request/response/error envelope，以及 `ExtensionToolSchema` 的最小协议校验（名称、描述、参数对象）。
+3. `pi-coding-agent::extensions_js` 仅 re-export 这些 seam；QuickJS、宿主权限、调度和实际执行继续留在 coding-agent，未把运行时依赖泄漏到核心 crate。
+4. 新增真实状态机、取消错误、RPC round-trip、tool schema 回归测试；不复用 LUM-864 fixture。
+
+**验证:**
+- `cargo test -p pi-pijs-core`：待执行
+- `cargo check -p pi-protocol`：待执行
+- `git diff --check`：待执行
+
+**LOC 迁移:** 新增约 150 LOC 纯协议/状态机；QuickJS host runtime 未迁移。
+
+**进度:** Round 67 完成；按既有路线图约 68%（本轮补齐 PiJS 生命周期、RPC envelope 与 tool schema seam）。
+
 
 **做了什么:**
 1. 新增 `crates/pi-pijs-core`，承载无 QuickJS/宿主依赖的 `HostcallKind`、`HostcallRequest`、`ExtensionToolDef`。

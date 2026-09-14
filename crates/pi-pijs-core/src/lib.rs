@@ -281,9 +281,218 @@ impl PiEventLoop {
     }
 }
 
+/// Lifecycle state for an extension plugin hosted by PiJS.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub enum PluginState {
+    Registered,
+    Activating,
+    Active,
+    Deactivating,
+    Stopped,
+    Failed,
+}
+
+/// Lifecycle event emitted by the runtime adapter.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PluginLifecycleEvent {
+    Activate,
+    Activated,
+    Deactivate,
+    Deactivated,
+    Failed(String),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum PluginTransitionError {
+    Invalid { state: PluginState, event: PluginLifecycleEvent },
+    Terminal(PluginState),
+}
+
+/// Small, host-independent lifecycle state machine for plugin orchestration.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PluginLifecycle {
+    state: PluginState,
+    failure_reason: Option<String>,
+}
+
+impl Default for PluginLifecycle {
+    fn default() -> Self { Self::new() }
+}
+
+impl PluginLifecycle {
+    #[must_use]
+    pub const fn new() -> Self {
+        Self { state: PluginState::Registered, failure_reason: None }
+    }
+
+    #[must_use]
+    pub const fn state(&self) -> PluginState { self.state }
+
+    #[must_use]
+    pub fn failure_reason(&self) -> Option<&str> { self.failure_reason.as_deref() }
+
+    pub fn apply(&mut self, event: PluginLifecycleEvent) -> Result<(), PluginTransitionError> {
+        use PluginLifecycleEvent as E;
+        use PluginState as S;
+        let next = match (&self.state, &event) {
+            (S::Registered, E::Activate) => S::Activating,
+            (S::Activating, E::Activated) => S::Active,
+            (S::Active, E::Deactivate) => S::Deactivating,
+            (S::Deactivating, E::Deactivated) => S::Stopped,
+            (S::Activating | S::Active | S::Deactivating, E::Failed(reason)) => {
+                self.failure_reason = Some(reason.clone());
+                S::Failed
+            }
+            (S::Failed | S::Stopped, _) => return Err(PluginTransitionError::Terminal(self.state)),
+            _ => return Err(PluginTransitionError::Invalid { state: self.state, event }),
+        };
+        self.state = next;
+        Ok(())
+    }
+}
+
+/// JSON-RPC request envelope used by the host/runtime seam.
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RpcRequest {
+    pub jsonrpc: String,
+    pub method: String,
+    pub params: serde_json::Value,
+    pub id: u64,
+}
+
+impl RpcRequest {
+    #[must_use]
+    pub fn new(method: impl Into<String>, params: serde_json::Value, id: u64) -> Self {
+        Self { jsonrpc: "2.0".into(), method: method.into(), params, id }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RpcError {
+    pub code: i64,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RpcResponse {
+    pub jsonrpc: String,
+    pub id: Option<u64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub result: Option<serde_json::Value>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<RpcError>,
+}
+
+impl RpcResponse {
+    #[must_use]
+    pub fn success(id: u64, result: serde_json::Value) -> Self {
+        Self { jsonrpc: "2.0".into(), id: Some(id), result: Some(result), error: None }
+    }
+
+    #[must_use]
+    pub fn error(id: u64, code: i64, message: impl Into<String>, data: Option<serde_json::Value>) -> Self {
+        Self { jsonrpc: "2.0".into(), id: Some(id), result: None, error: Some(RpcError { code, message: message.into(), data }) }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ToolSchemaError { InvalidName, EmptyDescription, ParametersMustBeObject }
+
+/// Minimal tool-schema contract; detailed JSON Schema validation remains host-side.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExtensionToolSchema {
+    pub name: String,
+    pub description: String,
+    pub parameters: serde_json::Value,
+}
+
+impl ExtensionToolSchema {
+    pub fn validate(&self) -> Result<(), ToolSchemaError> {
+        if self.name.trim().is_empty() { return Err(ToolSchemaError::InvalidName); }
+        if self.description.trim().is_empty() { return Err(ToolSchemaError::EmptyDescription); }
+        if !self.parameters.is_object() { return Err(ToolSchemaError::ParametersMustBeObject); }
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn lifecycle_accepts_activation_and_shutdown_and_rejects_invalid_reentry() {
+        let mut lifecycle = PluginLifecycle::new();
+        assert_eq!(lifecycle.state(), PluginState::Registered);
+        lifecycle.apply(PluginLifecycleEvent::Activate).unwrap();
+        lifecycle
+            .apply(PluginLifecycleEvent::Activated)
+            .unwrap();
+        assert_eq!(lifecycle.state(), PluginState::Active);
+        assert_eq!(
+            lifecycle.apply(PluginLifecycleEvent::Activate),
+            Err(PluginTransitionError::Invalid {
+                state: PluginState::Active,
+                event: PluginLifecycleEvent::Activate,
+            })
+        );
+        lifecycle.apply(PluginLifecycleEvent::Deactivate).unwrap();
+        lifecycle
+            .apply(PluginLifecycleEvent::Deactivated)
+            .unwrap();
+        assert_eq!(lifecycle.state(), PluginState::Stopped);
+    }
+
+    #[test]
+    fn lifecycle_cancellation_is_terminal_and_preserves_failure_reason() {
+        let mut lifecycle = PluginLifecycle::new();
+        lifecycle.apply(PluginLifecycleEvent::Activate).unwrap();
+        lifecycle
+            .apply(PluginLifecycleEvent::Failed("cancelled".into()))
+            .unwrap();
+        assert_eq!(lifecycle.state(), PluginState::Failed);
+        assert_eq!(lifecycle.failure_reason(), Some("cancelled"));
+        assert_eq!(
+            lifecycle.apply(PluginLifecycleEvent::Activate),
+            Err(PluginTransitionError::Terminal(PluginState::Failed))
+        );
+    }
+
+    #[test]
+    fn rpc_envelope_round_trips_request_response_and_error() {
+        let request = RpcRequest::new("activate", serde_json::json!({"id": "demo"}), 7);
+        let encoded = serde_json::to_string(&request).unwrap();
+        let decoded: RpcRequest = serde_json::from_str(&encoded).unwrap();
+        assert_eq!(decoded, request);
+
+        let response = RpcResponse::error(7, -32001, "cancelled", Some(serde_json::json!({"retry": false})));
+        assert_eq!(response.id, Some(7));
+        assert_eq!(response.error.as_ref().unwrap().code, -32001);
+        assert!(response.result.is_none());
+    }
+
+    #[test]
+    fn tool_schema_rejects_blank_names_and_non_object_parameters() {
+        let schema = ExtensionToolSchema {
+            name: " ".into(),
+            description: "demo".into(),
+            parameters: serde_json::json!([]),
+        };
+        assert_eq!(schema.validate(), Err(ToolSchemaError::InvalidName));
+
+        let schema = ExtensionToolSchema {
+            name: "demo".into(),
+            description: "demo".into(),
+            parameters: serde_json::json!(null),
+        };
+        assert_eq!(schema.validate(), Err(ToolSchemaError::ParametersMustBeObject));
+    }
+
+    use std::sync::Arc;
     #[test]
     fn completion_precedes_due_timer_and_drains_microtasks() {
         let clock = Arc::new(ManualClock::new(0));

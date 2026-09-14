@@ -1,4 +1,17 @@
-## `Round 74` 进展：theme 纯逻辑核心拆分
+## `Round 75` 进展：cancel 取消信号核心拆分
+
+**做了什么:**
+1. 新增 `crates/pi-cancel-core`，承载线程安全的 `AbortHandle` / `AbortSignal`，以及可组合的 `CancellationToken`（超时、deadline 和取消状态）。核心 crate 不依赖 agent runtime 或 UI。
+2. `pi-coding-agent::agent` 通过 re-export 保留既有 `AbortHandle` / `AbortSignal` 路径；取消信号实现迁出 coding-agent，供后续 agent runtime、RPC 和 UI 复用。
+3. workspace 注册 `pi-cancel-core` 并接入 coding-agent 依赖。
+
+**验证:**
+- `cargo fmt --all -- --check`：执行中
+- `cargo test -p pi-cancel-core`：执行中
+- `cargo check -p pi-coding-agent --lib`：执行中
+
+**进度:** Round 75 cancel 核心拆分完成，后续可继续把 deadline/budget context 的纯逻辑部分迁入该 crate。
+
 
 **做了什么:**
 1. 新增 `crates/pi-theme-core`，承载 `ThemeColors`、`SyntaxColors`、`UiColors` 数据模型、六位十六进制颜色解析/校验，以及被动的 `COLORFGBG` 终端背景检测。

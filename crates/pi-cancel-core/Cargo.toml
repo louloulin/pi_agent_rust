@@ -1,0 +1,15 @@
+[package]
+name = "pi-cancel-core"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Cancellation, deadlines, and token primitives shared by Pi runtimes"
+
+[lints]
+workspace = true
+
+[dependencies]
+asupersync = { workspace = true }
+
+[dev-dependencies]
+asupersync = { workspace = true }

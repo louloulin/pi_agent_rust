@@ -31,6 +31,7 @@ profiler = []
 anyhow = { workspace = true }
 arboard = { workspace = true }
 asupersync = { workspace = true }
+pi-cancel-core = { workspace = true }
 async-trait = { workspace = true }
 ast-grep-core = { workspace = true }
 ast-grep-language = { workspace = true }

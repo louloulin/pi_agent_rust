@@ -49,7 +49,8 @@ use crate::semantic_workspace_graph::{ContextBundleItem, SemanticContextBundle};
 use crate::session::{AutosaveFlushTrigger, Session, SessionHandle};
 use crate::tools::{Tool, ToolEffects, ToolOutput, ToolRegistry, ToolUpdate};
 use asupersync::runtime::{Runtime, RuntimeBuilder, RuntimeHandle};
-use asupersync::sync::{Mutex, Notify, OwnedMutexGuard};
+use asupersync::sync::{Mutex, OwnedMutexGuard};
+pub use pi_cancel_core::{AbortHandle, AbortSignal};
 use async_trait::async_trait;
 use chrono::Utc;
 use futures::FutureExt;
@@ -1488,69 +1489,6 @@ pub enum AgentEvent {
 // ============================================================================
 // Agent
 // ============================================================================
-
-/// Handle to request an abort of an in-flight agent run.
-#[derive(Debug, Clone)]
-pub struct AbortHandle {
-    inner: Arc<AbortSignalInner>,
-}
-
-/// Signal for observing abort requests.
-#[derive(Debug, Clone)]
-pub struct AbortSignal {
-    inner: Arc<AbortSignalInner>,
-}
-
-#[derive(Debug)]
-struct AbortSignalInner {
-    aborted: AtomicBool,
-    notify: Notify,
-}
-
-impl AbortHandle {
-    /// Create a new abort handle + signal pair.
-    #[must_use]
-    pub fn new() -> (Self, AbortSignal) {
-        let inner = Arc::new(AbortSignalInner {
-            aborted: AtomicBool::new(false),
-            notify: Notify::new(),
-        });
-        (
-            Self {
-                inner: Arc::clone(&inner),
-            },
-            AbortSignal { inner },
-        )
-    }
-
-    /// Trigger an abort.
-    pub fn abort(&self) {
-        if !self.inner.aborted.swap(true, Ordering::SeqCst) {
-            self.inner.notify.notify_waiters();
-        }
-    }
-}
-
-impl AbortSignal {
-    /// Check if an abort has already been requested.
-    #[must_use]
-    pub fn is_aborted(&self) -> bool {
-        self.inner.aborted.load(Ordering::SeqCst)
-    }
-
-    pub async fn wait(&self) {
-        if self.is_aborted() {
-            return;
-        }
-
-        loop {
-            self.inner.notify.notified().await;
-            if self.is_aborted() {
-                return;
-            }
-        }
-    }
-}
 
 /// The agent runtime that orchestrates LLM calls and tool execution.
 pub struct Agent {

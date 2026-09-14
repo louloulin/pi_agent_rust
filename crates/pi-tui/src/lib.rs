@@ -29,4 +29,8 @@ pub mod gallery;
 pub mod overlay_system;
 pub mod terminal_images;
 pub mod text_utils;
-pub mod tui;
+# tui.rs was split into the dependency-light pi-tui-core crate in Round 67;
+# keep the legacy module path as a compatibility re-export.
+// Round 67: the implementation lives in pi-tui-core; retain the historical
+// `pi_tui::tui` path for callers while avoiding duplicate rendering code.
+pub use pi_tui_core::tui;

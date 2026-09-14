@@ -9,10 +9,9 @@ description = "Phase-2 placeholder mirroring @earendil-works/pi-tui. Round 18 ab
 workspace = true
 
 [features]
-# Round 28.2: tui.rs gates rich_rust's syntax-highlighting renderer behind a
-# feature so consumers that don't need code blocks can skip the cost.
+# Round 67: implementation moved to dependency-light pi-tui-core.
 default = []
-syntax-highlighting = []
+syntax-highlighting = ["pi-tui-core/syntax-highlighting"]
 
 [dependencies]
 # Round 18: pi-tui is now an empty placeholder. All tui files moved to
@@ -46,5 +45,7 @@ unicode-width = { workspace = true }
 # surfaces (Esc-stack, toast notifications, welcome / help / picker modals).
 serde = { workspace = true }
 serde_json = { workspace = true }
-# gallery.rs (Round 30.3): visual component gallery harness uses
-# serde_json in the Debug impl fallback (`render_report_json`).
+# `pi_tui::tui`.
+# Round 67: implementation moved to dependency-light pi-tui-core; this crate
+# retains the facade and the other package-level TUI modules.
+pi-tui-core = { workspace = true }

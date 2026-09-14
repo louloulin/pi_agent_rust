@@ -1,0 +1,17 @@
+[package]
+name = "pi-tui-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Pure rendering, layout-independent console primitives, and TUI state helpers for Pi"
+
+[lints]
+workspace = true
+
+[features]
+default = []
+syntax-highlighting = ["rich_rust/syntax"]
+
+[dependencies]
+dirs = { workspace = true }
+rich_rust = { workspace = true }

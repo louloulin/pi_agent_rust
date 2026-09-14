@@ -9,6 +9,7 @@ description = "Phase-2 aggregator mirroring @earendil-works/pi-agent-core: agent
 workspace = true
 
 [dependencies]
+asupersync = { workspace = true }
 # Workspace deps required by the inlined Phase-1 leaves.
 anyhow = { workspace = true }
 chrono = { workspace = true }

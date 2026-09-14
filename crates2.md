@@ -8,9 +8,21 @@
 
 ---
 
-## 0. `Round 42` 进展
+## 0. `Round 43` 进展
 
 **做了什么:**
+1. 将 `crates/pi-coding-agent/src/agent_cx.rs`（246 LOC）迁移至 `crates/pi-agent-core/src/agent_cx.rs`
+2. `pi-agent-core` 新增 `asupersync` 依赖并导出 `agent_cx`
+3. `pi-coding-agent` 通过 `pub use pi_agent_core::agent_cx` 保留 `crate::agent_cx` 与公开调用路径兼容
+4. 本模块无 coding-agent 反向依赖，保持 AgentCx、AgentFs、AgentTime、AgentProcess 与原测试语义不变
+
+**验证:**
+- `git diff --check` ✅
+- `cargo check`：当前运行环境未发现 `cargo`/`rustc`，无法执行
+
+**提交/推送:** 待本轮提交并尝试推送
+
+
 1. 新增 `crates/pi-agent-core/src/plan.rs`，下沉 `PlanMode`/`PlanState` 状态机与 effects gate
 2. `pi-coding-agent/src/plan.rs` 保留 `SubmitPlanTool`，通过 re-export 维持旧 API 与调用路径
 3. `pi-agent-core` 新增 `pi-protocol` 依赖；状态机单元测试迁移到 core，避免 core 反向依赖 coding-agent

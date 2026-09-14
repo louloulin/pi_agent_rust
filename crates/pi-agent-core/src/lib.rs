@@ -8,6 +8,7 @@
 #![forbid(unsafe_code)]
 
 pub mod advisor;
+pub mod agent_cx;
 pub mod flake_classifier;
 pub mod plan;
 pub mod scheduler;

@@ -1,3 +1,14 @@
+[workspace]
+resolver = "2"
+members = [".", "crates/pi-ext-manifest-core"]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.95"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
 [package]
 name = "pi_agent_rust"
 version = "0.4.0"
@@ -203,6 +214,7 @@ name = "test_time"
 path = "examples/test_time.rs"
 
 [dependencies]
+pi-ext-manifest-core = { path = "crates/pi-ext-manifest-core" }
 # CLI
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"

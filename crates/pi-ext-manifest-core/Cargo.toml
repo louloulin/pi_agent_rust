@@ -1,0 +1,15 @@
+[package]
+name = "pi-ext-manifest-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure extension manifest schema, compatibility, and dependency resolution"
+license = "MIT"
+
+[lints]
+workspace = true
+
+[dependencies]
+semver = "1.0.27"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

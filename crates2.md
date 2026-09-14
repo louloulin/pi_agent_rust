@@ -1186,3 +1186,17 @@ Round 30 后(收尾)       : ~64%
 > 本文档版本:v2.20(2026-09-13)
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
+
+### Round 62 — `hostcall_amac.rs` 协议边界拆分 ✅
+
+**做了什么:**
+1. 将 `HostcallKind` / `HostcallRequest` 这两个纯协议数据结构迁入 `crates/pi-protocol/src/hostcall.rs`，并由 `pi-coding-agent::extensions_js` re-export，保留旧 API 路径。
+2. 将 `hostcall_amac.rs`（约 1,460 LOC）迁入 `pi-chord`；其依赖改为 `pi-protocol` 的请求类型与 `pi-agent-core::scheduler::HostcallOutcome`，不引入平台 hostcall、进程、网络或 agent runtime。
+3. `pi-coding-agent` 通过 `pub use pi_chord::hostcall_amac` 保留 `pi_coding_agent::hostcall_amac::*` facade；现有调用方无需改名。
+
+**验证:**
+- 当前环境未提供 `cargo` / `rustc`，因此无法执行 `cargo fmt` 或 `cargo check`；提交前需在 Rust 工具链环境运行：`cargo fmt --all -- --check`、`cargo check -p pi-protocol`、`cargo check -p pi-chord`、`cargo check -p pi-coding-agent`。
+
+**LOC 迁移:** 约 1,460 LOC（另迁移约 32 LOC 协议类型）。
+
+**进度:** Round 62 完成；整体模块化进度按 `crates2.md` 当前基线约 65%。

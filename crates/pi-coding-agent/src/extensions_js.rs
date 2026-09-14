@@ -172,39 +172,7 @@ fn compat_env_fallback_value(key: &str, env: &HashMap<String, String>) -> Option
 // Promise Bridge Types (bd-2ke)
 // ============================================================================
 
-/// Type of hostcall being requested from JavaScript.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum HostcallKind {
-    /// pi.tool(name, input) - invoke a tool
-    Tool { name: String },
-    /// pi.exec(cmd, args) - execute a shell command
-    Exec { cmd: String },
-    /// pi.http(request) - make an HTTP request
-    Http,
-    /// pi.session(op, args) - session operations
-    Session { op: String },
-    /// pi.ui(op, args) - UI operations
-    Ui { op: String },
-    /// pi.events(op, args) - event operations
-    Events { op: String },
-    /// pi.log(entry) - structured log emission
-    Log,
-}
-
-/// A hostcall request enqueued from JavaScript.
-#[derive(Debug, Clone)]
-pub struct HostcallRequest {
-    /// Unique identifier for correlation.
-    pub call_id: String,
-    /// Type of hostcall.
-    pub kind: HostcallKind,
-    /// JSON payload for the hostcall.
-    pub payload: serde_json::Value,
-    /// Trace ID for correlation with macrotask.
-    pub trace_id: u64,
-    /// Active extension id (when known) for policy/log correlation.
-    pub extension_id: Option<String>,
-}
+pub use pi_protocol::{HostcallKind, HostcallRequest};
 
 impl QueueTenant for HostcallRequest {
     fn tenant_key(&self) -> Option<&str> {

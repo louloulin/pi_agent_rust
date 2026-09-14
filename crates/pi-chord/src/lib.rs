@@ -52,3 +52,5 @@ pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
 pub mod skills_managed;
+
+pub mod hostcall_amac;

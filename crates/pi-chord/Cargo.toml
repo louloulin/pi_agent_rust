@@ -37,6 +37,10 @@ futures = { workspace = true }
 # skills_managed.rs (Round 30.4) — managed skill dir resolution
 dirs = { workspace = true }
 
+# hostcall_amac protocol boundary and scheduler outcome types
+pi-agent-core = { workspace = true }
+pi-protocol = { workspace = true }
+
 [dev-dependencies]
 serde_json = { workspace = true }
 # file_lock.rs in-crate tests need tempfile for scratch dirs.

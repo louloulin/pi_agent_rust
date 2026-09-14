@@ -105,7 +105,8 @@ pub mod worktree_iso;
 // Round 18: modules absorbed from pi-chord and pi-session-backends.
 pub mod compaction;
 pub mod compaction_worker;
-pub mod hostcall_amac;
+// Round 62: AMAC planner moved to pi-chord; retain the legacy facade.
+pub use pi_chord::hostcall_amac;
 pub mod http_shim;
 pub mod migrations;
 pub mod session;

@@ -1199,4 +1199,18 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 约 1,460 LOC（另迁移约 32 LOC 协议类型）。
 
-**进度:** Round 62 完成。本文所称“约 65%”是路线图估算，不是当前 Rust LOC 或编译通过率：分母为本文第 1–12 节列出的多 crate 目标模块范围（目标完成度 = 100%），分子为已在历史 Round 24–30 记录中完成归属迁移、并保留 facade/依赖边界的目标模块范围；按第 15 节 `Round 30 后 ~64%` 轨迹取整为约 65%。该口径不把未迁移的 provider/API、agent runtime 和平台 hostcall 计入已完成，也不替代逐 crate 编译验证。
+
+### Round 64 — `markdown_rich.rs` → `pi-chord`（纯 formatter 拆分）✅
+
+**做了什么:**
+1. 将 `crates/pi-coding-agent/src/markdown_rich.rs` 的纯实现迁入 `crates/pi-chord/src/markdown_rich.rs`（482 LOC，含 9 个单元测试）。内容仅依赖 `std` 与 `serde`：语法语言枚举、LaTeX/十六进制增强、Markdown 保护区处理、OSC-8 链接和 Mermaid 文本格式化。
+2. `pi-coding-agent` 改为 `pub use pi_chord::markdown_rich`，保留 `pi_coding_agent::markdown_rich::*`；上层 `pi` facade 的既有 API 无需改动。
+3. 未迁移任何 TUI、agent 状态或渲染运行时逻辑；`interactive/view.rs` 继续通过旧 facade 调用 `enrich_markdown`。
+
+**验证:**
+- `dsr quality --tool pi_agent_rust`：当前环境不可用（`dsr: command not found`）。
+- 静态核对：模块实现含 9 个单元测试，`pi-chord` 已声明 `serde` 依赖，旧 facade 引用完整；未执行编译或测试（当前环境同时缺少 `cargo`、`rustc`）。
+
+**LOC 迁移:** 482 LOC（实现与测试）。
+
+**进度:** Round 64 实现完成，待质量门禁确认。

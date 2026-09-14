@@ -35,6 +35,8 @@
 //! - `skills_managed.rs` — User-managed skill CRUD (create / update /
 //!   delete / list) backed by a per-user ledger under the agent global dir
 //!   (Round 30.4)
+//! - `markdown_rich.rs` — pure Markdown/text enrichment, token classification,
+//!   terminal links, and mermaid formatting (Round 64)
 
 #![forbid(unsafe_code)]
 
@@ -54,3 +56,5 @@ pub mod hostcall_trace_jit;
 pub mod skills_managed;
 
 pub mod hostcall_amac;
+
+pub mod markdown_rich;

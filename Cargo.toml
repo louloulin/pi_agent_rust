@@ -5,6 +5,7 @@ resolver = "2"
 # xtask hosts workspace plumbing (cargo xtask ci).
 members = [
     "crates/pi",
+    "crates/pi-path-core",
     "crates/pi-agent-cx",
     "crates/pi-bpe",
     "crates/pi-mono",
@@ -63,6 +64,7 @@ readme = "README.md"
 [workspace.dependencies]
 # CLI
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
+pi-path-core = { path = "crates/pi-path-core", version = "0.4.0" }
 clap_complete = "4.5.66"
 
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).

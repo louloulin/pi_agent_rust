@@ -1,0 +1,11 @@
+[package]
+name = "pi-path-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license = "MIT"
+description = "Platform-safe lexical path normalization and resolution for Pi"
+
+[dependencies]
+dirs = { workspace = true }

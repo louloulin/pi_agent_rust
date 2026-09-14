@@ -4217,45 +4217,9 @@ pub struct ProcessedFiles {
 }
 
 fn normalize_dot_segments(path: &Path) -> PathBuf {
-    use std::ffi::{OsStr, OsString};
-    use std::path::Component;
-
-    let mut out = PathBuf::new();
-    let mut normals: Vec<OsString> = Vec::new();
-    let mut has_prefix = false;
-    let mut has_root = false;
-
-    for component in path.components() {
-        match component {
-            Component::Prefix(prefix) => {
-                out.push(prefix.as_os_str());
-                has_prefix = true;
-            }
-            Component::RootDir => {
-                out.push(component.as_os_str());
-                has_root = true;
-            }
-            Component::CurDir => {}
-            Component::ParentDir => match normals.last() {
-                Some(last) if last.as_os_str() != OsStr::new("..") => {
-                    normals.pop();
-                }
-                _ => {
-                    if !has_root && !has_prefix {
-                        normals.push(OsString::from(".."));
-                    }
-                }
-            },
-            Component::Normal(part) => normals.push(part.to_os_string()),
-        }
-    }
-
-    for part in normals {
-        out.push(part);
-    }
-
-    out
+    pi_path_core::normalize(path)
 }
+
 
 #[cfg(feature = "fuzzing")]
 pub fn fuzz_normalize_dot_segments(path: &Path) -> PathBuf {

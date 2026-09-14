@@ -58,6 +58,7 @@ pub mod auth;
 pub mod bash_mediation;
 pub mod browser;
 pub mod btw;
+
 pub mod checkpoint;
 // Round 30.5: `completions` re-housed at `cli/completions` (sibling to
 // `cli::Cli` whose derive graph it walks). Re-export it here so

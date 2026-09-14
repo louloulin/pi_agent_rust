@@ -1317,7 +1317,22 @@ Round 30 后(收尾)       : ~64%
 
 **LOC 迁移:** 509 LOC。pi-chord 现在持有 17 个模块。
 
-### Round 31 — `platform.rs` → `pi-chord` ✅(OS/文件系统抽象,纯 std)
+### Round 45 — `/btw` context shaping → `pi-chord` ✅
+
+**做了什么:**
+1. 新增 `crates/pi-chord/src/btw.rs`，将 `/btw` 所需的纯消息上下文摘要逻辑从 `pi-coding-agent` 下沉到 `pi-chord`。
+2. 保留 4,000 字符预算、最新消息优先、assistant/tool 事件压缩与按字符边界截断语义；客户端、认证和 provider 编排仍由 `pi-coding-agent` 持有，避免 `pi-chord` 反向依赖。
+3. `pi-coding-agent` 的交互调用改为 `pi_chord::btw::build_context_summary`，旧 `pi_coding_agent::btw` API 继续保留以兼容外部调用。
+4. 新增 `crates/pi-chord/tests/btw_context.rs` 回归测试，并更新 `crates2.md` 进度记录。
+
+**验证:**
+- `cargo test -p pi-chord --test btw_context`:✅ 1 passed
+- `cargo check -p pi-coding-agent --lib`:✅ 0 errors（188 个既有 warning）
+- `git diff --check`:✅
+
+**LOC 迁移:** 约 65 LOC；模块化复刻进度由约 30% 向 Round 30 目标继续推进。
+
+
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/platform.rs crates/pi-chord/src/platform.rs`(360 LOC,纯 std,零 `crate::` 自依赖)

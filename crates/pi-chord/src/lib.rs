@@ -53,6 +53,7 @@
 #![forbid(unsafe_code)]
 
 pub mod buffer_shim;
+pub mod btw;
 pub mod crash;
 pub mod extension_inclusion;
 pub mod extension_license;

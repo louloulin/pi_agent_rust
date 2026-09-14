@@ -3506,7 +3506,7 @@ result in account suspension/ban. Prefer using an Anthropic API key (ANTHROPIC_A
             BtwPrepared::AgentBusy,
             |mut agent| {
                 let snapshot = agent.messages().to_vec();
-                let summary = crate::btw::build_context_summary(&snapshot);
+                let summary = pi_chord::btw::build_context_summary(&snapshot);
                 let transformed =
                     agent
                         .secrets_transform_outbound_text(&summary)

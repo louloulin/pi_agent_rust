@@ -1,0 +1,14 @@
+[package]
+name = "pi-stats-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure local session statistics aggregation for Pi"
+license = "MIT"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3.25.0"

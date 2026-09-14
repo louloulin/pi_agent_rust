@@ -4,6 +4,8 @@
 //! branching and history navigation.
 
 use crate::agent_cx::AgentCx;
+pub use pi_session_core::{Checkpoint as SessionCheckpoint, Session as SessionCore, SessionSnapshot, SessionState};
+
 use crate::cli::Cli;
 use crate::config::Config;
 use pi_error::{Error, Result};

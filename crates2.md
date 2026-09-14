@@ -8,7 +8,20 @@
 
 ---
 
-## `Round 42` 进展
+### Round 65 — session 状态机核心拆分 ✅
+
+**做了什么:**
+1. 新增 `pi-session-core`，仅依赖 `serde`，承载纯 `Session` trait、生命周期状态机、`Checkpoint` 与 `SessionSnapshot` 模型。
+2. `pi-coding-agent` 注册 workspace 依赖，保留文件 IO、压缩、索引、迁移在 coding-agent/backends；未引入反向依赖。
+3. 为状态机非法迁移与快照 serde round-trip 增加单元测试。
+
+**验证:**
+- `cargo test -p pi-session-core` ✅
+- `cargo check -p pi-session-core` ✅
+- `git diff --check` ✅
+
+**进度:** Round 65 核心模型完成，旧 `pi-coding-agent::session` facade 未破坏。
+
 
 **做了什么:**
 1. 将 `crates/pi-coding-agent/src/conformance.rs`（4,387 LOC）的 fixture/diff 语义比较实现归位到 `crates/pi-evals/src/conformance.rs`。

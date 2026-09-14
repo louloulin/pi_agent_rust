@@ -81,6 +81,7 @@ pi-protocol = { workspace = true }
 # `pi-session-backends`. Add the workspace dep so call sites can switch
 # from `crate::compaction_snap` to `pi_session_backends::compaction_snap`.
 pi-session-backends = { workspace = true }
+pi-session-core = { workspace = true }
 # Round 28.1: re-house `terminal_images.rs` inside `pi-tui`. Add the workspace
 # dep so call sites can switch from `crate::terminal_images` to
 # `pi_tui::terminal_images`.

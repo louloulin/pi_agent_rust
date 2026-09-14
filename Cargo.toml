@@ -19,6 +19,7 @@ members = [
     "crates/pi-evals",
     "crates/pi-server",
     "crates/pi-session-backends",
+    "crates/pi-session-core",
     "crates/pi-protocol",
     "crates/pi-telemetry",
     "crates/pi-tui",
@@ -60,6 +61,7 @@ pi-chord = { path = "crates/pi-chord", version = "0.1.0" }
 pi-client = { path = "crates/pi-client", version = "0.1.0" }
 pi-server = { path = "crates/pi-server", version = "0.1.0" }
 pi-session-backends = { path = "crates/pi-session-backends", version = "0.1.0" }
+pi-session-core = { path = "crates/pi-session-core", version = "0.1.0" }
 pi-evals = { path = "crates/pi-evals", version = "0.1.0" }
 # Phase-1 leaf crates removed (Round 17): inlined into the 11 Phase-2 packages.
 

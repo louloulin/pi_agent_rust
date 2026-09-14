@@ -10,4 +10,5 @@
 pub mod advisor;
 pub mod agent_cx;
 pub mod flake_classifier;
+pub mod hooks;
 pub mod scheduler;

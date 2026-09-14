@@ -1183,7 +1183,20 @@ Round 30 后(收尾)       : ~64%
 
 ---
 
-> 本文档版本:v2.26(2026-09-13)
+### Round 44 — `hooks.rs` → `pi-agent-core` ✅(lifecycle hook registry)
+
+**做了什么:**
+1. 新增 `crates/pi-agent-core/src/hooks.rs`，提供 `HookKind`、`HookEvent`、`HookError` 与有序 `HookRegistry`。
+2. handler 按注册顺序执行，仅匹配当前事件类型；任一 handler 返回错误时立即停止并向调用方透传。
+3. 事件模型只依赖标准库，未耦合 session、provider 或 CLI，便于 TUI、RPC 与插件适配层复用。
+4. 新增 3 个单元测试，覆盖顺序、类型过滤与错误短路。
+
+**验证:**
+- `cargo test -p pi-agent-core hooks --lib`:✅ 3 passed（命令输出同时提示仓库既有 1 个 dead-code warning）
+
+**LOC:** 新增约 110 LOC。
+
+
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 

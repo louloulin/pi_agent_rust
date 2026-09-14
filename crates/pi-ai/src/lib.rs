@@ -23,7 +23,9 @@ pub mod model;
 // moved to pi-coding-agent in Round 18: models
 pub mod provider;
 pub mod provider_metadata;
-pub mod sse;
+pub mod sse {
+    pub use pi_streams_core::{SseEvent, SseParser, SseStream};
+}
 pub mod stream_rules;
 pub mod token_count;
 // moved to pi-coding-agent in Round 18: usage

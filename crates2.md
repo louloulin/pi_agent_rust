@@ -1298,6 +1298,7 @@ Round 30 后(收尾)       : ~64%
 **本轮变更:** 新增 `crates/pi-chord/src/btw_context.rs` 及其预算/工具调用回归测试；`pi-coding-agent::btw::build_context_summary` 改为 re-export；更新 `pi-chord` 依赖声明。
 
 
-### Round 74 — diff 纯算法 → pi-diff-core ✅
+### Round 75 — SSE/streaming parser → pi-streams-core ✅
 
-新增 crates/pi-diff-core，承载 DiffHunk、unified diff parser、hunk merge 与纯文本 diff；pi-coding-agent 保留兼容包装及 commit/runtime。验证：cargo test -p pi-diff-core（2 passed）、cargo check -p pi-diff-core（通过）。pi-coding-agent 全量 check 受 Windows 基线 signal_hook iterator/SIGBUS 错误阻塞。
+新增 `crates/pi-streams-core`，承载 `SseEvent`、`SseParser`、`SseStream`、UTF-8 分片恢复、错误恢复、事件累积及原有 54 个单元/property tests。`pi-ai` 保留 `pi_ai::sse::*` 兼容 re-export；coding-agent 的 HTTP SSE facade 直接依赖 core，HTTP 客户端与 agent runtime 未迁移。验证：`cargo test -p pi-streams-core`（54 passed）、`cargo check -p pi-streams-core`、`cargo check -p pi-ai` 通过；`cargo check -p pi-coding-agent --lib` 触发 Windows 基线 `signal_hook` iterator/SIGBUS 错误，非本轮改动。
+

@@ -73,6 +73,7 @@ pi-agent-core = { workspace = true }
 # `crate::buffer_shim` to `pi_chord::buffer_shim`.
 pi-chord = { workspace = true }
 pi-diff-core = { workspace = true }
+pi-streams-core = { workspace = true }
 pi-error = { workspace = true }
 # Round 30.1: re-house `jsonrpc.rs` / `framing.rs` / `tail.rs` inside
 # `pi-protocol`. The downstream `lsp/jsonrpc.rs` re-exports them as

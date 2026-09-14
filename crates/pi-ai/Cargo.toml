@@ -26,6 +26,7 @@ hmac = { workspace = true }
 json5 = { workspace = true }
 memchr = { workspace = true }
 pi-error = { workspace = true }
+pi-streams-core = { workspace = true }
 regex = { workspace = true }
 rustc-hash = { workspace = true }
 rustix = { workspace = true }

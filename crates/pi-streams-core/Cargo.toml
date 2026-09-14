@@ -1,0 +1,17 @@
+[package]
+name = "pi-streams-core"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Pure SSE parsing, UTF-8 recovery, and streaming accumulation for Pi"
+
+[lints]
+workspace = true
+
+[dependencies]
+futures = { workspace = true }
+memchr = { workspace = true }
+
+[dev-dependencies]
+proptest = { workspace = true }
+serde_json = { workspace = true }

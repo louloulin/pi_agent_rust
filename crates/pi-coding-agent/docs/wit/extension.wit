@@ -1,0 +1,14 @@
+// Round 19 stub: the canonical `pi-extension` WIT world was not ported from
+// the upstream `@pi/extension-sdk` package. The wasmtime component host
+// remains feature-gated; this minimal declaration keeps the build green
+// without committing to the eventual world contract.
+
+package pi:extension@0.1.0;
+
+interface host {
+    log: func(msg: string);
+}
+
+world pi-extension {
+    export host;
+}

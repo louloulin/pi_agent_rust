@@ -1,0 +1,50 @@
+[package]
+name = "pi-ai"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-ai: unified LLM API, providers, model discovery, tokenization, per-turn policy. After Round 17, the Phase-1 leaves (bpe, delight, dialects, embedded-assets, failover, magic-keywords, model, provider, provider-metadata, stream-rules, token-count) are inlined here."
+
+[lints]
+rust.unsafe_code = { level = "allow", priority = -1 }
+
+[dependencies]
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+asupersync = { workspace = true }
+async-trait = { workspace = true }
+base64 = { workspace = true }
+bstr = { workspace = true }
+chrono = { workspace = true }
+crc32c = { workspace = true }
+dirs = { workspace = true }
+fancy-regex = { workspace = true }
+flate2 = { workspace = true }
+fsqlite = { workspace = true }
+futures = { workspace = true }
+hmac = { workspace = true }
+json5 = { workspace = true }
+memchr = { workspace = true }
+pi-error = { workspace = true }
+regex = { workspace = true }
+rustc-hash = { workspace = true }
+rustix = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+tiktoken-rs = { workspace = true, optional = true }
+tracing = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[build-dependencies]
+flate2 = { workspace = true }
+crc32c = { workspace = true }
+
+[features]
+default = []
+bpe-tokens = ["dep:tiktoken-rs"]

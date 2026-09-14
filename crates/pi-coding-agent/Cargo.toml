@@ -1,0 +1,131 @@
+[package]
+name = "pi-coding-agent"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-coding-agent: the CLI binary entry, tools, session, extensions, and persistence. After Round 17, all Phase-1 leaves are inlined here."
+autobins = false
+
+[[bin]]
+name = "pi"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[features]
+# Round 19: gate the ftui/TUI-only helpers behind a feature so headless
+# builds keep working. Cargo will need to compile with `--features tui`
+# to expose `theme::tui_styles`, `glamour_style_config`, and the
+# associated bubbletea-side helpers.
+default = ["tui", "wasm-host", "ftui"]
+tui = []
+wasm-host = []
+ftui = []
+# Round 20: opt-in sampling profiler (bd-cv653.7.12.1). Snapshots land
+# under the per-user agent dir when `PI_PROFILE=1` or `--profile` is set.
+profiler = []
+
+[dependencies]
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+arboard = { workspace = true }
+asupersync = { workspace = true }
+async-trait = { workspace = true }
+ast-grep-core = { workspace = true }
+ast-grep-language = { workspace = true }
+base64 = { workspace = true }
+bubbletea = { workspace = true }
+bubbles = { workspace = true }
+chrono = { workspace = true }
+clap = { workspace = true }
+clap_complete = { workspace = true }
+crossterm = { workspace = true }
+dirs = { workspace = true }
+flate2 = { workspace = true }
+crc32c = { workspace = true }
+ctrlc = { workspace = true }
+fs4 = { workspace = true }
+fsqlite = { workspace = true }
+ftui = { workspace = true }
+ftui-extras = { workspace = true }
+futures = { workspace = true }
+getrandom = { workspace = true }
+glamour = { workspace = true }
+glob = { workspace = true }
+globset = { workspace = true }
+grep-regex = { workspace = true }
+hmac = { workspace = true }
+htmd = { workspace = true }
+ignore = { workspace = true }
+image = { workspace = true }
+json5 = { workspace = true }
+jsonschema = { workspace = true }
+lipgloss = { workspace = true }
+md-5 = { workspace = true }
+memchr = { workspace = true }
+pbkdf2 = { workspace = true }
+pdf-extract = { workspace = true }
+pi-ai = { workspace = true }
+pi-agent-core = { workspace = true }
+# Round 27.1: re-house `buffer_shim.rs` (Node Buffer polyfill source) inside
+# `pi-chord`. Add the workspace dep so call sites can switch from
+# `crate::buffer_shim` to `pi_chord::buffer_shim`.
+pi-chord = { workspace = true }
+pi-error = { workspace = true }
+# Round 30.1: re-house `jsonrpc.rs` / `framing.rs` / `tail.rs` inside
+# `pi-protocol`. The downstream `lsp/jsonrpc.rs` re-exports them as
+# `pi_coding_agent::jsonrpc::*` so existing call sites keep working.
+pi-protocol = { workspace = true }
+# Round 26.1: re-house `compaction_snap.rs` (Snapcompact mode) inside
+# `pi-session-backends`. Add the workspace dep so call sites can switch
+# from `crate::compaction_snap` to `pi_session_backends::compaction_snap`.
+pi-session-backends = { workspace = true }
+# Round 28.1: re-house `terminal_images.rs` inside `pi-tui`. Add the workspace
+# dep so call sites can switch from `crate::terminal_images` to
+# `pi_tui::terminal_images`.
+pi-tui = { workspace = true, features = ["tui"] }
+pi-telemetry = { workspace = true }
+portable-pty = { workspace = true }
+proptest = { workspace = true, optional = true }
+regex = { workspace = true }
+ring = { workspace = true }
+rquickjs = { workspace = true }
+rustix = { workspace = true }
+scrypt = { workspace = true }
+semver = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha1 = { workspace = true }
+sha2 = { workspace = true }
+signal-hook = { workspace = true }
+similar = { workspace = true }
+swc_common = { workspace = true }
+swc_ecma_ast = { workspace = true }
+swc_ecma_codegen = { workspace = true }
+swc_ecma_parser = { workspace = true }
+swc_ecma_transforms_base = { workspace = true }
+swc_ecma_transforms_typescript = { workspace = true }
+sysinfo = { workspace = true }
+win32job = { workspace = true }
+tempfile = { workspace = true }
+thiserror = { workspace = true }
+toml = { workspace = true }
+tracing = { workspace = true }
+unicode-normalization = { workspace = true }
+unicode-width = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+wasmtime = { workspace = true }
+xxhash-rust = { workspace = true }
+# Round 19 deps introduced when the inlined extension tools started
+# referencing crates that had previously been live in pi-tui / pi-coder
+# siblings only.
+crossbeam-queue = "0.3"
+filetime = "0.2"
+grep-searcher = "0.1"
+rich_rust = { version = "0.2", features = ["markdown"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[dev-dependencies]
+serde_json = { workspace = true }

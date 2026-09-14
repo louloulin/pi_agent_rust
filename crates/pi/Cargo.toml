@@ -1,0 +1,287 @@
+[package]
+name = "pi"
+version = "0.4.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Native AI coding agent CLI - Rust port of Pi Agent (modularized Phase-1)"
+authors = ["Jeffrey Emanuel", "Multica Modularization"]
+license-file = "LICENSE"
+repository = "https://github.com/louloulin/pi_agent_rust"
+homepage = "https://github.com/louloulin/pi_agent_rust"
+documentation = "https://docs.rs/pi"
+readme = "README.md"
+keywords = ["ai", "cli", "coding-agent", "llm", "anthropic"]
+categories = ["command-line-utilities", "development-tools"]
+autobins = false
+# Workspace member of pi.rs Phase-1. Source tree relocated from repo root into
+# crates/pi/ while preserving every module, example, bench, and test.
+include = [
+    "/docs/extension-artifact-provenance.json",
+    "/docs/evidence/tool-output-context-cache.jsonl",
+    "/docs/wit/extension.wit",
+    "/docs/provider-upstream-model-ids-snapshot.json",
+    "/docs/schema/extension_protocol.json",
+    "/legacy_pi_mono_code/pi-mono/packages/ai/src/models.generated.ts",
+    "/tests/fixtures/agent_mail/schema_corrupt_health.json",
+    "/Cargo.toml",
+    "/LICENSE",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/build.rs",
+    "/src/**",
+]
+
+[lib]
+name = "pi"
+path = "src/lib.rs"
+
+[[bin]]
+name = "pi_legacy_capture"
+path = "src/bin/pi_legacy_capture.rs"
+required-features = ["internal-legacy-capture"]
+
+[[bin]]
+name = "pi_mcp_fixture"
+path = "src/bin/pi_mcp_fixture.rs"
+required-features = ["internal-mcp-fixture"]
+
+# (Examples and benches auto-discovered from examples/ and benches/ — Cargo
+# discovers them by default; no [[example]] entries required.)
+
+[[bench]]
+name = "tools"
+harness = false
+
+[[bench]]
+name = "extensions"
+harness = false
+
+[[bench]]
+name = "extension_budget_inputs"
+harness = false
+
+[[bench]]
+name = "semantic_context"
+harness = false
+
+[[bench]]
+name = "pijs_workload"
+path = "examples/pijs_workload.rs"
+harness = false
+
+[[bench]]
+name = "system"
+harness = false
+
+[[bench]]
+name = "tui_perf"
+harness = false
+
+[[bench]]
+name = "search_backends"
+harness = false
+
+[dependencies]
+clap = { workspace = true }
+clap_complete = { workspace = true }
+# Phase-2 top-level packages (11 aggregators). The lib.rs facade re-exports
+# these; the binary entry will move to pi-coding-agent in a later round.
+pi-ai = { workspace = true }
+pi-agent-core = { workspace = true }
+pi-coding-agent = { workspace = true }
+pi-error = { workspace = true }
+pi-tui = { workspace = true }
+pi-telemetry = { workspace = true }
+pi-protocol = { workspace = true }
+pi-chord = { workspace = true }
+pi-client = { workspace = true }
+pi-server = { workspace = true }
+pi-session-backends = { workspace = true }
+pi-evals = { workspace = true }
+# Phase-1 leaf crates (kept until per-leaf internals are flattened).
+asupersync = { workspace = true }
+futures = { workspace = true }
+async-trait = { workspace = true }
+htmd = { workspace = true }
+pdf-extract = { workspace = true, optional = true }
+url = { workspace = true }
+ctrlc = { workspace = true }
+portable-pty = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+json5 = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+rich_rust = { workspace = true }
+crossterm = { workspace = true, optional = true }
+enable-ansi-support = { workspace = true }
+bubbletea = { workspace = true, optional = true }
+lipgloss = { workspace = true, optional = true }
+bubbles = { workspace = true, optional = true }
+glamour = { workspace = true, optional = true }
+unicode-width = { workspace = true, optional = true }
+textwrap = { workspace = true, optional = true }
+arboard = { workspace = true, optional = true }
+ftui = { workspace = true, optional = true }
+ftui-extras = { workspace = true, optional = true }
+dirs = { workspace = true }
+tempfile = { workspace = true }
+fs4 = { workspace = true }
+glob = { workspace = true }
+ignore = { workspace = true }
+globset = { workspace = true }
+grep-regex = { workspace = true }
+grep-searcher = { workspace = true }
+jsonschema = { workspace = true }
+rustix = { workspace = true }
+crossbeam-queue = { workspace = true }
+fsqlite = { workspace = true }
+chrono = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true }
+memchr = { workspace = true }
+signal-hook = { workspace = true }
+base64 = { workspace = true }
+flate2 = { workspace = true }
+toml = { workspace = true }
+sha2 = { workspace = true }
+sha1 = { workspace = true }
+md-5 = { workspace = true }
+hmac = { workspace = true }
+pbkdf2 = { workspace = true }
+scrypt = { workspace = true }
+getrandom = { workspace = true }
+regex = { workspace = true }
+ring = { workspace = true }
+semver = { workspace = true }
+crc32c = { workspace = true }
+ast-grep-core = { workspace = true }
+ast-grep-language = { workspace = true }
+unicode-normalization = { workspace = true }
+xxhash-rust = { workspace = true }
+similar = { workspace = true }
+sysinfo = { workspace = true }
+rquickjs = { workspace = true }
+pprof = { workspace = true, optional = true }
+swc_common = { workspace = true }
+swc_ecma_codegen = { workspace = true }
+swc_ecma_ast = { workspace = true }
+swc_ecma_parser = { workspace = true }
+swc_ecma_transforms_base = { workspace = true }
+swc_ecma_transforms_typescript = { workspace = true }
+swc_ecma_visit = { workspace = true }
+wasmtime = { workspace = true, optional = true }
+filetime = { workspace = true }
+image = { workspace = true, optional = true }
+tikv-jemallocator = { workspace = true, optional = true }
+win32job = { workspace = true, optional = true }
+
+[build-dependencies]
+vergen-gix = { workspace = true }
+
+[dev-dependencies]
+arbitrary = { workspace = true }
+pretty_assertions = { workspace = true }
+insta = { workspace = true }
+tempfile = { workspace = true }
+asupersync = { workspace = true }
+criterion = { workspace = true }
+jsonschema = { workspace = true }
+proptest = { workspace = true }
+wat = { workspace = true }
+toml = { workspace = true }
+loom = { workspace = true }
+
+[target.'cfg(any(target_os = "linux", target_os = "macos"))'.dependencies]
+tikv-jemallocator = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "freebsd")'.dependencies]
+rquickjs = { workspace = true }
+
+[target.'cfg(target_os = "android")'.dependencies]
+rquickjs = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+win32job = { workspace = true }
+
+[features]
+default = ["sqlite-sessions", "tui", "bpe-tokens", "ftui"]
+full = [
+    "image-resize",
+    "jemalloc",
+    "clipboard",
+    "wasm-host",
+    "sqlite-sessions",
+    "syntax-highlighting",
+    "tui",
+    "url-pdf",
+    "bpe-tokens",
+    "rich_rust/full",
+]
+bpe-tokens = ["pi-ai/bpe-tokens"]
+url-pdf = ["dep:pdf-extract"]
+profiler = ["dep:pprof", "pi-telemetry/profiler"]
+tui = [
+    "dep:crossterm",
+    "dep:bubbletea",
+    "dep:lipgloss",
+    "dep:bubbles",
+    "dep:glamour",
+    "dep:unicode-width",
+    "dep:textwrap",
+]
+ftui = ["dep:ftui", "dep:ftui-extras", "tui"]
+image-resize = ["image"]
+clipboard = ["dep:arboard"]
+wasm-host = ["dep:wasmtime"]
+sqlite-sessions = []
+syntax-highlighting = ["rich_rust/syntax"]
+ext-conformance = []
+fuzzing = []
+internal-legacy-capture = []
+internal-persistence-fault-injection = []
+internal-mcp-fixture = []
+loom-tests = []
+manual-timing-tests = []
+jemalloc = ["dep:tikv-jemallocator"]
+
+[[test]]
+name = "hostcall_queue_loom"
+path = "tests/hostcall_queue_loom.rs"
+required-features = ["loom-tests"]
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[profile.dev]
+opt-level = 0
+debug = true
+
+[profile.test]
+debug = "line-tables-only"
+incremental = false
+
+[profile.perf]
+inherits = "release"
+opt-level = 3
+lto = "thin"
+codegen-units = 8
+debug = 1
+strip = false
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+module_name_repetitions = "allow"
+assert_is_empty = "allow"
+suboptimal_flops = "allow"

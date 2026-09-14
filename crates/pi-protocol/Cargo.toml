@@ -1,0 +1,19 @@
+[package]
+name = "pi-protocol"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-protocol: JSON-RPC framing primitives shared by LSP, DAP, and MCP transports. Round 18 absorbed the larger rpc/acp/sdk/jsonrpc/validation_broker modules into pi-coding-agent to break the dependency cycle; Round 30.1 began restoring the leaf framing + jsonrpc + tail modules here."
+
+[lints]
+workspace = true
+
+[dependencies]
+# Round 30.1: jsonrpc/framing/tail moved from pi-coding-agent. They are
+# pure std + serde framing primitives with no transport dependencies.
+anyhow = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

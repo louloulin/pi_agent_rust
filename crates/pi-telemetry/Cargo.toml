@@ -1,0 +1,26 @@
+[package]
+name = "pi-telemetry"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-telemetry: PMU telemetry, profiler, session metrics. After Round 17, the Phase-1 leaves are inlined here."
+
+[lints]
+workspace = true
+
+[dependencies]
+# Workspace deps required by the inlined Phase-1 leaves.
+anyhow = { workspace = true }
+chrono = { workspace = true }
+pi-error = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+pprof = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[features]
+default = []
+profiler = ["dep:pprof"]

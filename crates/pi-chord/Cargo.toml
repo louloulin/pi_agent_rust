@@ -1,0 +1,50 @@
+[package]
+name = "pi-chord"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 aggregator mirroring @earendil-works/pi-chord: hostcall / buffer / file-lock runtime. After Round 17, the Phase-1 leaves are inlined here."
+
+[lints]
+workspace = true
+
+[dependencies]
+# Round 18: pi-chord is now an empty placeholder. All hostcall / buffer /
+# file-lock / swarm modules moved to pi-coding-agent to break the
+# pi-coding-agent ↔ pi-chord cycle.
+#
+# Round 27: re-housing leaves here, one at a time, to restore the upstream
+# surface.
+anyhow = { workspace = true }
+# file_lock.rs (Round 27.1)
+filetime = { workspace = true }
+rustix = { workspace = true }
+# hostcall_superinstructions.rs (Round 27.3) uses serde derive
+serde = { workspace = true }
+# hostcall_queue.rs (Round 27.7) uses crossbeam_queue for the fast ring
+crossbeam-queue = { workspace = true }
+# hostcall_egraph.rs (Round 27.8) uses serde_json for plan encoding
+serde_json = { workspace = true }
+tracing = { workspace = true }
+# extension_inclusion.rs (Round 29.1) uses sha2 for content addressing
+sha2 = { workspace = true }
+# extension_popularity.rs (Round 29.2) uses url for npm registry queries
+url = { workspace = true }
+# extension_popularity.rs (Round 29.2) — Error/Result re-exports
+pi-error = { workspace = true }
+# extension_popularity.rs (Round 29.2) — BoxFuture for the NpmHttpGet trait seam
+futures = { workspace = true }
+# skills_managed.rs (Round 30.4) — managed skill dir resolution
+dirs = { workspace = true }
+# crash.rs (Round 32) — timestamp + signal-hook integration
+chrono = { workspace = true }
+signal-hook = { workspace = true, features = ["iterator"] }
+# version.rs (Round 33) — semver compare + GitHub release parsing
+semver = { workspace = true }
+# turn_recovery.rs (Round 34) — classify StopReason into RecoveryClass
+pi-ai = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
+# file_lock.rs in-crate tests need tempfile for scratch dirs.
+tempfile = { workspace = true }

@@ -1,0 +1,38 @@
+[package]
+name = "pi-session-backends"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+description = "Phase-2 module mirroring @earendil-works/pi-session-backends: session persistence backends (SQLite, JSONL) — currently still in crates/pi-coding-agent/src"
+
+[lints]
+workspace = true
+
+[dependencies]
+# Round 18: pi-session-backends was an empty placeholder. All session
+# / compaction / sqlite modules moved to pi-coding-agent to break the
+# pi-coding-agent ↔ pi-session-backends cycle.
+#
+# Round 26: re-housing leaves here, one at a time, to restore the upstream
+# surface. Each leaf gets its own dep list appended below.
+#
+# compaction_snap.rs (Round 26.1)
+anyhow = { workspace = true }
+pi-ai = { workspace = true }
+base64 = { workspace = true }
+flate2 = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+
+# Note: session_import.rs (Round 26.2) had to stay in pi-coding-agent for
+# this round because Session lives in pi-coding-agent and pulling
+# session_import into pi-session-backends would re-introduce the cycle
+# Round 18 broke. The migration will resume once a Session trait seam is
+# available.
+
+[dev-dependencies]
+# tests/session_persistence.rs (Round 26.2 integration test)
+asupersync = { workspace = true }
+pi-coding-agent = { workspace = true }
+tempfile = { workspace = true }

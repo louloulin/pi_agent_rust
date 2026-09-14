@@ -1,0 +1,30 @@
+UTC 2026-09-11T02:03:48Z
+===lib name proof===
+ls: cannot access 'target/debug/libpi.so': No such file or directory
+-rw-rw-r-- 2 devbox devbox 725636334 Sep 11 02:01 target/debug/libpi.rlib
+---nm --defined-only libpi.rlib (top 30 symbols)---
+xargs: {}/bin/llvm-nm: No such file or directory
+===END===
+UTC 2026-09-11T02:03:48Z
+UTC 2026-09-11T02:03:52Z
+===lib artifacts===
+-rw-rw-r-- 1 devbox devbox     26456 Sep 11 02:02 target/debug/libpi.d
+-rw-rw-r-- 2 devbox devbox 725636334 Sep 11 02:01 target/debug/libpi.rlib
+===workspace_smoke lib name check===
+warning: profiles for the non root package will be ignored, specify profiles at the workspace root:
+package:   /home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/crates/pi/Cargo.toml
+workspace: /home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/Cargo.toml
+warning: crates/pi/Cargo.toml: file `/home/devbox/multica_workspaces/lumos-659117e3ca3d/lum-786-f963f7e70515/workdir/pi_agent_rust/crates/pi/examples/pijs_workload.rs` found to be present in multiple build targets:
+  * `example` target `pijs_workload`
+  * `bench` target `pijs_workload`
+warning: `pi` (manifest) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.61s
+     Running tests/workspace_smoke.rs (target/debug/build/xtask/08d349683a7df949/out/workspace_smoke-08d349683a7df949)
+
+running 1 test
+test pi_package_exposes_public_lib_target ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.46s
+
+===END===
+UTC 2026-09-11T02:03:53Z

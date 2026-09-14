@@ -6,9 +6,12 @@
 3. workspace 注册 `pi-cancel-core` 并接入 coding-agent 依赖。
 
 **验证:**
-- `cargo fmt --all -- --check`：执行中
-- `cargo test -p pi-cancel-core`：执行中
-- `cargo check -p pi-coding-agent --lib`：执行中
+- `cargo fmt --all -- --check`：无法执行，环境未安装 `cargo`
+- `cargo test -p pi-cancel-core`：无法执行，环境未安装 `cargo`
+- `cargo check -p pi-coding-agent --lib`：无法执行，环境未安装 `cargo`
+- `git diff --check`：通过
+
+**提交/推送:** 已提交 `a1d89c5a8`；`git push -u origin HEAD` 因当前环境无 GitHub HTTPS 凭据失败，提交保留在当前分支。
 
 **进度:** Round 75 cancel 核心拆分完成，后续可继续把 deadline/budget context 的纯逻辑部分迁入该 crate。
 

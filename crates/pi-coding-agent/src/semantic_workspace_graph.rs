@@ -1525,12 +1525,6 @@ fn unsafe_changed_path_exclusion(node: &SemanticGraphNode) -> ContextBundleExclu
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct ParsedRustSymbol {
-    kind: String,
-    name: String,
-}
-
 pub fn classify_bead_actionability(
     value: &Value,
     reference_time_utc: Option<DateTime<Utc>>,
@@ -5614,107 +5608,6 @@ fn collect_privacy_hints_from_reason(
         if let Some(kind) = part.strip_prefix("sensitive_path:") {
             sensitive_path_kinds.insert(kind.to_string());
         }
-    }
-}
-
-fn parse_rust_symbol(line: &str) -> Option<ParsedRustSymbol> {
-    if line.starts_with("//") {
-        return None;
-    }
-
-    let tokens: Vec<&str> = line
-        .split(|ch: char| !(ch.is_ascii_alphanumeric() || ch == '_'))
-        .filter(|token| !token.is_empty())
-        .collect();
-    for window in tokens.windows(2) {
-        let kind = window[0];
-        if matches!(kind, "fn" | "struct" | "enum" | "trait" | "mod") {
-            return Some(ParsedRustSymbol {
-                kind: kind.to_string(),
-                name: window[1].to_string(),
-            });
-        }
-    }
-    None
-}
-
-fn parse_markdown_heading(line: &str) -> Option<(usize, String)> {
-    let trimmed = line.trim_start();
-    let level = trimmed.chars().take_while(|ch| *ch == '#').count();
-    if level == 0 || level > 6 {
-        return None;
-    }
-    let title = trimmed[level..].trim();
-    if title.is_empty() {
-        return None;
-    }
-    Some((level, title.to_string()))
-}
-
-fn extract_evidence_citations(line: &str) -> Vec<String> {
-    let mut paths = BTreeSet::new();
-    for token in line.split(|ch: char| {
-        ch.is_whitespace()
-            || matches!(
-                ch,
-                '`' | '(' | ')' | '[' | ']' | ',' | ';' | '<' | '>' | '"' | '\''
-            )
-    }) {
-        if let Some(path) = normalize_citation_path(token) {
-            paths.insert(path);
-        }
-    }
-    paths.into_iter().collect()
-}
-
-fn normalize_citation_path(raw: &str) -> Option<String> {
-    let trimmed = raw.trim_matches(|ch: char| {
-        matches!(
-            ch,
-            '`' | '(' | ')' | '[' | ']' | '<' | '>' | '"' | '\'' | ',' | ';' | ':' | '.'
-        )
-    });
-    let without_anchor = trimmed.split('#').next().unwrap_or(trimmed);
-    if is_claim_evidence_path(without_anchor) {
-        Some(without_anchor.to_string())
-    } else {
-        None
-    }
-}
-
-fn is_claim_evidence_path(path: &str) -> bool {
-    path == "docs/parity-certification.json"
-        || path.starts_with("docs/evidence/") && has_extension(path, "json")
-        || path.starts_with("docs/contracts/") && has_extension(path, "json")
-        || path.starts_with("tests/perf/reports/") && has_extension(path, "json")
-        || path.starts_with("tests/golden_corpus/swarm_claim_readiness/")
-            && has_extension(path, "json")
-        || path.starts_with("tests/fixtures/vcr/") && has_extension(path, "json")
-        || path.starts_with("tests/fixtures/context_artifacts/")
-            && (has_extension(path, "json") || has_extension(path, "log"))
-}
-
-fn claim_surface_for_markdown_line(line: &str) -> &'static str {
-    let lower = line.to_ascii_lowercase();
-    if lower.contains("historical") || lower.contains("operator evidence only") {
-        "historical_snapshot"
-    } else if [
-        "drop-in",
-        "strict replacement",
-        "release-facing",
-        "release claim",
-        "certified",
-        "certification",
-        "performance claim",
-        "perf claim",
-        "budget",
-    ]
-    .iter()
-    .any(|needle| lower.contains(needle))
-    {
-        "release_facing"
-    } else {
-        "documentation"
     }
 }
 

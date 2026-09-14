@@ -17,15 +17,13 @@
 //! configuration error cannot revive an older trusted execution target.
 
 use std::collections::HashMap;
-use serde_json::json;
 use std::fs::File;
 use std::io::Read as _;
 use std::path::{Path, PathBuf};
 
-use serde::Deserialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-
+use pi_protocol::mcp_config::RawServer;
 const TRUST_FINGERPRINT_DOMAIN: &[u8] = b"pi_agent_rust:mcp-trust-surface:v2";
 const MAX_MCP_CONFIG_BYTES: usize = 1024 * 1024;
 
@@ -55,116 +53,15 @@ fn is_terminal_control(character: char) -> bool {
         )
 }
 
-const fn is_http_token_byte(byte: u8) -> bool {
+fn is_http_token_byte(byte: u8) -> bool {
     byte.is_ascii_alphanumeric()
-        || matches!(
-            byte,
-            b'!' | b'#'
-                | b'$'
-                | b'%'
-                | b'&'
-                | b'\''
-                | b'*'
-                | b'+'
-                | b'-'
-                | b'.'
-                | b'^'
-                | b'_'
-                | b'`'
-                | b'|'
-                | b'~'
-        )
+        || matches!(byte, b'!' | b'#' | b'$' | b'%' | b'&' | b'\'' | b'*' | b'+' | b'-' | b'.' | b'^' | b'_' | b'`' | b'|' | b'~')
 }
 
-pub(super) fn validate_http_header_value(value: &str) -> std::result::Result<(), String> {
-    if value.len() > MAX_MCP_HEADER_VALUE_BYTES {
-        return Err(format!(
-            "HTTP header value exceeds {MAX_MCP_HEADER_VALUE_BYTES} bytes"
-        ));
-    }
-    if value.chars().any(is_terminal_control) {
-        return Err(
-            "HTTP header value contains terminal or protocol control characters".to_string(),
-        );
-    }
-    Ok(())
-}
+pub(super) use pi_protocol::mcp_config::{validate_env_value, validate_http_header_value};
 
-pub(super) fn validate_env_value(value: &str) -> std::result::Result<(), String> {
-    if value.len() > MAX_MCP_ENV_VALUE_BYTES {
-        return Err(format!(
-            "environment value exceeds {MAX_MCP_ENV_VALUE_BYTES} bytes"
-        ));
-    }
-    if value.chars().any(is_terminal_control) {
-        return Err(
-            "environment value contains terminal or process control characters".to_string(),
-        );
-    }
-    Ok(())
-}
 
-/// Where a server definition came from.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Provenance {
-    /// `--mcp-config` CLI file.
-    Cli,
-    /// `.pi/mcp.json` in the project.
-    ProjectPi,
-    /// `.agents/mcp.json` in the project.
-    ProjectAgents,
-    /// `~/.pi/agent/mcp.json`.
-    GlobalPi,
-    /// A foreign tool's config file (`.claude/`, `.cursor/`, ...).
-    Foreign,
-    /// Contributed by an installed extension via `registerMcpServer`.
-    Extension,
-}
-
-impl Provenance {
-    /// Display label for the `/mcp` view.
-    #[must_use]
-    pub const fn label(self) -> &'static str {
-        match self {
-            Self::Cli => "cli",
-            Self::ProjectPi => ".pi",
-            Self::ProjectAgents => ".agents",
-            Self::GlobalPi => "global",
-            Self::Foreign => "foreign",
-            Self::Extension => "extension",
-        }
-    }
-
-    /// Whether this provenance is one of pi's native files.
-    #[must_use]
-    pub const fn is_native(self) -> bool {
-        !matches!(self, Self::Foreign | Self::Extension)
-    }
-}
-
-/// One server definition after merging.
-#[derive(Debug, Clone)]
-pub struct ConfiguredServer {
-    /// Server name (config map key).
-    pub name: String,
-    /// Spawn command (stdio servers).
-    pub command: Option<String>,
-    /// argv for the command.
-    pub args: Vec<String>,
-    /// Extra environment entries (values may use `$ENV:`/`$CMD:`).
-    pub env: Vec<(String, String)>,
-    /// Endpoint URL (HTTP servers).
-    pub url: Option<String>,
-    /// Extra HTTP headers (values may use `$ENV:`/`$CMD:`).
-    pub headers: Vec<(String, String)>,
-    /// Explicit transport hint (`"stdio"` / `"http"` / `"sse"`).
-    pub transport_hint: Option<String>,
-    /// Where the definition came from.
-    pub provenance: Provenance,
-    /// Source file it was read from.
-    pub source_file: PathBuf,
-}
+pub use pi_protocol::mcp_config::{ConfiguredServer, ConfigWarning, Provenance};
 
 impl ConfiguredServer {
     /// Versioned cryptographic fingerprint of the complete execution surface.
@@ -524,20 +421,8 @@ pub(super) fn normalize_env(
     Ok(env)
 }
 
-pub(super) fn validate_server_name(name: &str) -> std::result::Result<(), String> {
-    if name.is_empty() || name.len() > 128 {
-        return Err("server name must contain 1 to 128 ASCII characters".to_string());
-    }
-    if !name
-        .bytes()
-        .all(|byte| byte.is_ascii_alphanumeric() || matches!(byte, b'-' | b'_' | b'.'))
-    {
-        return Err(
-            "server name may contain only ASCII letters, digits, '.', '-', and '_'".to_string(),
-        );
-    }
-    Ok(())
-}
+pub(super) use pi_protocol::mcp_config::validate_server_name;
+
 
 fn hash_part(hasher: &mut Sha256, label: &str, value: &[u8]) {
     hasher.update(u64::try_from(label.len()).unwrap_or(u64::MAX).to_be_bytes());
@@ -612,33 +497,6 @@ fn hash_definitions(
             definition.as_bytes(),
         );
     }
-}
-
-/// A skipped entry, surfaced in `/mcp` and logs instead of aborting.
-#[derive(Debug, Clone, serde::Serialize)]
-#[serde(rename_all = "camelCase")]
-pub struct ConfigWarning {
-    pub source_file: PathBuf,
-    pub entry: String,
-    pub reason: String,
-}
-
-/// One raw server entry (tolerant: unknown fields ignored).
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct RawServer {
-    #[serde(default)]
-    command: Option<String>,
-    #[serde(default)]
-    args: Option<Vec<String>>,
-    #[serde(default)]
-    env: Option<HashMap<String, String>>,
-    #[serde(default)]
-    url: Option<String>,
-    #[serde(default)]
-    headers: Option<HashMap<String, String>>,
-    #[serde(default, rename = "type")]
-    transport: Option<String>,
 }
 
 /// Parse one server entry; `Err` carries the skip reason.

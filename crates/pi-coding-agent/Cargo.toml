@@ -72,12 +72,14 @@ pi-agent-core = { workspace = true }
 # `pi-chord`. Add the workspace dep so call sites can switch from
 # `crate::buffer_shim` to `pi_chord::buffer_shim`.
 pi-chord = { workspace = true }
+pi-error = { workspace = true }
 pi-evals = { workspace = true }
+# Round 64: protocol-owned MCP configuration contracts.
 # Round 30.1: re-house `jsonrpc.rs` / `framing.rs` / `tail.rs` inside
 # `pi-protocol`. The downstream `lsp/jsonrpc.rs` re-exports them as
 # `pi_coding_agent::jsonrpc::*` so existing call sites keep working.
-# Round 62: protocol-level encoding and error-classification seam for the
-# crypto shim; hostcall implementation remains in this crate.
+# Round 64: MCP configuration contracts are protocol-owned; discovery and
+# runtime remain in pi-coding-agent.
 pi-protocol = { workspace = true }
 # Round 26.1: re-house `compaction_snap.rs` (Snapcompact mode) inside
 # `pi-session-backends`. Add the workspace dep so call sites can switch

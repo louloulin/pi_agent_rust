@@ -8,7 +8,21 @@
 
 ---
 
-## `Round 42` 进展
+## `Round 64` 进展
+
+**做了什么:**
+1. 将 MCP 纯配置协议合同迁移到 `crates/pi-protocol/src/mcp_config.rs`：`ConfiguredServer`、`ConfigWarning`、`Provenance`、原始配置反序列化模型、协议版本常量及 header/env/name 校验。
+2. `pi-coding-agent::mcp::config` 保留 discovery、TOML/JSON 文件读取、合并优先级、fingerprint、进程 identity、trust/runtime 相关逻辑，并通过 facade 保持旧 API 路径。
+3. 保留 `pi-protocol` 的独立单元测试，验证协议版本和安全校验；更新 `pi-coding-agent` 依赖与锁文件。
+
+**验证:**
+- `cargo test -p pi-protocol mcp_config --lib` ✅ 1 passed
+- `cargo check -p pi-protocol --lib` ✅
+- `git diff --check` ✅
+- `cargo check -p pi-coding-agent --lib` ⚠️ 现有模块化基线在 Windows 上仍有大量与本改动无关的 `pi_error`/unstable API/类型错误；本轮新增 MCP 配置合同未出现独立编译错误。
+
+**进度:** 约 70%；纯配置协议模型、默认协议版本和校验已拆分，fingerprint 仍留在 coding-agent 以避免扩大本轮风险。
+
 
 **做了什么:**
 1. 将 `crates/pi-coding-agent/src/conformance.rs`（4,387 LOC）的 fixture/diff 语义比较实现归位到 `crates/pi-evals/src/conformance.rs`。

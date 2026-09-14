@@ -15,5 +15,6 @@
 pub mod crypto;
 pub mod framing;
 pub mod jsonrpc;
+pub mod mcp_config;
 pub mod tail;
 pub mod tool_effects;

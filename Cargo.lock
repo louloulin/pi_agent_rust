@@ -5762,7 +5762,7 @@ dependencies = [
  "pi-agent-core",
  "pi-ai",
  "pi-chord",
- "pi-evals",
+ "pi-error",
  "pi-protocol",
  "pi-session-backends",
  "pi-telemetry",

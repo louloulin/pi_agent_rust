@@ -1,0 +1,12 @@
+[package]
+name = "pi-swarm-ledger-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure swarm activity ledger entry, append, query, and aggregation algorithms"
+license-file = "../../LICENSE"
+repository = "https://github.com/louloulin/pi_agent_rust"
+
+[dependencies]
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = { version = "1", features = ["raw_value"] }

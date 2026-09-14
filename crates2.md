@@ -1,4 +1,16 @@
-# pi.rs 模块化复刻详细差距分析 (crates2.md)
+## 0. `Round 68` 进展
+
+**做了什么:**
+1. 新增 `crates/pi-index-core`，承载无 IO/agent 依赖的查询词法化、查询解析、倒排 posting 与字段相关性计算原语。
+2. `pi-coding-agent::extension_index` 保留数据模型、缓存、远端 NPM/GitHub IO 与旧 `search` facade，改用 `pi-index-core` 的 tokenize/relevance primitives；旧字段权重与排序保持不变。
+3. `pi-coding-agent` 依赖并 re-export `pi-index-core`，为后续 session 索引核心拆分保留稳定边界；session 文件/SQLite IO 仍留在 coding-agent。
+
+**验证:**
+- `cargo test -p pi-index-core`: ✅ 4 passed
+- `cargo check -p pi-coding-agent --lib`: ⚠️ 被基线 `pi-session-backends/src/session_import.rs` 的 2 个既有编译错误阻塞（`map_or_else` 闭包与 `Box<dyn SessionImportSink>` coercion），错误与本轮 index core 无关
+- `cargo fmt -p pi-index-core`: ✅
+- `cargo fmt --all -- --check`: ⚠️ Windows 路径长度错误（OS error 206）
+
 
 > 本文档是 `crates1.md` v1.2 + Round 23 差距分析的续篇,**逐文件**对比
 > 上游 `legacy_pi_mono_code/pi/`(= `https://github.com/earendil-works/pi.git` 快照,

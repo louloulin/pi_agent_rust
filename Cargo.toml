@@ -11,6 +11,7 @@ members = [
     "crates/pi",
     "crates/pi-ai",
     "crates/pi-agent-core",
+    "crates/pi-index-core",
     "crates/pi-mono",
     "crates/pi-chord",
     "crates/pi-client",
@@ -51,6 +52,7 @@ clap_complete = "4.5.66"
 # @earendil-works/pi packages).
 pi-ai = { path = "crates/pi-ai", version = "0.1.0" }
 pi-agent-core = { path = "crates/pi-agent-core", version = "0.1.0" }
+pi-index-core = { path = "crates/pi-index-core", version = "0.1.0" }
 pi-coding-agent = { path = "crates/pi-coding-agent", version = "0.1.0" }
 pi-error = { path = "crates/pi-error", version = "0.1.0" }
 pi-tui = { path = "crates/pi-tui", version = "0.1.0" }

@@ -68,6 +68,7 @@ pbkdf2 = { workspace = true }
 pdf-extract = { workspace = true }
 pi-ai = { workspace = true }
 pi-agent-core = { workspace = true }
+pi-index-core = { workspace = true }
 # Round 27.1: re-house `buffer_shim.rs` (Node Buffer polyfill source) inside
 # `pi-chord`. Add the workspace dep so call sites can switch from
 # `crate::buffer_shim` to `pi_chord::buffer_shim`.

@@ -138,11 +138,7 @@ impl ExtensionIndex {
             return Vec::new();
         }
 
-        let tokens = q
-            .split_whitespace()
-            .map(|t| t.trim().to_ascii_lowercase())
-            .filter(|t| !t.is_empty())
-            .collect::<Vec<_>>();
+        let tokens = pi_index_core::tokenize(q);
         if tokens.is_empty() {
             return Vec::new();
         }
@@ -771,36 +767,17 @@ fn dedupe_sorted(values: Vec<String>) -> Vec<String> {
 }
 
 fn score_entry(entry: &ExtensionIndexEntry, tokens: &[String]) -> i64 {
-    let name = entry.name.to_ascii_lowercase();
-    let id = entry.id.to_ascii_lowercase();
-    let description = entry
-        .description
-        .as_ref()
-        .map(|s| s.to_ascii_lowercase())
-        .unwrap_or_default();
-    let tags = entry
-        .tags
-        .iter()
-        .map(|t| t.to_ascii_lowercase())
-        .collect::<Vec<_>>();
-
-    let mut score: i64 = 0;
-    for token in tokens {
-        if name.contains(token) {
-            score += 300;
-        }
-        if id.contains(token) {
-            score += 120;
-        }
-        if description.contains(token) {
-            score += 60;
-        }
-        if tags.iter().any(|t| t.contains(token)) {
-            score += 180;
-        }
-    }
-
-    score
+    let query = tokens.join(" ");
+    let tags = entry.tags.join(" ");
+    pi_index_core::relevance_score(
+        &query,
+        [
+            (entry.name.as_str(), 300),
+            (entry.id.as_str(), 120),
+            (entry.description.as_deref().unwrap_or_default(), 60),
+            (tags.as_str(), 180),
+        ],
+    )
 }
 
 #[derive(Debug, Clone)]

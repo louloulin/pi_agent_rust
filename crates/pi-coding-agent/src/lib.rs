@@ -12,6 +12,7 @@
 
 // Inlined from the Phase-1 leaves (Round 17).
 pub use pi_agent_core::advisor;
+pub use pi_index_core;
 pub mod cli;
 pub mod conformance;
 pub mod context_files;

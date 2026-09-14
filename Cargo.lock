@@ -5640,6 +5640,7 @@ dependencies = [
  "futures",
  "pi-ai",
  "pi-error",
+ "pi-protocol",
  "proptest",
  "serde",
  "serde_json",
@@ -5694,6 +5695,7 @@ dependencies = [
  "futures",
  "pi-ai",
  "pi-error",
+ "pi-tui",
  "proptest",
  "regex",
  "rustix",
@@ -5763,6 +5765,7 @@ dependencies = [
  "pi-ai",
  "pi-chord",
  "pi-error",
+ "pi-index-core",
  "pi-protocol",
  "pi-session-backends",
  "pi-telemetry",
@@ -5826,6 +5829,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-index-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "pi-mono"
 version = "0.4.0"
 dependencies = [
@@ -5867,11 +5877,14 @@ dependencies = [
  "anyhow",
  "asupersync",
  "base64 0.23.1",
+ "chrono",
  "flate2",
  "pi-ai",
  "pi-coding-agent",
+ "pi-error",
  "serde",
  "serde_json",
+ "sha2 0.11.0",
  "tempfile",
  "tracing",
 ]

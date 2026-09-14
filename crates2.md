@@ -1195,7 +1195,7 @@ Round 30 后(收尾)       : ~64%
 3. 新增 `compare_version` 与 `VersionComparison`，统一语义版本范围比较和非法输入的 fail-closed 结果。
 4. 将新 crate 纳入 workspace，并让 `pi-coding-agent` 声明依赖；HTTP 调用、auth、文件加载仍留在 `pi-coding-agent`，避免核心 crate 反向耦合运行时。
 
-**验证:** 待执行 `dsr quality --tool pi_agent_rust`。
+**验证:** `cargo test -p pi-model-core`：2 passed；`git diff --check` 通过。项目规定的 `dsr quality --tool pi_agent_rust` 已尝试，但当前环境无 `dsr` 命令（exit 127）。
 
 **本轮进度:** model registry 核心纯逻辑拆分完成；现有运行时注册表接线仍属于后续迁移工作。
 

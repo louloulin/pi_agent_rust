@@ -325,6 +325,7 @@ pub mod terminal_images;
 pub mod theme;
 #[doc(hidden)]
 pub mod todo;
+pub use pi_todo_core;
 #[doc(hidden)]
 pub mod token_count;
 pub mod tools;

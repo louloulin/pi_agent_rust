@@ -1,0 +1,11 @@
+[package]
+name = "pi-todo-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure todo/task-list state machine for Pi"
+license-file = "../../LICENSE"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"

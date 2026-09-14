@@ -52,3 +52,33 @@ pub struct TrustInputs {
     pub env_override: Option<String>,
     pub interactive: bool,
 }
+
+/// Pure persisted trust decisions keyed by workspace and surface digest.
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct TrustDecisionBook {
+    #[serde(default, rename = "workspaces")]
+    records: std::collections::BTreeMap<String, TrustDecisionRecord>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TrustDecisionRecord {
+    pub digest: String,
+    pub decision: TrustDecision,
+    #[serde(default)]
+    pub updated_at: String,
+}
+
+impl TrustDecisionBook {
+    #[must_use]
+    pub fn decision(&self, workspace: &str, digest: &str) -> Option<TrustDecision> {
+        self.records.get(workspace)
+            .filter(|record| record.digest == digest)
+            .map(|record| record.decision)
+    }
+
+    pub fn record(&mut self, workspace: impl Into<String>, digest: impl Into<String>, decision: TrustDecision, updated_at: impl Into<String>) {
+        self.records.insert(workspace.into(), TrustDecisionRecord {
+            digest: digest.into(), decision, updated_at: updated_at.into(),
+        });
+    }
+}

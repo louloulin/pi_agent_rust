@@ -30,7 +30,6 @@ use pi_chord::workspace_trust::*;
 use pi_error::{Error, Result};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest as _, Sha256};
-use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::Read as _;
 use std::path::{Path, PathBuf};
@@ -257,21 +256,6 @@ fn collect_files_recursive(root: &Path, dir: &Path, out: &mut Vec<FoundSurfaceFi
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct TrustRecord {
-    digest: String,
-    decision: TrustDecision,
-    #[serde(default)]
-    updated_at: String,
-}
-
-#[derive(Debug, Default, Serialize, Deserialize)]
-struct TrustStoreFile {
-    #[serde(default)]
-    version: u32,
-    #[serde(default)]
-    workspaces: BTreeMap<String, TrustRecord>,
-}
-
 /// Persistent map of workspace path -> (surface digest, decision).
 #[derive(Debug)]
 pub struct WorkspaceTrustStore {
@@ -304,22 +288,17 @@ impl WorkspaceTrustStore {
     #[must_use]
     pub fn decision(&self, workspace: &str, digest: &str) -> Option<TrustDecision> {
         self.data
-            .workspaces
-            .get(workspace)
-            .filter(|record| record.digest == digest)
-            .map(|record| record.decision)
+            .book.decision(workspace, digest)
     }
 
     /// Record a decision for `workspace` at `digest` and save the store.
     pub fn record(&mut self, workspace: &str, digest: &str, decision: TrustDecision) -> Result<()> {
         self.data.version = TRUST_STORE_VERSION;
-        self.data.workspaces.insert(
-            workspace.to_string(),
-            TrustRecord {
-                digest: digest.to_string(),
-                decision,
-                updated_at: chrono::Utc::now().to_rfc3339(),
-            },
+        self.data.book.record(
+            workspace,
+            digest,
+            decision,
+            chrono::Utc::now().to_rfc3339(),
         );
         if let Some(parent) = self.path.parent() {
             std::fs::create_dir_all(parent).map_err(|err| {

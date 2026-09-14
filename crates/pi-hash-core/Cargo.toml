@@ -1,0 +1,18 @@
+[package]
+name = "pi-hash-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure hashing and binary encoding primitives for pi.rs"
+license = "MIT"
+repository = "https://github.com/louloulin/pi_agent_rust"
+
+[dependencies]
+base64 = { workspace = true }
+blake3 = { workspace = true }
+md-5 = { workspace = true }
+sha1 = { workspace = true }
+sha2 = { workspace = true }
+
+[lints]
+workspace = true

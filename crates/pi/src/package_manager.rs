@@ -2547,20 +2547,8 @@ fn temporary_dir(prefix: &str, suffix: Option<&str>) -> PathBuf {
     dir
 }
 
-/// Lowercase hex encoding of `bytes`.
-///
-/// Matches the old `{:x}` formatting of digest outputs byte-for-byte. Shared
-/// by every module that renders a digest as hex, since digest 0.11 output
-/// arrays no longer impl `LowerHex`.
-pub fn hex_encode(bytes: &[u8]) -> String {
-    const LUT: &[u8; 16] = b"0123456789abcdef";
-    let mut out = String::with_capacity(bytes.len().saturating_mul(2));
-    for &b in bytes {
-        out.push(LUT[(b >> 4) as usize] as char);
-        out.push(LUT[(b & 0x0f) as usize] as char);
-    }
-    out
-}
+/// Lowercase hex encoding shared by package and runtime digest paths.
+pub use pi_hash_core::encode_hex as hex_encode;
 
 fn resolve_path_from_base(input: &str, base_dir: &Path) -> PathBuf {
     let trimmed = input.trim();

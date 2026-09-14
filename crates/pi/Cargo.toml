@@ -91,6 +91,7 @@ clap = { workspace = true }
 clap_complete = { workspace = true }
 pi-agent-cx = { workspace = true }
 pi-html-core = { workspace = true }
+pi-hash-core = { workspace = true }
 pi-bpe = { workspace = true }
 pi-buffer-shim = { workspace = true }
 pi-cli = { workspace = true, features = ["ftui"] }

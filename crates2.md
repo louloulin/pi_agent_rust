@@ -1,11 +1,12 @@
-# pi.rs 模块化进度（Round 77）
+# pi.rs 模块化进度（Round 78）
 
-## Round 77 — HTML 转义与 URL 组件核心拆分 ✅
+## Round 78 — 哈希与编码核心拆分 ✅
 
-- 新增 `pi-html-core`，承载无运行时/UI 依赖的 HTML escape、百分号 URL 编解码、query pair 解析、OAuth code/state 片段解析和 URL query 构建逻辑。
-- `pi`/coding-agent 保留 session HTML 渲染、OAuth 网络/凭据流程与 UI；后续接入 facade 时仅依赖 `pi-html-core` 的纯函数，不反向依赖 runtime。
-- 新增 4 个单元测试，覆盖 HTML 特殊字符、Unicode URL 编解码、query/fragment OAuth 输入和 query URL 构建。
+- 新增 `pi-hash-core`，承载无运行时/文件 IO 依赖的 SHA-1/SHA-256/SHA-384/SHA-512、MD5、BLAKE3 摘要实现与 `HashDigest` trait。
+- 提供统一的算法解析、原始摘要、十六进制和标准 base64 编解码 API；非法 hex 输入显式返回错误。
+- `coding-agent`/`pi` 保留 agent runtime、文件 IO 和 QuickJS crypto hostcall 编排；核心 crate 不反向依赖 runtime。
+- 单元测试覆盖算法名称归一化、SHA-256/MD5/BLAKE3 已知向量、hex/base64 往返及非法输入。
 
-验证：待完成 wiring 后运行 `cargo fmt --all -- --check`、`cargo test -p pi-html-core`、`cargo check -p pi --lib`。
+验证：`cargo fmt --all -- --check`、`cargo test -p pi-hash-core`、`cargo check -p pi --lib`。
 
-进度：Round 77 核心 crate 已创建；当前整体模块化进度约 76%，HTML/OAuth 逻辑 facade 接入尚未完成。
+进度：Round 78 哈希摘要核心 crate 已创建并加入 workspace；当前整体模块化进度约 77%。

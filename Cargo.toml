@@ -7,6 +7,7 @@ members = [
     "crates/pi",
     "crates/pi-agent-cx",
     "crates/pi-html-core",
+    "crates/pi-hash-core",
     "crates/pi-bpe",
     "crates/pi-mono",
     "crates/pi-buffer-shim",
@@ -69,6 +70,7 @@ clap_complete = "4.5.66"
 # Stage 2 leaf crates (workspace-internal path deps, single source of truth).
 pi-agent-cx = { path = "crates/pi-agent-cx", version = "0.1.0" }
 pi-html-core = { path = "crates/pi-html-core", version = "0.1.0" }
+pi-hash-core = { path = "crates/pi-hash-core", version = "0.1.0" }
 pi-bpe = { path = "crates/pi-bpe", version = "0.1.0" }
 pi-buffer-shim = { path = "crates/pi-buffer-shim", version = "0.1.0" }
 pi-cli = { path = "crates/pi-cli", version = "0.1.0" }
@@ -173,6 +175,7 @@ flate2 = "1.1.9"
 sha2 = "0.11"
 sha1 = "0.11"
 md-5 = "0.11"
+blake3 = "1.8.2"
 hmac = "0.13"
 pbkdf2 = { version = "0.13.0", features = ["hmac"] }
 scrypt = { version = "0.12.0", default-features = false }

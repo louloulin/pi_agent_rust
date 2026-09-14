@@ -5590,6 +5590,7 @@ dependencies = [
  "pi-file-lock",
  "pi-flake-classifier",
  "pi-gallery",
+ "pi-hash-core",
  "pi-hostcall-io-uring-lane",
  "pi-hostcall-s3-fifo",
  "pi-hostcall-superinstructions",
@@ -5799,6 +5800,17 @@ version = "0.1.0"
 dependencies = [
  "serde",
  "serde_json",
+]
+
+[[package]]
+name = "pi-hash-core"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "blake3",
+ "md-5 0.11.0",
+ "sha1 0.11.0",
+ "sha2 0.11.0",
 ]
 
 [[package]]

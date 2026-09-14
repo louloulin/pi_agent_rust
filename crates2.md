@@ -1187,6 +1187,21 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
+### Round 43 — `theme.rs` → `pi-tui` ✅(theme schema and discovery)
+
+**做了什么:**
+1. 将 `crates/pi-coding-agent/src/theme.rs` 迁移到 `crates/pi-tui/src/theme.rs`，保留主题 JSON schema、内置主题、颜色校验、文件发现/加载、终端背景检测与 TUI 样式生成。
+2. 用显式 `ThemeRoots` 与 `Theme::resolve(spec, roots, cwd)` 替代对 `pi-coding-agent::Config` 的反向依赖，`pi-coding-agent` 通过 `pub use pi_tui::theme` 保持原有模块路径。
+3. 更新 interactive、session picker、main 的调用点；`pi-tui` 新增主题所需依赖与 `tui` feature，资源大小限制和 `parse_hex_color` 作为跨 crate API 暴露。
+
+**验证:**
+- `cargo check -p pi-tui`:✅
+- `cargo check -p pi-coding-agent --lib`:✅（188 warnings，基线警告）
+- `cargo test -p pi-tui theme --lib`:⚠️ 被现有 `autocomplete` 测试初始化缺少 `models` 字段阻塞，与主题迁移无关
+- `git diff --check`:✅
+
+**LOC 迁移:** 约 1,550 LOC。
+
 ### Round 37 — `agent_cx.rs` → `pi-agent-core` ✅(capability-scoped context)
 
 **做了什么:**

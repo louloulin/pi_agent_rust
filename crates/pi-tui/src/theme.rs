@@ -4,7 +4,6 @@
 //! - Global themes: `~/.pi/agent/themes/*.json`
 //! - Project themes: `<cwd>/.pi/themes/*.json`
 
-use crate::config::Config;
 use pi_error::{Error, Result};
 #[cfg(feature = "tui")]
 use glamour::{Style as GlamourStyle, StyleConfig as GlamourStyleConfig};
@@ -21,7 +20,7 @@ use std::path::{Path, PathBuf};
 /// cannot allocate an arbitrarily large file while resource categories load in
 /// parallel. Readers consume at most one byte beyond the limit to distinguish
 /// an exact-limit file from an oversized one.
-pub(crate) const MAX_RESOURCE_FILE_BYTES: usize = 1024 * 1024;
+pub const MAX_RESOURCE_FILE_BYTES: usize = 1024 * 1024;
 
 fn read_theme_file_bounded(path: &Path) -> Result<String> {
     let file = fs::File::open(path).map_err(|err| {
@@ -173,10 +172,10 @@ pub struct ThemeRoots {
 
 impl ThemeRoots {
     #[must_use]
-    pub fn from_cwd(cwd: &Path) -> Self {
+    pub fn new(global_dir: PathBuf, project_dir: PathBuf) -> Self {
         Self {
-            global_dir: Config::global_dir(),
-            project_dir: cwd.join(Config::project_dir()),
+            global_dir,
+            project_dir,
         }
     }
 }
@@ -195,8 +194,8 @@ impl Theme {
     ///
     /// Falls back to dark on error.
     #[must_use]
-    pub fn resolve(config: &Config, cwd: &Path) -> Self {
-        let Some(spec) = config.theme.as_deref() else {
+    pub fn resolve(spec: Option<&str>, roots: &ThemeRoots, cwd: &Path) -> Self {
+        let Some(spec) = spec else {
             return Self::detected();
         };
         let spec = spec.trim();
@@ -204,7 +203,7 @@ impl Theme {
             return Self::detected();
         }
 
-        match Self::resolve_spec(spec, cwd) {
+        match Self::resolve_spec_with_roots(spec, roots, cwd) {
             Ok(theme) => theme,
             Err(err) => {
                 tracing::warn!("Failed to load theme '{spec}': {err}");
@@ -221,6 +220,10 @@ impl Theme {
     /// - Theme name: resolves via [`Self::load_by_name`]
     /// - File path: resolves via [`Self::load`] (absolute or cwd-relative, supports `~/...`)
     pub fn resolve_spec(spec: &str, cwd: &Path) -> Result<Self> {
+        Self::resolve_spec_with_roots(spec, &ThemeRoots::new(PathBuf::new(), PathBuf::new()), cwd)
+    }
+
+    pub fn resolve_spec_with_roots(spec: &str, roots: &ThemeRoots, cwd: &Path) -> Result<Self> {
         let spec = spec.trim();
         if spec.is_empty() {
             return Err(Error::validation("Theme spec is empty"));
@@ -252,7 +255,7 @@ impl Theme {
             return Self::load(&path);
         }
 
-        Self::load_by_name(spec, cwd)
+        Self::load_by_name_with_roots(spec, roots)
     }
 
     #[must_use]
@@ -368,7 +371,10 @@ impl Theme {
     /// Discover available theme JSON files.
     #[must_use]
     pub fn discover_themes(cwd: &Path) -> Vec<PathBuf> {
-        Self::discover_themes_with_roots(&ThemeRoots::from_cwd(cwd))
+        Self::discover_themes_with_roots(&ThemeRoots::new(
+            dirs::home_dir().unwrap_or_default().join(".pi/agent"),
+            cwd.join(".pi"),
+        ))
     }
 
     /// Discover available theme JSON files using explicit roots.
@@ -391,7 +397,10 @@ impl Theme {
 
     /// Load a theme by name, searching global and project theme directories.
     pub fn load_by_name(name: &str, cwd: &Path) -> Result<Self> {
-        Self::load_by_name_with_roots(name, &ThemeRoots::from_cwd(cwd))
+        Self::load_by_name_with_roots(name, &ThemeRoots::new(
+            dirs::home_dir().unwrap_or_default().join(".pi/agent"),
+            cwd.join(".pi"),
+        ))
     }
 
     /// Load a theme by name using explicit roots.
@@ -665,7 +674,7 @@ fn resolve_theme_path(spec: &str, cwd: &Path) -> PathBuf {
     }
 }
 
-pub(crate) fn parse_hex_color(value: &str) -> Option<(u8, u8, u8)> {
+pub fn parse_hex_color(value: &str) -> Option<(u8, u8, u8)> {
     let value = value.trim();
     let hex = value.strip_prefix('#')?;
     if hex.len() != 6 || !hex.is_ascii() {
@@ -907,12 +916,9 @@ mod tests {
 
     #[test]
     fn resolve_falls_back_to_dark_for_invalid_spec() {
-        let cfg = Config {
-            theme: Some("does-not-exist".to_string()),
-            ..Default::default()
-        };
         let cwd = tempfile::tempdir().expect("tempdir");
-        let resolved = Theme::resolve(&cfg, cwd.path());
+        let cfg = ThemeRoots::new(PathBuf::new(), PathBuf::new());
+        let resolved = Theme::resolve(Some("does-not-exist"), &cfg, cwd.path());
         assert_eq!(resolved.name, "dark");
     }
 
@@ -924,34 +930,25 @@ mod tests {
 
     #[test]
     fn resolve_auto_detects_when_no_theme_set() {
-        let cfg = Config {
-            theme: None,
-            ..Default::default()
-        };
         let cwd = tempfile::tempdir().expect("tempdir");
-        let resolved = Theme::resolve(&cfg, cwd.path());
+        let cfg = ThemeRoots::new(PathBuf::new(), PathBuf::new());
+        let resolved = Theme::resolve(None, &cfg, cwd.path());
         assert_eq!(resolved.name, Theme::detected().name);
     }
 
     #[test]
     fn resolve_auto_detects_when_theme_is_empty() {
-        let cfg = Config {
-            theme: Some(String::new()),
-            ..Default::default()
-        };
         let cwd = tempfile::tempdir().expect("tempdir");
-        let resolved = Theme::resolve(&cfg, cwd.path());
+        let cfg = ThemeRoots::new(PathBuf::new(), PathBuf::new());
+        let resolved = Theme::resolve(Some(""), &cfg, cwd.path());
         assert_eq!(resolved.name, Theme::detected().name);
     }
 
     #[test]
     fn resolve_auto_detects_when_theme_is_whitespace() {
-        let cfg = Config {
-            theme: Some("   ".to_string()),
-            ..Default::default()
-        };
         let cwd = tempfile::tempdir().expect("tempdir");
-        let resolved = Theme::resolve(&cfg, cwd.path());
+        let cfg = ThemeRoots::new(PathBuf::new(), PathBuf::new());
+        let resolved = Theme::resolve(Some("   "), &cfg, cwd.path());
         assert_eq!(resolved.name, Theme::detected().name);
     }
 

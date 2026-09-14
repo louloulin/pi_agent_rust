@@ -29,4 +29,5 @@ pub mod gallery;
 pub mod overlay_system;
 pub mod terminal_images;
 pub mod text_utils;
+pub mod theme;
 pub mod tui;

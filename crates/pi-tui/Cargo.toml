@@ -12,6 +12,7 @@ workspace = true
 # Round 28.2: tui.rs gates rich_rust's syntax-highlighting renderer behind a
 # feature so consumers that don't need code blocks can skip the cost.
 default = []
+tui = ["dep:glamour", "dep:lipgloss"]
 syntax-highlighting = []
 
 [dependencies]
@@ -48,3 +49,10 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 # gallery.rs (Round 30.3): visual component gallery harness uses
 # serde_json in the Debug impl fallback (`render_report_json`).
+# theme.rs (Round 43): theme schema, discovery, validation, and rendering.
+tracing = { workspace = true }
+pi-error = { workspace = true }
+tempfile = { workspace = true }
+proptest = { workspace = true }
+glamour = { workspace = true, optional = true }
+lipgloss = { workspace = true, optional = true }

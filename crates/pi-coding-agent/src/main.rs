@@ -2539,7 +2539,7 @@ async fn run(
                 approval_state: Some(approval_state.clone()),
                 ..Default::default()
             };
-            let theme = pi_coding_agent::theme::Theme::resolve(&config, &cwd);
+            let theme = pi_coding_agent::theme::Theme::resolve(config.theme.as_deref(), &pi_coding_agent::theme::ThemeRoots::new(Config::global_dir(), cwd.join(Config::project_dir())), &cwd);
             let ftui_models = model_registry
                 .get_available()
                 .into_iter()

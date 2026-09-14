@@ -1566,7 +1566,7 @@ After approving access in the browser, press Enter in Pi to complete login."
                 self.autocomplete.provider.set_catalog(autocomplete_catalog);
                 self.autocomplete.close();
                 self.resources = resources;
-                self.apply_theme(Theme::resolve(&self.config, &self.cwd));
+                self.apply_theme(Theme::resolve(self.config.theme.as_deref(), &crate::theme::ThemeRoots::new(crate::config::Config::global_dir(), self.cwd.join(crate::config::Config::project_dir())), &self.cwd));
                 self.agent_state = AgentState::Idle;
                 self.current_tool = None;
                 self.current_tool_id = None;

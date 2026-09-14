@@ -317,7 +317,7 @@ pub async fn pick_session(override_dir: Option<&Path>) -> Option<Session> {
     }
 
     let config = Config::load().unwrap_or_default();
-    let theme = Theme::resolve(&config, &cwd);
+    let theme = Theme::resolve(config.theme.as_deref(), &crate::theme::ThemeRoots::new(Config::global_dir(), cwd.join(Config::project_dir())), &cwd);
     let picker = SessionPicker::with_theme_and_root(sessions, &theme, base_dir.clone());
 
     // Run the TUI

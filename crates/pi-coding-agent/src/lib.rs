@@ -105,7 +105,7 @@ pub mod pi_wasm;
 pub mod resources;
 pub mod security_scan;
 pub mod semantic_workspace_graph;
-pub mod theme;
+pub use pi_tui::theme;
 pub mod todo;
 pub mod tools;
 pub mod usage;

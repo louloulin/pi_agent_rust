@@ -2822,7 +2822,7 @@ impl PiApp {
         let (term_width, term_height) =
             terminal::size().map_or((80, 24), |(w, h)| (w as usize, h as usize));
 
-        let theme = Theme::resolve(&config, &cwd);
+        let theme = Theme::resolve(config.theme.as_deref(), &crate::theme::ThemeRoots::new(crate::config::Config::global_dir(), cwd.join(crate::config::Config::project_dir())), &cwd);
         let styles = theme.tui_styles();
         let mut markdown_style = theme.glamour_style_config();
         markdown_style.code_block.block.margin = Some(config.markdown_code_block_indent() as usize);

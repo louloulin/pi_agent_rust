@@ -84,7 +84,7 @@ pi-session-backends = { workspace = true }
 # Round 28.1: re-house `terminal_images.rs` inside `pi-tui`. Add the workspace
 # dep so call sites can switch from `crate::terminal_images` to
 # `pi_tui::terminal_images`.
-pi-tui = { workspace = true }
+pi-tui = { workspace = true, features = ["tui"] }
 pi-telemetry = { workspace = true }
 portable-pty = { workspace = true }
 proptest = { workspace = true, optional = true }

@@ -5451,6 +5451,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-delight"
+version = "0.1.0"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "pi-time"
 version = "0.1.0"
 dependencies = [
@@ -5508,6 +5515,7 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
+ "pi-delight",
  "pi-time",
  "portable-pty",
  "pprof",

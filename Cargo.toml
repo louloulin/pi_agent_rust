@@ -1,5 +1,5 @@
 [workspace]
-members = ["crates/pi-time"]
+members = ["crates/pi-time", "crates/pi-delight"]
 
 [package]
 name = "pi_agent_rust"
@@ -207,6 +207,7 @@ path = "examples/test_time.rs"
 
 [dependencies]
 pi-time = { path = "crates/pi-time" }
+pi-delight = { path = "crates/pi-delight" }
 # CLI
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"

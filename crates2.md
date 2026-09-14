@@ -1216,7 +1216,19 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 40 — `model_routing.rs` → `pi-chord` ✅(RoutingModel trait seam)
+### Round 62 — `hostcall_amac.rs` 协议边界拆分 ✅
+
+**做了什么:**
+1. 将 `HostcallKind` / `HostcallRequest` 迁入 `crates/pi-protocol/src/hostcall.rs`，由 `pi-coding-agent::extensions_js` re-export，保留旧 API facade。
+2. 将 `hostcall_amac.rs`（约 1,460 LOC）迁入 `pi-chord`，依赖改为 `pi-protocol` 请求类型与 `pi-agent-core::scheduler::HostcallOutcome`。
+3. `pi-coding-agent` 通过 `pub use pi_chord::hostcall_amac` 保留兼容路径。
+
+**验证:**
+- 当前环境无 `cargo` / `rustc`，无法执行格式化或编译检查；需补跑 `cargo fmt --all -- --check`、`cargo check -p pi-protocol`、`cargo check -p pi-chord`、`cargo check -p pi-coding-agent`。
+
+**LOC 迁移:** 约 1,460 LOC，另迁移约 32 LOC 协议类型。
+
+**进度:** Round 62 完成。本文“约 65%”是路线图估算：分母为第 1–12 节多 crate 目标模块范围，分子为 Round 24–30 已记录的归属迁移、依赖边界与 facade 兼容目标；第 15 节 Round 30 后约 64% 取整为约 65%。不代表 LOC 百分比或编译通过率。
 
 **做了什么:**
 1. `git mv crates/pi-coding-agent/src/model_routing.rs crates/pi-chord/src/model_routing.rs`（710 LOC）
@@ -1398,3 +1410,17 @@ Round 30 后(收尾)       : ~64%
 **LOC 迁移:** 188 LOC(`pi-coding-agent/src/` → `pi-coding-agent/src/cli/`)。
 
 **Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。
+
+### Round 62 — `hostcall_amac.rs` 协议边界拆分 ✅
+
+**做了什么:**
+1. 将 `HostcallKind` / `HostcallRequest` 迁入 `crates/pi-protocol/src/hostcall.rs`，由 `pi-coding-agent::extensions_js` re-export，保留旧 API facade。
+2. 将 `hostcall_amac.rs`（约 1,460 LOC）迁入 `pi-chord`，依赖改为 `pi-protocol` 请求类型与 `pi-agent-core::scheduler::HostcallOutcome`。
+3. `pi-coding-agent` 通过 `pub use pi_chord::hostcall_amac` 保留兼容路径。
+
+**验证:**
+- 当前环境无 `cargo` / `rustc`，无法执行格式化或编译检查；需补跑 `cargo fmt --all -- --check`、`cargo check -p pi-protocol`、`cargo check -p pi-chord`、`cargo check -p pi-coding-agent`。
+
+**LOC 迁移:** 约 1,460 LOC，另迁移约 32 LOC 协议类型。
+
+**进度:** Round 62 完成。本文“约 65%”是路线图估算：分母为第 1–12 节多 crate 目标模块范围，分子为 Round 24–30 已记录的归属迁移、依赖边界与 facade 兼容目标；第 15 节 Round 30 后约 64% 取整为约 65%。不代表 LOC 百分比或编译通过率。

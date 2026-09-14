@@ -46,6 +46,10 @@ pi-ai = { workspace = true }
 # secrets.rs (Round 37) — credential detection and in-memory vault
 regex = { workspace = true }
 
+# hostcall_amac protocol boundary and scheduler outcome types
+pi-agent-core = { workspace = true }
+pi-protocol = { workspace = true }
+
 [dev-dependencies]
 serde_json = { workspace = true }
 proptest = { workspace = true }

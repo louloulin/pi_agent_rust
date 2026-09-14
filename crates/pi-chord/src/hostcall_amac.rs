@@ -11,9 +11,8 @@
 //! dispatch based on observed per-call timing telemetry as a proxy for LLC miss
 //! rates and stall cycles.
 
-use crate::extensions_js::HostcallKind;
-use crate::extensions_js::HostcallRequest;
 use pi_agent_core::scheduler::HostcallOutcome;
+use pi_protocol::{HostcallKind, HostcallRequest};
 use serde::{Deserialize, Serialize};
 
 // ── Configuration constants ──────────────────────────────────────────────

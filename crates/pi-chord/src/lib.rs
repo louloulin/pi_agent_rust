@@ -65,6 +65,7 @@ pub mod btw;
 pub mod buffer_shim;
 pub mod commit_split;
 pub mod crash;
+pub mod current_time;
 pub mod extension_inclusion;
 pub mod extension_license;
 pub mod extension_popularity;

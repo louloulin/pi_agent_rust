@@ -8,6 +8,18 @@
 
 ---
 
+## 0. `Round 51` 进展
+
+**做了什么:**
+1. 盘点 `current_time.rs`（276 LOC）：`TimeSnapshot` 的 chrono 快照/格式化/details 为纯 core；`CurrentTimeTool` 及 Tool/agent 适配保留在 coding-agent
+2. 新增 `crates/pi-chord/src/current_time.rs`，承载纯时间快照、RFC3339/offset/weekday/ISO-week 格式化与纯测试
+3. `pi-coding-agent/src/current_time.rs` 改为 `TimeSnapshot` re-export + `CurrentTimeTool` 兼容 adapter
+4. pi-chord 复用已有 chrono/serde_json 依赖，不引入新 runtime
+
+**验证:**
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` 待提交后执行
+
 ## 0. `Round 50` 进展
 
 **做了什么:**

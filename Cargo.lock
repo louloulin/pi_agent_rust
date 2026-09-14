@@ -5692,8 +5692,10 @@ dependencies = [
  "dirs",
  "filetime",
  "futures",
+ "pi-agent-core",
  "pi-ai",
  "pi-error",
+ "pi-protocol",
  "proptest",
  "regex",
  "rustix",
@@ -5765,6 +5767,7 @@ dependencies = [
  "pi-evals",
  "pi-protocol",
  "pi-session-backends",
+ "pi-session-core",
  "pi-telemetry",
  "pi-tui",
  "portable-pty",
@@ -5880,6 +5883,14 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tracing",
+]
+
+[[package]]
+name = "pi-session-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

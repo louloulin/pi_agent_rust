@@ -13,33 +13,15 @@
 use std::collections::HashMap;
 use std::fmt;
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
+pub use pi_session_core::Checkpoint;
 use pi_error::Result;
 use pi_ai::model::{Message, UserContent, UserMessage};
 use crate::session::{CustomEntry, Session, SessionEntry, SessionMessage};
 
 /// Tool-result schema tag for checkpoint/rewind operations.
 pub const CHECKPOINT_SCHEMA: &str = "pi.checkpoint.v1";
-
-/// A checkpoint marker.
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct Checkpoint {
-    pub schema: String,
-    pub name: String,
-    pub note: Option<String>,
-    pub token_estimate: u64,
-    /// Active message count at mark time: the rewind span boundary.
-    pub message_count: usize,
-    pub at_ms: i64,
-    /// Session-tree entry id of the checkpoint marker itself. Derived from
-    /// the tree at mark/find time (never stored inside the entry data);
-    /// rewind entries reference it so context rebuilds can replay the
-    /// collapse durably.
-    #[serde(skip_serializing, default)]
-    pub entry_id: Option<String>,
-}
 
 fn now_ms() -> i64 {
     std::time::SystemTime::now()

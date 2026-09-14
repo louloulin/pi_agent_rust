@@ -7896,7 +7896,7 @@ async fn run_first_time_setup(
 ) -> Result<bool> {
     let console = PiConsole::new();
 
-    console.render_rule(Some("Welcome to Pi"));
+    console.render_rule(Some(pi_chord::banner::WELCOME_TITLE));
     match startup_error {
         StartupError::NoModelsAvailable { .. } => {
             console.print_markup("[bold]No authenticated models are available yet.[/]\n");

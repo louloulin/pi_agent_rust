@@ -64,6 +64,7 @@ pub mod ast_tools;
 pub mod auth;
 pub mod bash_mediation;
 pub mod browser;
+pub use pi_chord::banner;
 pub mod btw;
 pub mod checkpoint;
 // Round 30.5: `completions` re-housed at `cli/completions` (sibling to

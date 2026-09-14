@@ -8,9 +8,23 @@
 
 ---
 
-## 0. `Round 45` 进展
+## 0. `Round 46` 进展
 
 **做了什么:**
+1. 确认 `banner.rs`、`clipboard.rs`、`brand.rs` 均不存在；按 fallback 从现有启动 banner 使用点提取独立模块
+2. 新增 `crates/pi-chord/src/banner.rs`，提供 `WELCOME_TITLE` 与 `WELCOME_GREETING` 常量及测试
+3. `pi-chord/src/lib.rs` 导出 banner；`pi-coding-agent` 通过 `pub use pi_chord::banner` 保留兼容路径
+4. first-time setup 使用共享 `WELCOME_TITLE`，显示行为不变
+
+**验证:**
+- `which cargo` / `cargo --version`：`cargo: command not found`
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` ✅
+- `git ls-tree HEAD crates/pi-chord/src/banner.rs` ✅
+- `grep -rn 'banner' crates/pi-coding-agent/src | grep -v pi_chord` ✅，仅剩 UI 错误 banner/布局等非启动常量引用
+- `git diff --stat HEAD~1`：4 files changed, 25 insertions(+), 1 deletion(-)
+
+
 1. 盘点 `session_import.rs` 原依赖：`Session`（写入/索引/codec 聚合）、`Config::sessions_dir`、`package_manager::hex_encode`；转换逻辑本身只依赖 std/serde/pi-ai/sha2/chrono
 2. 将 627 LOC 外国会话转换引擎迁移至 `crates/pi-session-backends/src/session_import.rs`（当前 575 LOC，删除原 crate-coupled 测试块）
 3. 新增 `SessionImportFactory` 与 `SessionImportSink` trait seam；Store、Index、Projection、Codec 细节全部由宿主 adapter 持有

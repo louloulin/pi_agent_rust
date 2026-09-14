@@ -1187,6 +1187,18 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
+### Round 71 — model registry core → `pi-model-core` ✅
+
+**做了什么:**
+1. 新增 `crates/pi-model-core`，只包含无副作用的模型描述 `ModelDescriptor` / `ModelCost` / `InputType`。
+2. 新增 `CapabilitySet::negotiate`，实现模型级 capability 覆盖 provider 默认值的纯协商逻辑。
+3. 新增 `compare_version` 与 `VersionComparison`，统一语义版本范围比较和非法输入的 fail-closed 结果。
+4. 将新 crate 纳入 workspace，并让 `pi-coding-agent` 声明依赖；HTTP 调用、auth、文件加载仍留在 `pi-coding-agent`，避免核心 crate 反向耦合运行时。
+
+**验证:** 待执行 `dsr quality --tool pi_agent_rust`。
+
+**本轮进度:** model registry 核心纯逻辑拆分完成；现有运行时注册表接线仍属于后续迁移工作。
+
 ### Round 35 — `status_line.rs` → `pi-chord` ✅(Powerline status line)
 
 **做了什么:**

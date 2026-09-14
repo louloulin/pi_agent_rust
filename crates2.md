@@ -1262,4 +1262,4 @@ Round 30 后(收尾)       : ~64%
 
 新增 `pi-ext-manifest-core`，承载纯扩展清单 schema 模型、v1/v2 capability 校验和 semver API 版本协商；文件系统加载、entrypoint 解析及 agent runtime 仍留在 coding-agent。workspace 已注册该 crate，保留现有 facade 路径以便后续渐进迁移。
 
-验证：`cargo test -p pi-ext-manifest-core`、`cargo check -p pi-ext-manifest-core`、`git diff --check`。
+验证：`git diff --check` 已通过；当前执行环境没有 `cargo` / `rustc`，因此 `cargo test -p pi-ext-manifest-core` 与 `cargo check -p pi-ext-manifest-core` 需在具备 Rust toolchain 的环境补跑。

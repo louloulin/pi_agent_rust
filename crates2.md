@@ -8,6 +8,17 @@
 
 ---
 
+## 0. `Round 49` 进展
+
+**做了什么:**
+1. 确认 `version_check.rs` 已在 Round 33 将版本实现迁移到 `pi-chord::version`（历史提交 `8d463da83`）
+2. `pi-chord` 增加 `pub use version as check` 轻量兼容别名
+3. `pi-coding-agent/src/version_check.rs` 改为从 `pi_chord::check::*` 透传；保留唯一不可下沉的 `ClientHttpFetch` HTTP adapter
+
+**验证:**
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` ✅
+
 ## 0. `Round 48` 进展
 
 **做了什么:**

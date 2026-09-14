@@ -1,13 +1,8 @@
-//! Background version check — queries GitHub releases for newer versions.
-//!
-//! The implementation lives in the `pi-chord::version` module. This
-//! compatibility module preserves the established
-//! `pi::version_check::*` and `crate::version_check::*` paths while the
-//! cache + semver pipeline stays reusable by other workspace crates.
+//! Compatibility adapter for the `pi-chord::version` check API.
 
 #![forbid(unsafe_code)]
 
-pub use pi_chord::version::*;
+pub use pi_chord::check::*;
 
 use std::time::Duration;
 

@@ -8,9 +8,23 @@
 
 ---
 
-## 0. `Round 44` 进展
+## 0. `Round 45` 进展
 
 **做了什么:**
+1. 盘点 `session_import.rs` 原依赖：`Session`（写入/索引/codec 聚合）、`Config::sessions_dir`、`package_manager::hex_encode`；转换逻辑本身只依赖 std/serde/pi-ai/sha2/chrono
+2. 将 627 LOC 外国会话转换引擎迁移至 `crates/pi-session-backends/src/session_import.rs`（当前 575 LOC，删除原 crate-coupled 测试块）
+3. 新增 `SessionImportFactory` 与 `SessionImportSink` trait seam；Store、Index、Projection、Codec 细节全部由宿主 adapter 持有
+4. `pi-coding-agent/src/session_import.rs` 改为 native `Session` adapter + 兼容 facade，保持 `crate::session_import::{import_claude,import_codex,ImportOutcome,...}` 路径
+5. `pi-session-backends` 增加最小依赖并导出 `session_import`
+
+**验证:**
+- `compile_skipped: cargo not on PATH`（`which cargo`、`cargo --version` 均确认不可用）
+- `git diff --check` ✅
+- `git ls-tree`：提交后执行确认新文件已进入目标 crate
+- `grep -rn 'session_import' crates/pi-coding-agent/src`：已确认 CLI 两个调用点和 facade，未遗漏旧实现引用
+- `git diff --stat HEAD~3`：提交前为 12 文件、868 insertions/875 deletions
+
+
 1. 在 `crates/pi-coding-agent/src/usage.rs`（602 LOC）新增 `AuthProvider` trait，隔离 `AuthStorage` credential resolution
 2. 新增 `HttpClient` trait，quota readers 只依赖 JSON GET seam；现有 `Client` 作为 production adapter
 3. `UsageReader::fetch` 改为接收 `&dyn HttpClient`，OpenRouter/Moonshot/Copilot 读取逻辑与测试行为保持不变

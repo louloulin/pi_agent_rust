@@ -24,12 +24,13 @@ flate2 = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+sha2 = { workspace = true }
+chrono = { workspace = true }
+pi-error = { workspace = true }
 
-# Note: session_import.rs (Round 26.2) had to stay in pi-coding-agent for
-# this round because Session lives in pi-coding-agent and pulling
-# session_import into pi-session-backends would re-introduce the cycle
-# Round 18 broke. The migration will resume once a Session trait seam is
-# available.
+
+# session_import.rs (Round 45) depends only on SessionImportFactory/SessionImportSink
+# traits; the native Session adapter remains in pi-coding-agent.
 
 [dev-dependencies]
 # tests/session_persistence.rs (Round 26.2 integration test)

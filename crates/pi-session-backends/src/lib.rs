@@ -13,13 +13,10 @@
 //!   `pi-coding-agent ↔ pi-session-backends` cycle that would be introduced
 //!   by an in-crate `pub mod`)
 //!
-//! The remaining session / sqlite / picker files (`session.rs`,
-//! `session_index.rs`, `session_picker.rs`, `session_sqlite.rs`,
-//! `session_store_v2.rs`, `session_import.rs`) stay in `pi-coding-agent`
-//! for now; they will be migrated in later rounds once the inter-module
-//! dependency edges are analysed and broken with `EventSource` / `StoreKind`
-//! traits.
+//! Remaining session store files stay in `pi-coding-agent` until their
+//! storage seams are extracted; foreign-session conversion is now independent.
 
 #![forbid(unsafe_code)]
 
 pub mod compaction_snap;
+pub mod session_import;

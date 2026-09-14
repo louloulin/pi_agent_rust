@@ -1,0 +1,11 @@
+[package]
+name = "pi-current-time-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure wall-clock snapshot and formatting primitives for Pi"
+license = "MIT"
+
+[dependencies]
+chrono = "0.4"
+serde_json = "1"

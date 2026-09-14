@@ -8,6 +8,18 @@
 
 ---
 
+## 0. `Round 48` 进展
+
+**做了什么:**
+1. 盘点 `http_shim.rs`：431 LOC 全部为嵌入式 Node `http`/`https` JavaScript shim 字符串（STATUS_CODES、METHODS、request/response/header/body/cookie-like handling），不含 Rust reqwest/asupersync 客户端逻辑
+2. 将源码迁移至 `crates/pi-chord/src/http.rs`；pi-chord 不引入 reqwest，仅承载独立 JS 协议资产
+3. `pi-coding-agent` 通过 `pub use pi_chord::http as http_shim` 保留 extension compressor 的原调用路径
+4. `crates2.md` 已记录 Round 48
+
+**验证:**
+- `compile_skipped: cargo not on PATH`
+- `git diff --check` 待提交后执行
+
 ## 0. `Round 47` 进展
 
 **做了什么:**

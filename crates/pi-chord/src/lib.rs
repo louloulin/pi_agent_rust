@@ -77,6 +77,7 @@ pub mod hostcall_rewrite;
 pub mod hostcall_s3_fifo;
 pub mod hostcall_superinstructions;
 pub mod hostcall_trace_jit;
+pub mod http;
 pub mod model_routing;
 pub mod platform;
 pub mod secrets;

@@ -134,7 +134,7 @@ pub mod worktree_iso;
 pub mod compaction;
 pub mod compaction_worker;
 pub mod hostcall_amac;
-pub mod http_shim;
+pub use pi_chord::http as http_shim;
 pub mod migrations;
 pub mod session;
 pub mod session_import;

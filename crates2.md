@@ -1414,6 +1414,18 @@ Round 30 后(收尾)       : ~64%
 **进度:** 本轮完成 `crypto_shim` 纯协议/编码/错误分类 seam；整体模块化进度按既有记录仍为持续拆分阶段。
 
 
-- 将可复用的 `TimeSnapshot` 时钟领域类型、文本渲染和 details 序列化归位到 `pi-agent-core::current_time`。
-- `pi-coding-agent::current_time` 保留工具适配层，并 re-export `TimeSnapshot`，兼容既有调用路径。
-- 验证：`cargo check -p pi-agent-core` 通过；`pi-coding-agent` 检查已启动，但本地 180 秒前台预算耗尽于依赖编译阶段，未宣称通过。
+## Round 63 — `crypto_shim` runtime/key backend seam
+
+**做了什么:**
+1. 扩展 `crates/pi-protocol/src/crypto.rs`：新增 `CryptoBackend`、`KeyBackend` trait，统一 `CryptoError`/`CryptoErrorClass`，并把 AES-GCM key 与 KDF 输出长度校验提升为协议边界。
+2. `crates/pi-coding-agent/src/crypto_shim.rs` 增加 ring 适配实现：`RingCryptoBackend` 负责 AES-GCM/Ed25519，`RingKeyBackend` 负责 DER/SPKI key material；QuickJS hostcall 注册、OS entropy 与 JS module 仍留在 coding-agent。
+3. 未重做 Round 62 已迁移的 `encode_output`/`hex_lower`；shim 仍通过 `pi-protocol::crypto` facade 调用。
+
+**验证:**
+- `cargo test -p pi-protocol crypto --lib`：✅ 5 passed
+- `cargo check -p pi-coding-agent --lib`：受仓库既有 Windows/nightly 基线错误阻塞（`windows_by_handle` 及大量 unrelated inference errors），未出现 crypto seam 错误
+- `git diff --check`：✅
+
+**覆盖率:** 协议 crypto 模块当前 5 个单元测试，覆盖编码、错误分类、AES key 长度及 KDF 输出边界；QuickJS 端由既有 `tests/node_crypto_shim.rs` 覆盖，本轮未新增行为分支。
+
+**进度:** runtime/key backend seam 已完成；平台熵源和 QuickJS hostcall 仍按要求保留在 `pi-coding-agent`。

@@ -6,6 +6,7 @@
 //! JS module.
 
 use pbkdf2::pbkdf2_hmac;
+use pi_protocol::crypto::{CryptoBackend, CryptoError, KeyBackend};
 use ring::{
     aead::{AES_128_GCM, AES_256_GCM, Aad, LessSafeKey, Nonce, UnboundKey},
     signature::{Ed25519KeyPair, UnparsedPublicKey},
@@ -21,6 +22,85 @@ const KDF_MAX_SCRYPT_LOG_N: u8 = 20; // N <= 2^20
 const KDF_MAX_SCRYPT_R: u32 = 16;
 const KDF_MAX_SCRYPT_P: u32 = 16;
 const KDF_MAX_SCRYPT_MEM_BYTES: usize = 32 * 1024 * 1024; // 32MB
+
+/// Ring-backed implementation of the runtime-independent crypto seam.
+struct RingCryptoBackend;
+
+impl CryptoBackend for RingCryptoBackend {
+    fn aes_gcm_encrypt(
+        &self,
+        algorithm: &str,
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+        plaintext: &[u8],
+    ) -> Result<Vec<u8>, CryptoError> {
+        let cipher = aes_gcm_key(algorithm, key)
+            .map_err(|_| CryptoError::invalid_key("invalid AES-GCM key"))?;
+        let nonce = Nonce::try_assume_unique_for_key(iv)
+            .map_err(|_| CryptoError::invalid_input("AES-GCM IV must be exactly 12 bytes"))?;
+        let mut output = plaintext.to_vec();
+        let tag = cipher
+            .seal_in_place_separate_tag(nonce, Aad::from(aad), &mut output)
+            .map_err(|_| {
+                CryptoError::new(
+                    pi_protocol::crypto::CryptoErrorClass::DerivationFailed,
+                    "AES-GCM encryption failed",
+                )
+            })?;
+        output.extend_from_slice(tag.as_ref());
+        Ok(output)
+    }
+
+    fn aes_gcm_decrypt(
+        &self,
+        algorithm: &str,
+        key: &[u8],
+        iv: &[u8],
+        aad: &[u8],
+        ciphertext_and_tag: &[u8],
+    ) -> Result<Vec<u8>, CryptoError> {
+        let cipher = aes_gcm_key(algorithm, key)
+            .map_err(|_| CryptoError::invalid_key("invalid AES-GCM key"))?;
+        let nonce = Nonce::try_assume_unique_for_key(iv)
+            .map_err(|_| CryptoError::invalid_input("AES-GCM IV must be exactly 12 bytes"))?;
+        let mut input = ciphertext_and_tag.to_vec();
+        cipher
+            .open_in_place(nonce, Aad::from(aad), &mut input)
+            .map(|plain| plain.to_vec())
+            .map_err(|_| CryptoError::authentication_failed())
+    }
+
+    fn ed25519_sign(&self, private_key: &[u8], data: &[u8]) -> Result<Vec<u8>, CryptoError> {
+        let pair = Ed25519KeyPair::from_pkcs8(private_key)
+            .or_else(|_| Ed25519KeyPair::from_pkcs8_maybe_unchecked(private_key))
+            .map_err(|_| CryptoError::invalid_key("invalid Ed25519 PKCS#8 private key"))?;
+        Ok(pair.sign(data).as_ref().to_vec())
+    }
+
+    fn ed25519_verify(
+        &self,
+        public_key: &[u8],
+        data: &[u8],
+        signature: &[u8],
+    ) -> Result<bool, CryptoError> {
+        let verifier = UnparsedPublicKey::new(&ring::signature::ED25519, public_key);
+        Ok(verifier.verify(data, signature).is_ok())
+    }
+}
+
+struct RingKeyBackend;
+impl KeyBackend for RingKeyBackend {
+    type Key = Vec<u8>;
+    fn load_private_key(&self, encoded: &[u8]) -> Result<Self::Key, CryptoError> {
+        Ok(encoded.to_vec())
+    }
+    fn load_public_key(&self, encoded: &[u8]) -> Result<Self::Key, CryptoError> {
+        ed25519_public_key_from_spki(encoded)
+            .map(|key| key.to_vec())
+            .map_err(|_| CryptoError::invalid_key("invalid Ed25519 SPKI public key"))
+    }
+}
 
 /// Register all crypto hostcalls on the `QuickJS` global object.
 ///

@@ -4304,20 +4304,7 @@ fn record_conflict_signal(
 }
 
 fn git_porcelain_paths(output: &str) -> Vec<String> {
-    let mut paths = BTreeSet::new();
-    for line in output.lines().filter(|line| !line.trim().is_empty()) {
-        let raw_path = line.get(3..).unwrap_or(line).trim();
-        let path = raw_path
-            .rsplit(" -> ")
-            .next()
-            .unwrap_or(raw_path)
-            .trim_matches('"')
-            .trim();
-        if !path.is_empty() {
-            paths.insert(path.to_string());
-        }
-    }
-    paths.into_iter().collect()
+    pi_git_core::porcelain_paths(output)
 }
 
 fn select_swarm_conflict_fallback_lanes(
@@ -9376,27 +9363,14 @@ struct GitPorcelainSummary {
 }
 
 fn summarize_git_porcelain(output: &str) -> GitPorcelainSummary {
-    let mut summary = GitPorcelainSummary::default();
-    for line in output.lines().filter(|line| !line.trim().is_empty()) {
-        summary.total += 1;
-        let bytes = line.as_bytes();
-        let x = bytes.first().copied().unwrap_or(b' ');
-        let y = bytes.get(1).copied().unwrap_or(b' ');
-        if x.eq(&b'?') && y.eq(&b'?') {
-            summary.untracked += 1;
-            continue;
-        }
-        if x.ne(&b' ') {
-            summary.staged += 1;
-        }
-        if y.ne(&b' ') {
-            summary.unstaged += 1;
-        }
-        if x.eq(&b'D') || y.eq(&b'D') {
-            summary.deleted += 1;
-        }
+    let summary = pi_git_core::summarize_porcelain(output);
+    GitPorcelainSummary {
+        staged: summary.staged,
+        unstaged: summary.unstaged,
+        untracked: summary.untracked,
+        deleted: summary.deleted,
+        total: summary.total,
     }
-    summary
 }
 
 fn check_swarm_rch(findings: &mut Vec<Finding>) {

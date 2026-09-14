@@ -4593,14 +4593,7 @@ fn context_preview_workspace_id(cwd: &Path) -> String {
 fn context_preview_git_branch(cwd: &Path) -> Option<String> {
     let head_path = context_preview_git_head_path(cwd)?;
     let head = fs::read_to_string(head_path).ok()?;
-    let head = head.trim();
-    head.strip_prefix("ref: refs/heads/").map_or_else(
-        || {
-            head.get(..12.min(head.len()))
-                .and_then(|short| non_empty_string(&format!("detached:{short}")))
-        },
-        non_empty_string,
-    )
+    pi_git_core::parse_ref_name(&head)
 }
 
 fn context_preview_git_head_path(cwd: &Path) -> Option<PathBuf> {

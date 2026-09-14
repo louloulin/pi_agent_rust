@@ -1,0 +1,11 @@
+[package]
+name = "pi-git-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Structured parsing primitives for Pi's Git integration"
+license-file = "../../LICENSE"
+repository = "https://github.com/louloulin/pi_agent_rust"
+
+[lints]
+workspace = true

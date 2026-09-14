@@ -882,72 +882,7 @@ pub struct EventHookPayload {
     pub data: Option<Value>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LogPayload {
-    pub schema: String,
-    pub ts: String,
-    pub level: LogLevel,
-    pub event: String,
-    pub message: String,
-    pub correlation: LogCorrelation,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub source: Option<LogSource>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub data: Option<Value>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LogCorrelation {
-    pub extension_id: String,
-    pub scenario_id: String,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub session_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub run_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub artifact_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub tool_call_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub slash_command_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub event_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub host_call_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub rpc_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub trace_id: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub span_id: Option<String>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct LogSource {
-    pub component: LogComponent,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub host: Option<String>,
-    #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub pid: Option<u32>,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum LogComponent {
-    Capture,
-    Harness,
-    Runtime,
-    Extension,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "lowercase")]
-pub enum LogLevel {
-    Debug,
-    Info,
-    Warn,
-    Error,
-}
+pub use pi_log_core::{LogComponent, LogCorrelation, LogLevel, LogPayload, LogSink, LogSource};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ErrorPayload {
@@ -2025,7 +1960,7 @@ fn hash_hostcall_envelope(
 }
 
 pub const PROTOCOL_VERSION: &str = "1.0";
-pub const LOG_SCHEMA_VERSION: &str = "pi.ext.log.v1";
+pub const LOG_SCHEMA_VERSION: &str = pi_log_core::LOG_SCHEMA_VERSION;
 pub const COMPAT_LEDGER_SCHEMA_VERSION: &str = "pi.ext.compat_ledger.v1";
 pub const RUNTIME_RISK_LEDGER_SCHEMA_VERSION: &str = "pi.ext.runtime_risk_ledger.v1";
 pub const RUNTIME_RISK_REPLAY_SCHEMA_VERSION: &str = "pi.ext.runtime_risk_replay.v1";

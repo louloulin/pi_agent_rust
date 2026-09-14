@@ -2355,28 +2355,9 @@ fn validate_event_hook(payload: &EventHookPayload) -> Result<()> {
 }
 
 pub(super) fn validate_log(payload: &LogPayload) -> Result<()> {
-    if payload.schema != LOG_SCHEMA_VERSION {
-        return Err(Error::validation(format!(
-            "Unsupported log schema: {}",
-            payload.schema
-        )));
-    }
-    if payload.ts.trim().is_empty() {
-        return Err(Error::validation("Log timestamp is empty"));
-    }
-    if payload.event.trim().is_empty() {
-        return Err(Error::validation("Log event is empty"));
-    }
-    if payload.message.trim().is_empty() {
-        return Err(Error::validation("Log message is empty"));
-    }
-    if payload.correlation.extension_id.trim().is_empty() {
-        return Err(Error::validation("Log correlation extension_id is empty"));
-    }
-    if payload.correlation.scenario_id.trim().is_empty() {
-        return Err(Error::validation("Log correlation scenario_id is empty"));
-    }
-    Ok(())
+    pi_log_core::validate_log(payload)
+        .map_err(Error::validation)
+
 }
 
 fn validate_error(payload: &ErrorPayload) -> Result<()> {

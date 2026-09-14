@@ -8,6 +8,14 @@
 
 ---
 
+## Round 76 — `pi-log-core` ✅
+
+新增 `crates/pi-log-core`，承载结构化日志的纯数据契约：`LogPayload`、`LogCorrelation`、`LogSource`、`LogComponent`、`LogLevel`、`LogSink` trait、schema 常量与校验函数；`pi-coding-agent::extensions_api` 保留原模块路径并 re-export 类型，具体 tracing 输出仍留在 coding-agent。
+
+验证：当前环境未安装 `cargo`，无法执行真实 `cargo test/check`；已完成代码接线，待 Rust 工具链可用后验证。
+
+---
+
 ## Round 73 — `pi-queue-core` ✅
 
 新增 `crates/pi-queue-core`，承载 agent 消息队列的纯生产者/消费者核心：`QueuedAgentMessage`、`QueueMode`、`MessageQueue`、双队列限长、lossless handoff、job session 归属过滤、取消后的持久化身份清理。agent runtime、扩展注入队列和 UI 仍由 `pi-coding-agent` 管理。

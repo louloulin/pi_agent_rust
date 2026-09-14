@@ -59,7 +59,7 @@ pub mod extension_license;
 pub mod extension_popularity;
 pub mod extension_validation;
 pub mod file_lock;
-pub mod hostcall_egraph;
+pub mod hostcall_amac;
 pub mod hostcall_io_uring_lane;
 pub mod hostcall_queue;
 pub mod hostcall_rewrite;

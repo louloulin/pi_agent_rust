@@ -31,7 +31,8 @@ use pi_chord::hostcall_queue::{
     HOSTCALL_FAST_RING_CAPACITY, HOSTCALL_OVERFLOW_CAPACITY, HostcallQueueEnqueueResult,
     HostcallQueueTelemetry, HostcallRequestQueue, QueueTenant,
 };
-use pi_agent_core::scheduler::{Clock as SchedulerClock, HostcallOutcome, Scheduler, WallClock};
+use pi_protocol::{HostcallKind, HostcallRequest};
+pub use pi_protocol::{HostcallKind, HostcallRequest};
 use base64::Engine as _;
 use base64::engine::general_purpose::STANDARD as BASE64_STANDARD;
 use rquickjs::function::{Func, Opt};
@@ -172,40 +173,8 @@ fn compat_env_fallback_value(key: &str, env: &HashMap<String, String>) -> Option
 // Promise Bridge Types (bd-2ke)
 // ============================================================================
 
-/// Type of hostcall being requested from JavaScript.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum HostcallKind {
-    /// pi.tool(name, input) - invoke a tool
-    Tool { name: String },
-    /// pi.exec(cmd, args) - execute a shell command
-    Exec { cmd: String },
-    /// pi.http(request) - make an HTTP request
-    Http,
-    /// pi.session(op, args) - session operations
-    Session { op: String },
-    /// pi.ui(op, args) - UI operations
-    Ui { op: String },
-    /// pi.events(op, args) - event operations
-    Events { op: String },
-    /// pi.log(entry) - structured log emission
-    Log,
-}
-
-/// A hostcall request enqueued from JavaScript.
-#[derive(Debug, Clone)]
-pub struct HostcallRequest {
-    /// Unique identifier for correlation.
-    pub call_id: String,
-    /// Type of hostcall.
-    pub kind: HostcallKind,
-    /// JSON payload for the hostcall.
-    pub payload: serde_json::Value,
-    /// Trace ID for correlation with macrotask.
-    pub trace_id: u64,
-    /// Active extension id (when known) for policy/log correlation.
-    pub extension_id: Option<String>,
-}
-
+// HostcallKind and HostcallRequest live in pi-protocol; QueueTenant is the
+// coding-agent-owned queue integration for the runtime adapter.
 impl QueueTenant for HostcallRequest {
     fn tenant_key(&self) -> Option<&str> {
         self.extension_id.as_deref()

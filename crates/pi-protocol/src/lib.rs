@@ -13,5 +13,6 @@
 #![forbid(unsafe_code)]
 
 pub mod framing;
+pub mod hostcall;
 pub mod jsonrpc;
 pub mod tail;

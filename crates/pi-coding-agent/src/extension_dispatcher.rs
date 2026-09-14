@@ -31,7 +31,7 @@ use crate::extensions::{
     ui_response_value_for_op, validate_host_call,
 };
 use crate::extensions_js::{HostcallKind, HostcallRequest, PiJsRuntime, js_to_json, json_to_js};
-use crate::hostcall_amac::{AmacBatchExecutor, AmacBatchExecutorConfig};
+use pi_chord::hostcall_amac::{AmacBatchExecutor, AmacBatchExecutorConfig};
 use pi_chord::hostcall_io_uring_lane::{
     HostcallCapabilityClass, HostcallDispatchLane, HostcallIoHint, IoUringFallbackReason,
     IoUringLaneDecisionInput, IoUringLanePolicyConfig, decide_io_uring_lane,

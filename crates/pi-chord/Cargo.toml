@@ -41,8 +41,12 @@ chrono = { workspace = true }
 signal-hook = { workspace = true }
 # version.rs (Round 33) — semver compare + GitHub release parsing
 semver = { workspace = true }
-# turn_recovery.rs (Round 34) — classify StopReason into RecoveryClass
+# Round 34: `turn_recovery` re-housed in `pi-chord` (only depends on
+# `pi_ai::model::StopReason`, zero `crate::` self-deps).
 pi-ai = { workspace = true }
+# hostcall AMAC runtime adapter: planning is protocol-only; outcomes come from scheduler.
+pi-agent-core = { workspace = true }
+pi-protocol = { workspace = true }
 
 [dev-dependencies]
 serde_json = { workspace = true }

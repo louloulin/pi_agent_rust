@@ -119,7 +119,7 @@ pub mod worktree_iso;
 // Round 18: modules absorbed from pi-chord and pi-session-backends.
 pub mod compaction;
 pub mod compaction_worker;
-pub mod hostcall_amac;
+pub use pi_chord::hostcall_amac;
 pub mod http_shim;
 pub mod migrations;
 pub mod session;

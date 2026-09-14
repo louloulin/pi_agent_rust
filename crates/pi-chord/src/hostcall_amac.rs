@@ -11,12 +11,17 @@
 //! dispatch based on observed per-call timing telemetry as a proxy for LLC miss
 //! rates and stall cycles.
 
-use crate::extensions_js::HostcallKind;
-use crate::extensions_js::HostcallRequest;
 use pi_agent_core::scheduler::HostcallOutcome;
+use pi_protocol::{HostcallKind, HostcallRequest};
+use crate::hostcall_queue::QueueTenant;
 use serde::{Deserialize, Serialize};
 
-// ── Configuration constants ──────────────────────────────────────────────
+impl QueueTenant for HostcallRequest {
+    fn tenant_key(&self) -> Option<&str> {
+        self.extension_id.as_deref()
+    }
+}
+
 
 /// Minimum batch size to consider AMAC interleaving (below this, sequential
 /// dispatch has less overhead).

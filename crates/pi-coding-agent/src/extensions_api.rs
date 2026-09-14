@@ -24,9 +24,9 @@ pub use crate::extensions_js::{
     PiJsRuntimeConfig,
 };
 pub(crate) use crate::extensions_js::{js_to_json, json_to_js};
-use crate::hostcall_amac::AmacBatchExecutor;
+use pi_chord::hostcall_amac::AmacBatchExecutor;
 #[cfg(test)]
-use crate::hostcall_amac::AmacBatchExecutorConfig;
+use pi_chord::hostcall_amac::AmacBatchExecutorConfig;
 use pi_chord::hostcall_rewrite::{
     HostcallRewriteEngine, HostcallRewritePlan, HostcallRewritePlanKind,
 };
@@ -11082,7 +11082,7 @@ thread_local! {
 /// runtime pump (the thread-local executor was never initialized with
 /// any observations).
 #[must_use]
-pub fn amac_telemetry_snapshot() -> Option<crate::hostcall_amac::AmacStallTelemetrySnapshot> {
+pub fn amac_telemetry_snapshot() -> Option<pi_chord::hostcall_amac::AmacStallTelemetrySnapshot> {
     AMAC_EXECUTOR.with(|cell| {
         let executor = cell.borrow();
         let snap = executor.telemetry().snapshot();

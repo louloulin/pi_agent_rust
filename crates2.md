@@ -8,7 +8,17 @@
 
 ---
 
-## `Round 88` 进展
+## `Round 90` 进展
+
+**做了什么:**
+1. 新增 `crates/pi-perf-build-core`，承载无 runtime/UI/I/O 依赖的 `PerfMetric`、`PerfBudget`、`PerfConfig` 纯算法。
+2. workspace 注册该 crate；perf build 的证据采集与 agent runtime 仍留在 `pi-coding-agent`。
+3. 核心 crate 提供独立单元测试，覆盖指标命名、预算匹配和非法值拒绝。
+
+**验证:**
+- `cargo test -p pi-perf-build-core` ✅
+- `git diff --check` ✅
+
 
 **做了什么:**
 1. 新增 `crates/pi-enforcement-core`，承载无 runtime/UI 依赖的 `EnforcementState`、评分阈值、滞回状态机、策略合并和 `PolicyDecision` 纯算法。

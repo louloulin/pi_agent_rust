@@ -18,6 +18,7 @@ members = [
     "crates/pi-error",
     "crates/pi-evals",
     "crates/pi-enforcement-core",
+    "crates/pi-perf-build-core",
     "crates/pi-server",
     "crates/pi-session-backends",
     "crates/pi-protocol",
@@ -63,6 +64,7 @@ pi-server = { path = "crates/pi-server", version = "0.1.0" }
 pi-session-backends = { path = "crates/pi-session-backends", version = "0.1.0" }
 pi-evals = { path = "crates/pi-evals", version = "0.1.0" }
 pi-enforcement-core = { path = "crates/pi-enforcement-core", version = "0.1.0" }
+pi-perf-build-core = { path = "crates/pi-perf-build-core", version = "0.1.0" }
 # Phase-1 leaf crates removed (Round 17): inlined into the 11 Phase-2 packages.
 
 # Async runtime

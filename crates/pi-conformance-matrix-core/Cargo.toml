@@ -1,0 +1,16 @@
+[package]
+name = "pi-conformance-matrix-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Pure extension conformance matrix and assertion algorithms"
+license-file = "../../LICENSE"
+repository = "https://github.com/louloulin/pi_agent_rust"
+
+[dependencies]
+serde = { version = "1", features = ["derive", "rc"] }
+serde_json = { version = "1", features = ["raw_value"] }
+sha2 = "0.11"
+
+[dev-dependencies]
+proptest = "1.10.0"

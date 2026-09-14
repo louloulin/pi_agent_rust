@@ -1216,7 +1216,24 @@ Round 30 后(收尾)       : ~64%
 > 与 Multica issue `01a08d97` 绑定,分支 `feature/crates0911`
 > 参考:`legacy_pi_mono_code/pi/packages/*/src/`(earendil-works/pi 快照,2026-09-13)
 
-### Round 62 — `hostcall_amac.rs` 协议边界拆分 ✅
+### Round 66 — `pi-pijs-core` PiJS 协议核心拆分 ✅
+
+**做了什么:**
+1. 新增 `crates/pi-pijs-core`，承载无 QuickJS/宿主依赖的 `HostcallKind`、`HostcallRequest`、`ExtensionToolDef`。
+2. 将确定性时钟与事件循环协议（Promise 完成 macrotask、timer 排序、microtask drain 计数）实现为可独立测试的 `PiEventLoop` facade；QuickJS 集成与宿主 scheduler 仍留在 `pi-coding-agent`。
+3. `pi-coding-agent::extensions_js` 与 `pi-protocol::hostcall` 改为 re-export 核心类型，保持旧 API 路径兼容。
+4. 新增 3 个核心回归测试：hostcall completion 优先级、timer deadline/order、clear timeout 幂等性。
+
+**验证:**
+- `cargo test -p pi-pijs-core` ✅ 3 passed
+- `cargo check -p pi-protocol` ✅
+- `git diff --check` ✅
+- `cargo check -p pi-coding-agent --lib` 仍受该并行模块化分支既有 Windows/toolchain 错误阻塞（589 errors，包含 `pi_error` 依赖与 `windows_by_handle` 等；未定位到本轮新增错误）。
+
+**LOC 迁移:** 纯协议核心新增约 230 LOC；QuickJS 集成未迁移。
+
+**进度:** Round 66 完成；按当前路线图约 65%（本轮新增独立 `pi-pijs-core` 边界，未将 QuickJS/宿主代码计入迁移）。
+
 
 **做了什么:**
 1. 将 `HostcallKind` / `HostcallRequest` 迁入 `crates/pi-protocol/src/hostcall.rs`，由 `pi-coding-agent::extensions_js` re-export，保留旧 API facade。

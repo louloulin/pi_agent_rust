@@ -172,23 +172,12 @@ fn compat_env_fallback_value(key: &str, env: &HashMap<String, String>) -> Option
 // Promise Bridge Types (bd-2ke)
 // ============================================================================
 
-pub use pi_protocol::{HostcallKind, HostcallRequest};
+pub use pi_pijs_core::{ExtensionToolDef, HostcallKind, HostcallRequest};
 
 impl QueueTenant for HostcallRequest {
     fn tenant_key(&self) -> Option<&str> {
         self.extension_id.as_deref()
     }
-}
-
-/// Tool definition registered by a JS extension.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Debug, Clone, serde::Deserialize, PartialEq)]
-pub struct ExtensionToolDef {
-    pub name: String,
-    #[serde(default)]
-    pub label: Option<String>,
-    pub description: String,
-    pub parameters: serde_json::Value,
 }
 
 /// Delegates to the canonical streaming implementation in `extensions.rs`.

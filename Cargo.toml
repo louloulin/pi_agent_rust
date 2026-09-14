@@ -20,6 +20,7 @@ members = [
     "crates/pi-server",
     "crates/pi-session-backends",
     "crates/pi-protocol",
+    "crates/pi-pijs-core",
     "crates/pi-telemetry",
     "crates/pi-tui",
     "xtask",
@@ -56,6 +57,7 @@ pi-error = { path = "crates/pi-error", version = "0.1.0" }
 pi-tui = { path = "crates/pi-tui", version = "0.1.0" }
 pi-telemetry = { path = "crates/pi-telemetry", version = "0.1.0" }
 pi-protocol = { path = "crates/pi-protocol", version = "0.1.0" }
+pi-pijs-core = { path = "crates/pi-pijs-core", version = "0.1.0" }
 pi-chord = { path = "crates/pi-chord", version = "0.1.0" }
 pi-client = { path = "crates/pi-client", version = "0.1.0" }
 pi-server = { path = "crates/pi-server", version = "0.1.0" }

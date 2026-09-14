@@ -5692,8 +5692,10 @@ dependencies = [
  "dirs",
  "filetime",
  "futures",
+ "pi-agent-core",
  "pi-ai",
  "pi-error",
+ "pi-protocol",
  "proptest",
  "regex",
  "rustix",
@@ -5763,6 +5765,7 @@ dependencies = [
  "pi-ai",
  "pi-chord",
  "pi-evals",
+ "pi-pijs-core",
  "pi-protocol",
  "pi-session-backends",
  "pi-telemetry",
@@ -5851,10 +5854,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-pijs-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "pi-protocol"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "pi-pijs-core",
  "serde",
  "serde_json",
 ]

@@ -8,7 +8,15 @@
 
 ---
 
-## 0. 摘要
+## Round 73 — `pi-queue-core` ✅
+
+新增 `crates/pi-queue-core`，承载 agent 消息队列的纯生产者/消费者核心：`QueuedAgentMessage`、`QueueMode`、`MessageQueue`、双队列限长、lossless handoff、job session 归属过滤、取消后的持久化身份清理。agent runtime、扩展注入队列和 UI 仍由 `pi-coding-agent` 管理。
+
+验证：`cargo test -p pi-queue-core`（2 passed）。
+
+---
+
+
 
 | 维度 | 当前 | 目标(Round 30) |
 |------|------|-----------------|

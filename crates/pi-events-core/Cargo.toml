@@ -1,0 +1,13 @@
+[package]
+name = "pi-events-core"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Dependency-light event types, filtering, and subscription dispatch primitives for Pi"
+license = "MIT"
+
+[lib]
+name = "pi_events_core"
+path = "src/lib.rs"
+
+[dependencies]

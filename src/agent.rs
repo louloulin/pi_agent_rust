@@ -1485,6 +1485,32 @@ pub enum AgentEvent {
     },
 }
 
+impl pi_events_core::EventType for AgentEvent {
+    fn event_type(&self) -> &'static str {
+        match self {
+            Self::AgentStart { .. } => "agent_start",
+            Self::AgentEnd { .. } => "agent_end",
+            Self::TurnStart { .. } => "turn_start",
+            Self::TurnEnd { .. } => "turn_end",
+            Self::MessageStart { .. } => "message_start",
+            Self::MessageUpdate { .. } => "message_update",
+            Self::MessageEnd { .. } => "message_end",
+            Self::ToolExecutionStart { .. } => "tool_execution_start",
+            Self::ToolExecutionUpdate { .. } => "tool_execution_update",
+            Self::ToolExecutionEnd { .. } => "tool_execution_end",
+            Self::AutoCompactionStart { .. } => "auto_compaction_start",
+            Self::AutoCompactionEnd { .. } => "auto_compaction_end",
+            Self::AutoRetryStart { .. } => "auto_retry_start",
+            Self::AutoRetryEnd { .. } => "auto_retry_end",
+            Self::FailoverStart { .. } => "failover_start",
+            Self::FailoverEnd { .. } => "failover_end",
+            Self::AdvisorNote { .. } => "advisor_note",
+            Self::ProviderError { .. } => "provider_error",
+            Self::ExtensionError { .. } => "extension_error",
+        }
+    }
+}
+
 // ============================================================================
 // Agent
 // ============================================================================

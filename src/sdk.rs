@@ -28,12 +28,10 @@ use crate::providers;
 use clap::Parser;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::{Map, Value};
-use std::collections::HashMap;
 use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::{Path, PathBuf};
 use std::process::{Child, ChildStdin, ChildStdout, Command, Stdio};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU64, Ordering};
 
 pub use crate::agent::{
     AbortHandle, AbortSignal, Agent, AgentConfig, AgentEvent, AgentSession, QueueMode,
@@ -161,11 +159,7 @@ pub fn all_tool_definitions(cwd: &Path) -> Vec<ToolDefinition> {
 // ============================================================================
 
 /// Opaque identifier for an event subscription.
-///
-/// Returned by [`AgentSessionHandle::subscribe`] and used to remove the
-/// listener via [`AgentSessionHandle::unsubscribe`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SubscriptionId(u64);
+pub use pi_events_core::SubscriptionId;
 
 /// Callback invoked when a tool execution starts.
 ///
@@ -184,7 +178,6 @@ pub type OnToolEnd = Arc<dyn Fn(&str, &ToolOutput, bool) + Send + Sync>;
 pub type OnStreamEvent = Arc<dyn Fn(&StreamEvent) + Send + Sync>;
 
 pub type EventSubscriber = Arc<dyn Fn(AgentEvent) + Send + Sync>;
-type EventSubscribers = HashMap<SubscriptionId, EventSubscriber>;
 
 /// Collection of session-level event listeners.
 ///
@@ -193,8 +186,7 @@ type EventSubscribers = HashMap<SubscriptionId, EventSubscriber>;
 /// [`AgentSessionHandle::prompt`].
 #[derive(Clone, Default)]
 pub struct EventListeners {
-    next_id: Arc<AtomicU64>,
-    subscribers: Arc<std::sync::Mutex<EventSubscribers>>,
+    bus: pi_events_core::EventBus<AgentEvent>,
     pub on_tool_start: Option<OnToolStart>,
     pub on_tool_end: Option<OnToolEnd>,
     pub on_stream_event: Option<OnStreamEvent>,
@@ -203,8 +195,7 @@ pub struct EventListeners {
 impl EventListeners {
     fn new() -> Self {
         Self {
-            next_id: Arc::new(AtomicU64::new(1)),
-            subscribers: Arc::new(std::sync::Mutex::new(HashMap::new())),
+            bus: pi_events_core::EventBus::new(),
             on_tool_start: None,
             on_tool_end: None,
             on_stream_event: None,
@@ -213,36 +204,17 @@ impl EventListeners {
 
     /// Register a session-level event listener.
     pub fn subscribe(&self, listener: EventSubscriber) -> SubscriptionId {
-        let id = SubscriptionId(self.next_id.fetch_add(1, Ordering::Relaxed));
-        let mut subs = self
-            .subscribers
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        subs.insert(id, listener);
-        id
+        self.bus.subscribe(move |event| listener(event.clone()))
     }
 
     /// Remove a previously registered listener.
     pub fn unsubscribe(&self, id: SubscriptionId) -> bool {
-        let mut subs = self
-            .subscribers
-            .lock()
-            .unwrap_or_else(std::sync::PoisonError::into_inner);
-        subs.remove(&id).is_some()
+        self.bus.unsubscribe(id)
     }
 
     /// Dispatch an [`AgentEvent`] to all registered subscribers.
     pub fn notify(&self, event: &AgentEvent) {
-        let listeners: Vec<_> = {
-            let subs = self
-                .subscribers
-                .lock()
-                .unwrap_or_else(std::sync::PoisonError::into_inner);
-            subs.values().cloned().collect()
-        };
-        for listener in listeners {
-            listener(event.clone());
-        }
+        self.bus.publish(event);
     }
 
     /// Dispatch tool-start to the typed hook (if set).
@@ -269,11 +241,9 @@ impl EventListeners {
 
 impl std::fmt::Debug for EventListeners {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let count = self.subscribers.lock().map_or(0, |s| s.len());
-        let next_id = self.next_id.load(Ordering::Relaxed);
+        let count = self.bus.len();
         f.debug_struct("EventListeners")
             .field("subscriber_count", &count)
-            .field("next_id", &next_id)
             .field("has_on_tool_start", &self.on_tool_start.is_some())
             .field("has_on_tool_end", &self.on_tool_end.is_some())
             .field("has_on_stream_event", &self.on_stream_event.is_some())

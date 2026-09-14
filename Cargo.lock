@@ -5755,6 +5755,7 @@ dependencies = [
  "pi-agent-core",
  "pi-ai",
  "pi-chord",
+ "pi-diff-core",
  "pi-error",
  "pi-protocol",
  "pi-session-backends",
@@ -5793,6 +5794,15 @@ dependencies = [
  "uuid",
  "wasmtime",
  "xxhash-rust",
+]
+
+[[package]]
+name = "pi-diff-core"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "similar",
 ]
 
 [[package]]

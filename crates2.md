@@ -1296,3 +1296,8 @@ Round 30 后(收尾)       : ~64%
 **设计:** 将无状态的会话消息压缩逻辑放入 `pi-chord::btw_context`，模型、认证和 Provider 绑定仍保留在 `pi-coding-agent::btw`，通过 re-export 保持既有调用路径，避免引入反向依赖。
 
 **本轮变更:** 新增 `crates/pi-chord/src/btw_context.rs` 及其预算/工具调用回归测试；`pi-coding-agent::btw::build_context_summary` 改为 re-export；更新 `pi-chord` 依赖声明。
+
+
+### Round 74 — diff 纯算法 → pi-diff-core ✅
+
+新增 crates/pi-diff-core，承载 DiffHunk、unified diff parser、hunk merge 与纯文本 diff；pi-coding-agent 保留兼容包装及 commit/runtime。验证：cargo test -p pi-diff-core（2 passed）、cargo check -p pi-diff-core（通过）。pi-coding-agent 全量 check 受 Windows 基线 signal_hook iterator/SIGBUS 错误阻塞。

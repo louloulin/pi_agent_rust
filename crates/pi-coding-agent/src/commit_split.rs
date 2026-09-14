@@ -13,6 +13,17 @@ use serde::{Deserialize, Serialize};
 use pi_error::{Error, Result};
 use crate::memory::screen_secrets;
 
+pub use pi_diff_core::{merge_hunks, parse_unified_diff, unified_text_diff, DiffHunk};
+
+/// Compatibility wrapper for the pure diff parser.
+pub struct DiffParser;
+
+impl DiffParser {
+    pub fn parse_unified_diff(diff: &str) -> Result<Vec<DiffHunk>> {
+        Ok(parse_unified_diff(diff))
+    }
+}
+
 /// File category used for commit ordering priority and scoring.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum FileCategory {
@@ -93,18 +104,6 @@ pub fn is_lockfile(path: &str) -> bool {
         || lower.ends_with("bun.lockb")
         || lower.ends_with("composer.lock")
         || lower.ends_with("gemfile.lock")
-}
-
-/// A parsed unified diff hunk.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-pub struct DiffHunk {
-    pub file_path: String,
-    pub old_start: usize,
-    pub old_lines: usize,
-    pub new_start: usize,
-    pub new_lines: usize,
-    pub header: String,
-    pub content: String,
 }
 
 /// Atomic commit unit in a planned sequence.
@@ -192,110 +191,6 @@ impl ConflictScanner {
                 "Unresolved merge conflict marker detected in {file_name}:L{line_no}"
             )))
         })
-    }
-}
-
-/// Hunk header bounds: `(old_start, old_lines, new_start, new_lines)`.
-type HunkBounds = (usize, usize, usize, usize);
-
-/// Hunk parser for raw `git diff` output.
-pub struct DiffParser;
-
-impl DiffParser {
-    fn parse_diff_line<'a>(
-        line: &'a str,
-        current_file: &mut &'a str,
-    ) -> Option<(&'a str, HunkBounds)> {
-        if let Some(rest) = line.strip_prefix("diff --git ") {
-            if let Some(b_part) = rest.split_whitespace().nth(1) {
-                *current_file = b_part.trim_start_matches("b/");
-            }
-            None
-        } else if let Some(rest) = line.strip_prefix("+++ b/") {
-            *current_file = rest;
-            None
-        } else if line.starts_with("@@ ") {
-            let header_bounds = Self::parse_hunk_header(line);
-            Some((*current_file, header_bounds))
-        } else {
-            None
-        }
-    }
-
-    fn make_hunk(
-        file: &str,
-        old_start: usize,
-        old_lines: usize,
-        new_start: usize,
-        new_lines: usize,
-        header: &str,
-    ) -> DiffHunk {
-        DiffHunk {
-            file_path: file.to_string(),
-            old_start,
-            old_lines,
-            new_start,
-            new_lines,
-            header: header.to_string(),
-            content: String::new(),
-        }
-    }
-
-    /// Parse raw unified diff into structured hunks per file.
-    pub fn parse_unified_diff(diff: &str) -> Result<Vec<DiffHunk>> {
-        let mut hunks = Vec::new();
-        let mut current_file = "";
-
-        for line in diff.lines() {
-            if let Some((file, (old_start, old_lines, new_start, new_lines))) =
-                Self::parse_diff_line(line, &mut current_file)
-            {
-                hunks.push(Self::make_hunk(
-                    file, old_start, old_lines, new_start, new_lines, line,
-                ));
-            } else if let Some(last_hunk) = hunks.last_mut() {
-                if !last_hunk.content.is_empty() {
-                    last_hunk.content.push('\n');
-                }
-                last_hunk.content.push_str(line);
-            }
-        }
-
-        Ok(hunks)
-    }
-
-    fn parse_hunk_header(header: &str) -> HunkBounds {
-        let mut old_start = 1;
-        let mut old_lines = 1;
-        let mut new_start = 1;
-        let mut new_lines = 1;
-
-        if let Some(inside) = header
-            .strip_prefix("@@ -")
-            .and_then(|s| s.split(" @@").next())
-        {
-            let parts: Vec<&str> = inside.split(" +").collect();
-            if let Some(old_part) = parts.first() {
-                let sub: Vec<&str> = old_part.split(',').collect();
-                if let Some(s) = sub.first().and_then(|s| s.parse::<usize>().ok()) {
-                    old_start = s;
-                }
-                if let Some(l) = sub.get(1).and_then(|s| s.parse::<usize>().ok()) {
-                    old_lines = l;
-                }
-            }
-            if let Some(new_part) = parts.get(1) {
-                let sub: Vec<&str> = new_part.split(',').collect();
-                if let Some(s) = sub.first().and_then(|s| s.parse::<usize>().ok()) {
-                    new_start = s;
-                }
-                if let Some(l) = sub.get(1).and_then(|s| s.parse::<usize>().ok()) {
-                    new_lines = l;
-                }
-            }
-        }
-
-        (old_start, old_lines, new_start, new_lines)
     }
 }
 

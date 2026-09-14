@@ -12,8 +12,8 @@ members = [
     "crates/pi-ai",
     "crates/pi-agent-core",
     "crates/pi-mono",
+    "crates/pi-diff-core",
     "crates/pi-chord",
-    "crates/pi-client",
     "crates/pi-coding-agent",
     "crates/pi-error",
     "crates/pi-evals",
@@ -57,6 +57,7 @@ pi-tui = { path = "crates/pi-tui", version = "0.1.0" }
 pi-telemetry = { path = "crates/pi-telemetry", version = "0.1.0" }
 pi-protocol = { path = "crates/pi-protocol", version = "0.1.0" }
 pi-chord = { path = "crates/pi-chord", version = "0.1.0" }
+pi-diff-core = { path = "crates/pi-diff-core", version = "0.1.0" }
 pi-client = { path = "crates/pi-client", version = "0.1.0" }
 pi-server = { path = "crates/pi-server", version = "0.1.0" }
 pi-session-backends = { path = "crates/pi-session-backends", version = "0.1.0" }

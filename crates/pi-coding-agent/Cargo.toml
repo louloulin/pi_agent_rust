@@ -67,6 +67,8 @@ memchr = { workspace = true }
 pbkdf2 = { workspace = true }
 pdf-extract = { workspace = true }
 pi-ai = { workspace = true }
+# Provider implementations, HTTP client, and authentication remain in pi-coding-agent.
+pi-llm-core = { workspace = true }
 pi-agent-core = { workspace = true }
 # Round 27.1: re-house `buffer_shim.rs` (Node Buffer polyfill source) inside
 # `pi-chord`. Add the workspace dep so call sites can switch from

@@ -1291,3 +1291,18 @@ Round 30 后(收尾)       : ~64%
 **LOC 迁移:** 188 LOC(`pi-coding-agent/src/` → `pi-coding-agent/src/cli/`)。
 
 **Round 30 累计(本轮 + Round 30.1-30.4):** 1,339 LOC。`cli/` 现在持有 `Cli`(2849 LOC)+ `completions`(188 LOC)共 2 个文件。
+
+### Round 68 — LLM 核心协议边界 ✅
+
+**做了什么:**
+1. 新增 `crates/pi-llm-core`，仅依赖 `serde` / `serde_json`，承载 provider 无关的请求/响应 envelope、失败分类、重试策略和 `Retry-After` 解析。
+2. HTTP 客户端、认证和具体 provider 实现仍留在 `pi-coding-agent`；workspace 与 coding-agent 接入 `pi-llm-core`，不改变旧 facade 路径。
+3. `FailureKind` 提供统一 retryability 判定，`RetryPolicy` 提供有上限的指数退避并尊重服务端 hint，`classify_status` 统一 4xx/5xx 分类。
+
+**验证:**
+- `git diff --check`:✅
+- 当前运行环境未安装 cargo（`cargo: command not found`），因此无法执行 `cargo fmt` / `cargo test` / `cargo check`；需在 Rust 工具链环境补跑。
+
+**LOC 迁移/新增:** 约 135 LOC 核心纯逻辑；provider 主体未迁移，保持兼容 facade。
+
+**进度:** Round 68 完成；按 crates2.md 的 Phase-2 目标范围继续推进，不能宣称整体完成。

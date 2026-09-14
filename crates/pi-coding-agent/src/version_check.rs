@@ -2,7 +2,11 @@
 
 #![forbid(unsafe_code)]
 
-pub use pi_chord::check::*;
+pub use pi_chord::version::{
+    CURRENT_VERSION, HttpFetch, VersionCheckResult, check_cached, is_newer,
+    parse_github_release_version, read_cached_version, refresh_cache_if_stale,
+    write_cached_version,
+};
 
 use std::time::Duration;
 

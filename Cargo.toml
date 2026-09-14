@@ -203,6 +203,9 @@ name = "test_time"
 path = "examples/test_time.rs"
 
 [dependencies]
+# CLI parsing, validation, and help generation (kept behind the historical
+# `pi::cli` facade in `src/cli.rs`).
+pi-cli-core = { path = "crates/pi-cli-core" }
 # CLI
 clap = { version = "4.5.60", features = ["derive", "env", "string"] }
 clap_complete = "4.5.66"
@@ -491,7 +494,7 @@ tui = [
 # FrankenTUI migration stack (bd-cv653.9.1): default-OFF while the interactive
 # runtime is ported. Requires `tui` because the bridge reuses PiMsg and the
 # existing agent-event plumbing during coexistence.
-ftui = ["dep:ftui", "dep:ftui-extras", "tui"]
+ftui = ["dep:ftui", "dep:ftui-extras", "tui", "pi-cli-core/ftui"]
 image-resize = ["image"]
 clipboard = ["dep:arboard"]
 wasm-host = ["dep:wasmtime"]

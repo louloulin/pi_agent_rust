@@ -1,9 +1,9 @@
-//! CLI argument parsing using Clap.
+//! Backward-compatible facade for the extracted CLI core.
+//!
+//! The parsing model and command definitions live in `pi-cli-core`; this
+//! module intentionally keeps the historic `pi::cli::*` API stable.
 
-use clap::error::ErrorKind;
-use clap::{Parser, Subcommand};
-use std::collections::HashSet;
-use std::path::PathBuf;
+pub use pi_cli_core::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ExtensionCliFlag {

@@ -9,4 +9,5 @@
 
 pub mod advisor;
 pub mod flake_classifier;
+pub mod plan;
 pub mod scheduler;

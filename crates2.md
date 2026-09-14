@@ -8,9 +8,18 @@
 
 ---
 
-## 0. `Round 41` 进展
+## 0. `Round 42` 进展
 
 **做了什么:**
+1. 新增 `crates/pi-agent-core/src/plan.rs`，下沉 `PlanMode`/`PlanState` 状态机与 effects gate
+2. `pi-coding-agent/src/plan.rs` 保留 `SubmitPlanTool`，通过 re-export 维持旧 API 与调用路径
+3. `pi-agent-core` 新增 `pi-protocol` 依赖；状态机单元测试迁移到 core，避免 core 反向依赖 coding-agent
+
+**验证:**
+- `git diff --check` ✅
+- Rust 工具链当前不可用（环境中未发现 `cargo`/`rustc`），未能执行 cargo check/test
+
+
 1. 新增 `crates/pi-protocol/src/tool_effects.rs`，承载 read/write/append/network/process effects、labels、parallel-safety 与 barrier 规则
 2. `pi-coding-agent::tools` 改为 re-export 协议类型，保持所有既有 `ToolEffects` 调用路径与行为
 3. 新增协议单元测试覆盖 labels、barrier 与并发兼容性

@@ -32,6 +32,8 @@ sha2 = { workspace = true }
 url = { workspace = true }
 # extension_popularity.rs (Round 29.2) — Error/Result re-exports
 pi-error = { workspace = true }
+# workspace.rs (Round 52) — autocomplete root-provider trait seam
+pi-tui = { workspace = true }
 # extension_popularity.rs (Round 29.2) — BoxFuture for the NpmHttpGet trait seam
 futures = { workspace = true }
 # skills_managed.rs (Round 30.4) — managed skill dir resolution

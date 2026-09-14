@@ -79,11 +79,35 @@ fn now_ms() -> i64 {
         .map_or(0, |d| i64::try_from(d.as_millis()).unwrap_or(i64::MAX))
 }
 
+/// Credential lookup seam used by usage assembly.
+pub trait AuthProvider: Send + Sync {
+    fn resolve_api_key(&self, provider: &str) -> Option<String>;
+}
+
+impl AuthProvider for AuthStorage {
+    fn resolve_api_key(&self, provider: &str) -> Option<String> {
+        AuthStorage::resolve_api_key(self, provider, None)
+    }
+}
+
+/// Minimal JSON HTTP seam used by quota readers.
+#[async_trait::async_trait]
+pub trait HttpClient: Send + Sync {
+    async fn get_json(&self, url: &str, headers: &[(&str, &str)]) -> Result<serde_json::Value>;
+}
+
+#[async_trait::async_trait]
+impl HttpClient for Client {
+    async fn get_json(&self, url: &str, headers: &[(&str, &str)]) -> Result<serde_json::Value> {
+        client_get_json(self, url, headers).await
+    }
+}
+
 /// A single provider's quota endpoint reader.
 #[async_trait::async_trait]
 pub trait UsageReader: Send + Sync {
     fn provider(&self) -> &'static str;
-    async fn fetch(&self, client: &Client) -> Result<ProviderUsage>;
+    async fn fetch(&self, client: &dyn HttpClient) -> Result<ProviderUsage>;
 }
 
 // ── OpenRouter ──────────────────────────────────────────────────────
@@ -112,10 +136,9 @@ impl UsageReader for OpenRouterUsageReader {
         "openrouter"
     }
 
-    async fn fetch(&self, client: &Client) -> Result<ProviderUsage> {
+    async fn fetch(&self, client: &dyn HttpClient) -> Result<ProviderUsage> {
         let url = format!("{}/api/v1/credits", self.base_url.trim_end_matches('/'));
-        let body = get_json(
-            client,
+        let body = client.get_json(
             &url,
             &[("Authorization", &format!("Bearer {}", self.api_key))],
         )
@@ -168,13 +191,12 @@ impl UsageReader for MoonshotUsageReader {
         "moonshotai"
     }
 
-    async fn fetch(&self, client: &Client) -> Result<ProviderUsage> {
+    async fn fetch(&self, client: &dyn HttpClient) -> Result<ProviderUsage> {
         let url = format!(
             "{}/v1/users/me/balance",
             self.base_url.trim_end_matches('/')
         );
-        let body = get_json(
-            client,
+        let body = client.get_json(
             &url,
             &[("Authorization", &format!("Bearer {}", self.api_key))],
         )
@@ -237,13 +259,12 @@ impl UsageReader for CopilotUsageReader {
         "github-copilot"
     }
 
-    async fn fetch(&self, client: &Client) -> Result<ProviderUsage> {
+    async fn fetch(&self, client: &dyn HttpClient) -> Result<ProviderUsage> {
         let url = format!(
             "{}/copilot_internal/v2/token",
             self.base_url.trim_end_matches('/')
         );
-        let body = get_json(
-            client,
+        let body = client.get_json(
             &url,
             &[
                 ("Authorization", &format!("token {}", self.github_token)), // ubs:ignore outbound auth header, local credential
@@ -272,7 +293,7 @@ impl UsageReader for CopilotUsageReader {
     }
 }
 
-async fn get_json(
+async fn client_get_json(
     client: &Client,
     url: &str,
     headers: &[(&str, &str)],
@@ -314,21 +335,21 @@ pub type ConfiguredReaders = (Vec<Box<dyn UsageReader>>, Vec<(String, String)>);
 /// Build readers for every provider with resolvable credentials, plus
 /// documented-unavailable rows for known no-endpoint providers.
 #[must_use]
-pub fn readers_from_auth(auth: &AuthStorage) -> ConfiguredReaders {
+pub fn readers_from_auth(auth: &impl AuthProvider) -> ConfiguredReaders {
     let mut readers: Vec<Box<dyn UsageReader>> = Vec::new();
     let mut unavailable: Vec<(String, String)> = Vec::new();
 
-    if let Some(key) = auth.resolve_api_key("openrouter", None) {
+    if let Some(key) = auth.resolve_api_key("openrouter") {
         readers.push(Box::new(OpenRouterUsageReader::new(key)));
     }
-    if let Some(key) = auth.resolve_api_key("moonshotai", None) {
+    if let Some(key) = auth.resolve_api_key("moonshotai") {
         readers.push(Box::new(MoonshotUsageReader::new(key)));
     }
-    if let Some(token) = auth.resolve_api_key("github-copilot", None) {
+    if let Some(token) = auth.resolve_api_key("github-copilot") {
         readers.push(Box::new(CopilotUsageReader::new(token)));
     }
     for (provider, reason) in NO_ENDPOINT_REASON {
-        if auth.resolve_api_key(provider, None).is_some() {
+        if auth.resolve_api_key(provider).is_some() {
             unavailable.push(((*provider).to_string(), (*reason).to_string()));
         }
     }

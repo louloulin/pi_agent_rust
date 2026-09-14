@@ -8,9 +8,24 @@
 
 ---
 
-## 0. `Round 43` 进展
+## 0. `Round 44` 进展
 
 **做了什么:**
+1. 在 `crates/pi-coding-agent/src/usage.rs`（602 LOC）新增 `AuthProvider` trait，隔离 `AuthStorage` credential resolution
+2. 新增 `HttpClient` trait，quota readers 只依赖 JSON GET seam；现有 `Client` 作为 production adapter
+3. `UsageReader::fetch` 改为接收 `&dyn HttpClient`，OpenRouter/Moonshot/Copilot 读取逻辑与测试行为保持不变
+4. `readers_from_auth` 改为泛型 `AuthProvider`，为后续迁移到独立 crate 消除 auth/http 反向依赖
+
+**验证:**
+- `which cargo`：未找到
+- `cargo --version`：`cargo: command not found`
+- `rustc --version`：`rustc: command not found`
+- `compile_skipped: cargo/rustc not found in current runtime; multica runtime list has no available Rust-enabled runtime to switch into`
+- `git diff --check` ✅
+
+**推送前状态:** 已先执行 `git push`；失败原因：当前本地分支 upstream 名称不一致，Git 提示应使用 `git push origin HEAD:agent/winpi/3c60b22a5547-1789306200`。随后将按该同 base 远端分支显式推送。
+
+
 1. 将 `crates/pi-coding-agent/src/agent_cx.rs`（246 LOC）迁移至 `crates/pi-agent-core/src/agent_cx.rs`
 2. `pi-agent-core` 新增 `asupersync` 依赖并导出 `agent_cx`
 3. `pi-coding-agent` 通过 `pub use pi_agent_core::agent_cx` 保留 `crate::agent_cx` 与公开调用路径兼容

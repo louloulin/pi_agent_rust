@@ -5451,6 +5451,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "pi-current-time-core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde_json",
+]
+
+[[package]]
 name = "pi_agent_rust"
 version = "0.4.0"
 dependencies = [
@@ -5500,6 +5508,7 @@ dependencies = [
  "memchr",
  "pbkdf2",
  "pdf-extract",
+ "pi-current-time-core",
  "portable-pty",
  "pprof",
  "pretty_assertions",

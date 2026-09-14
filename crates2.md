@@ -1,4 +1,16 @@
-# pi.rs 模块化复刻详细差距分析 (crates2.md)
+## `Round 74` 进展：theme 纯逻辑核心拆分
+
+**做了什么:**
+1. 新增 `crates/pi-theme-core`，承载 `ThemeColors`、`SyntaxColors`、`UiColors` 数据模型、六位十六进制颜色解析/校验，以及被动的 `COLORFGBG` 终端背景检测。
+2. `pi-coding-agent::theme` 保留主题 JSON 文件读取、目录发现、内置主题和 lipgloss/glamour TUI 适配；纯逻辑类型与函数改为从 `pi-theme-core` re-export，保持历史模块路径。
+3. 将 `pi-theme-core` 注册到 workspace，并由 `pi-coding-agent` 引用，确保核心 crate 不依赖 TUI 或文件系统。
+
+**验证:**
+- `cargo fmt --all -- --check`：环境未安装 `cargo`，无法执行。
+- `git diff --check`：待执行。
+
+**LOC 迁移:** 新增 `pi-theme-core` 纯逻辑核心；coding-agent 继续保留 UI/文件适配层。
+
 
 > 本文档是 `crates1.md` v1.2 + Round 23 差距分析的续篇,**逐文件**对比
 > 上游 `legacy_pi_mono_code/pi/`(= `https://github.com/earendil-works/pi.git` 快照,

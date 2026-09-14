@@ -22,6 +22,7 @@ members = [
     "crates/pi-protocol",
     "crates/pi-telemetry",
     "crates/pi-tui",
+    "crates/pi-theme-core",
     "xtask",
 ]
 # Exclude the workspace_smoke integration test's own target directory.
@@ -54,6 +55,7 @@ pi-agent-core = { path = "crates/pi-agent-core", version = "0.1.0" }
 pi-coding-agent = { path = "crates/pi-coding-agent", version = "0.1.0" }
 pi-error = { path = "crates/pi-error", version = "0.1.0" }
 pi-tui = { path = "crates/pi-tui", version = "0.1.0" }
+pi-theme-core = { path = "crates/pi-theme-core", version = "0.1.0" }
 pi-telemetry = { path = "crates/pi-telemetry", version = "0.1.0" }
 pi-protocol = { path = "crates/pi-protocol", version = "0.1.0" }
 pi-chord = { path = "crates/pi-chord", version = "0.1.0" }

@@ -6,11 +6,12 @@
 
 use crate::config::Config;
 use pi_error::{Error, Result};
+use serde::{Deserialize, Serialize};
 #[cfg(feature = "tui")]
 use glamour::{Style as GlamourStyle, StyleConfig as GlamourStyleConfig};
 #[cfg(feature = "tui")]
 use lipgloss::Style as LipglossStyle;
-use serde::{Deserialize, Serialize};
+use pi_theme_core::{SyntaxColors, ThemeColors, UiColors};
 use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
@@ -85,84 +86,11 @@ pub struct Theme {
     pub ui: UiColors,
 }
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct ThemeColors {
-    pub foreground: String,
-    pub background: String,
-    pub accent: String,
-    pub success: String,
-    pub warning: String,
-    pub error: String,
-    pub muted: String,
-}
+pub use pi_theme_core::{
+    classify_colorfgbg, detect_terminal_background, parse_hex_color, TerminalBackground,
+};
+pub use pi_theme_core::{SyntaxColors, ThemeColors, UiColors};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct SyntaxColors {
-    pub keyword: String,
-    pub string: String,
-    pub number: String,
-    pub comment: String,
-    pub function: String,
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct UiColors {
-    pub border: String,
-    pub selection: String,
-    pub cursor: String,
-}
-
-/// Terminal background classification used for theme auto-detection.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum TerminalBackground {
-    Dark,
-    Light,
-}
-
-/// Classify a `COLORFGBG` value into a terminal background.
-///
-/// `COLORFGBG` is a passive environment hint set by some terminals
-/// (rxvt, konsole, and others) with the format `"<fg>;<bg>"` or
-/// `"<fg>;default;<bg>"`. The last segment is the background color
-/// index: values below 8 are dark colors, 8 and above are light.
-///
-/// Mirrors original Pi's `detectTerminalBackground()`: missing or
-/// unparseable values default to dark.
-#[must_use]
-pub fn classify_colorfgbg(value: Option<&str>) -> TerminalBackground {
-    let Some(value) = value else {
-        return TerminalBackground::Dark;
-    };
-    let value = value.trim();
-    if value.is_empty() {
-        return TerminalBackground::Dark;
-    }
-    let mut parts = value.split(';');
-    let (Some(_fg), Some(second)) = (parts.next(), parts.next()) else {
-        return TerminalBackground::Dark;
-    };
-    // "fg;default;bg" form: the background index is the last segment.
-    let bg = parts.next_back().unwrap_or(second);
-    bg.trim()
-        .parse::<u32>()
-        .map_or(TerminalBackground::Dark, |index| {
-            if index < 8 {
-                TerminalBackground::Dark
-            } else {
-                TerminalBackground::Light
-            }
-        })
-}
-
-/// Detect the terminal background from the `COLORFGBG` environment variable.
-///
-/// This is intentionally passive (no OSC/tty queries, which can hang or
-/// raise SIGTTIN in background processes). Defaults to dark when the
-/// variable is missing or unparseable.
-#[must_use]
-pub fn detect_terminal_background() -> TerminalBackground {
-    classify_colorfgbg(std::env::var("COLORFGBG").ok().as_deref())
-}
 
 /// Explicit roots for theme discovery.
 #[derive(Debug, Clone)]
@@ -556,39 +484,24 @@ impl Theme {
             return Err(Error::validation("Theme version is empty"));
         }
 
-        Self::validate_color("colors.foreground", &self.colors.foreground)?;
-        Self::validate_color("colors.background", &self.colors.background)?;
-        Self::validate_color("colors.accent", &self.colors.accent)?;
-        Self::validate_color("colors.success", &self.colors.success)?;
-        Self::validate_color("colors.warning", &self.colors.warning)?;
-        Self::validate_color("colors.error", &self.colors.error)?;
-        Self::validate_color("colors.muted", &self.colors.muted)?;
+        pi_theme_core::validate_color("colors.foreground", &self.colors.foreground)?;
+        pi_theme_core::validate_color("colors.background", &self.colors.background)?;
+        pi_theme_core::validate_color("colors.accent", &self.colors.accent)?;
+        pi_theme_core::validate_color("colors.success", &self.colors.success)?;
+        pi_theme_core::validate_color("colors.warning", &self.colors.warning)?;
+        pi_theme_core::validate_color("colors.error", &self.colors.error)?;
+        pi_theme_core::validate_color("colors.muted", &self.colors.muted)?;
 
-        Self::validate_color("syntax.keyword", &self.syntax.keyword)?;
-        Self::validate_color("syntax.string", &self.syntax.string)?;
-        Self::validate_color("syntax.number", &self.syntax.number)?;
-        Self::validate_color("syntax.comment", &self.syntax.comment)?;
-        Self::validate_color("syntax.function", &self.syntax.function)?;
+        pi_theme_core::validate_color("syntax.keyword", &self.syntax.keyword)?;
+        pi_theme_core::validate_color("syntax.string", &self.syntax.string)?;
+        pi_theme_core::validate_color("syntax.number", &self.syntax.number)?;
+        pi_theme_core::validate_color("syntax.comment", &self.syntax.comment)?;
+        pi_theme_core::validate_color("syntax.function", &self.syntax.function)?;
 
-        Self::validate_color("ui.border", &self.ui.border)?;
-        Self::validate_color("ui.selection", &self.ui.selection)?;
-        Self::validate_color("ui.cursor", &self.ui.cursor)?;
+        pi_theme_core::validate_color("ui.border", &self.ui.border)?;
+        pi_theme_core::validate_color("ui.selection", &self.ui.selection)?;
+        pi_theme_core::validate_color("ui.cursor", &self.ui.cursor)?;
 
-        Ok(())
-    }
-
-    fn validate_color(field: &str, value: &str) -> Result<()> {
-        let value = value.trim();
-        if !value.starts_with('#') || value.len() != 7 {
-            return Err(Error::validation(format!(
-                "Invalid color for {field}: {value}"
-            )));
-        }
-        if !value[1..].chars().all(|c| c.is_ascii_hexdigit()) {
-            return Err(Error::validation(format!(
-                "Invalid color for {field}: {value}"
-            )));
-        }
         Ok(())
     }
 }
@@ -665,18 +578,6 @@ fn resolve_theme_path(spec: &str, cwd: &Path) -> PathBuf {
     }
 }
 
-pub(crate) fn parse_hex_color(value: &str) -> Option<(u8, u8, u8)> {
-    let value = value.trim();
-    let hex = value.strip_prefix('#')?;
-    if hex.len() != 6 || !hex.is_ascii() {
-        return None;
-    }
-
-    let r = u8::from_str_radix(&hex[0..2], 16).ok()?;
-    let g = u8::from_str_radix(&hex[2..4], 16).ok()?;
-    let b = u8::from_str_radix(&hex[4..6], 16).ok()?;
-    Some((r, g, b))
-}
 
 #[cfg(test)]
 mod tests {
@@ -1056,24 +957,24 @@ mod tests {
 
     #[test]
     fn validate_color_valid() {
-        assert!(Theme::validate_color("test", "#000000").is_ok());
-        assert!(Theme::validate_color("test", "#ffffff").is_ok());
-        assert!(Theme::validate_color("test", "#AbCdEf").is_ok());
+        assert!(pi_theme_core::validate_color("test", "#000000").is_ok());
+        assert!(pi_theme_core::validate_color("test", "#ffffff").is_ok());
+        assert!(pi_theme_core::validate_color("test", "#AbCdEf").is_ok());
     }
 
     #[test]
     fn validate_color_invalid_no_hash() {
-        assert!(Theme::validate_color("test", "000000").is_err());
+        assert!(pi_theme_core::validate_color("test", "000000").is_err());
     }
 
     #[test]
     fn validate_color_invalid_too_short() {
-        assert!(Theme::validate_color("test", "#123").is_err());
+        assert!(pi_theme_core::validate_color("test", "#123").is_err());
     }
 
     #[test]
     fn validate_color_invalid_chars() {
-        assert!(Theme::validate_color("test", "#ZZZZZZ").is_err());
+        assert!(pi_theme_core::validate_color("test", "#ZZZZZZ").is_err());
     }
 
     // ── validate ─────────────────────────────────────────────────────

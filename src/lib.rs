@@ -110,6 +110,10 @@ pub mod btw;
 pub mod buffer_shim;
 pub mod checkpoint;
 #[doc(hidden)]
+pub mod chat_input;
+#[doc(hidden)]
+pub mod chat_input_ftui;
+#[doc(hidden)]
 pub mod cli;
 pub mod commit_split;
 #[doc(hidden)]
